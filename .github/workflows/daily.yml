@@ -1,0 +1,23 @@
+name: Daily rate post
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # 02:00 UTC = 09:00 Vietnam (UTC+7). GitHub may delay cron by several minutes.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m bot daily
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
