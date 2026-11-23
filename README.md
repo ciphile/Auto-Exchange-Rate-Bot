@@ -1,55 +1,69 @@
 # Auto-Exchange-Rate-Bot
 
-Telegram bot that posts the **SGD → VND** rate every morning and answers rate
-questions in the group, so nobody has to paste Wise / VCB screenshots by hand.
+Telegram bot cho nhóm làm remote ở VN, nhận lương SGD qua Wise rồi đổi sang VND.
+Bot đăng bản tin tỉ giá mỗi sáng, **báo khi tỉ giá cắt các mốc nhóm hay than** (20,000 / 20,100…),
+và trả lời lệnh trong group. Lời bình do Claude viết theo giọng Abe; **mọi con số do code tính**.
 
-Sources (no API keys needed):
+## Nguồn tỉ giá (không cần API key)
 
-| Source | What | Notes |
+| Nguồn | Là gì | Ghi chú |
 | --- | --- | --- |
-| [open.er-api.com](https://www.exchangerate-api.com/docs/free) | mid-market rate (≈ Wise before fees) | updated once a day |
-| Vietcombank XML | live VCB cash-buy / transfer-buy / sell | VCB asks for ≤ 1 request per 5 min |
-| Vietcombank JSON | VCB's end-of-day rate for a past date | used for the "▲/▼ vs yesterday" arrows |
+| Wise | tỉ giá **mid-market** SGD→VND (Wise không có giá mua/bán riêng; phí tính thêm khi chuyển) | endpoint công khai của wise.com, theo giờ; **không chính thức**, có thể đổi. Dự phòng: open.er-api.com (1 lần/ngày) |
+| VCB | giá **NH mua** (tiền mặt, chuyển khoản) và **NH bán** | XML công khai của VCB, ≤ 1 request / 5 phút |
+| VPBank | như VCB | JSON công khai trên vpbank.com.vn, lấy bản cập nhật mới nhất trong ngày |
+| Chợ đen | **ước tính** = Wise × (1 + chênh lệch) | không có API. Mặc định +0.4%; mỗi lần ai đó gõ `/doi 20100` bot học lại chênh lệch từ các lần đổi thật |
 
-DBS, PayNow and black-market rates have no public API, so they are not included.
-To add a source, write a fetcher in `bot/sources.py` and show it in `bot/messages.py`.
+"NH mua" = ngân hàng mua SGD của mình = số mình nhận được khi bán SGD. CK = chuyển khoản, TM = tiền mặt.
 
-## Chat commands
+## Cảnh báo mốc giá
 
-- `/rate` – today's summary
-- `/vcb` – VCB board for SGD
-- `/convert 10000` – SGD → VND (mid-market and VCB)
-- `/convert 200000000 vnd` – VND → SGD; amounts accept `10,000`, `10.000`, `10k`, `200tr`
+- Mốc mặc định: 19,900 · 19,950 · **20,000** · **20,100** · 20,200 · 20,300 (sửa bằng biến `BOT_LEVELS`, vd `19900,20000,20100`).
+- Chạy mỗi giờ. Chỉ báo khi **vừa cắt** một mốc, có đệm ±10 VND để không báo liên tục khi giá lởn vởn sát mốc.
+- Không báo từ 22:00 đến 07:00 (giờ VN), tối đa 4 tin/ngày, 2 mốc thường cách nhau ≥ 2 giờ (mốc 20,000 / 20,100 thì bỏ qua cooldown).
+  Tin bị hoãn vẫn được báo sau nếu giá còn nằm bên kia mốc.
 
-## Setup
+## Lệnh trong group
 
-1. Create a bot with [@BotFather](https://t.me/BotFather), add it to the group, and
-   turn **Group Privacy** off (BotFather → Bot Settings) so it can see `/commands`.
-2. Find the group's chat id (a negative number): send a message in the group, then open
-   `https://api.telegram.org/bot<TOKEN>/getUpdates` and read `message.chat.id`.
-3. In the GitHub repo: **Settings → Secrets and variables → Actions**, add
-   `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID`.
-4. Run **Actions → Daily rate post → Run workflow** once to check it posts.
+- `/rate` – Wise, chợ đen ước tính, VCB, VPBank
+- `/bank` – giá VCB và VPBank
+- `/convert 10000` (SGD→VND) · `/convert 200tr vnd` (VND→SGD); nhận `10,000`, `10.000`, `10k`, `200tr`
+- `/doi 20100` – báo giá chợ đen vừa đổi được
 
-The bot only answers in the configured chat and ignores commands older than 30 minutes.
+## Cài đặt
 
-## Schedules and limits
+1. Tạo bot với [@BotFather](https://t.me/BotFather) và thêm vào group.
+   **Có thể để Group Privacy BẬT** (bot không đọc chat thường). Lệnh vẫn chạy khi gõ từ menu gợi ý của Telegram
+   (nó tự thêm `@tên_bot`). Chỉ tắt Group Privacy nếu muốn gõ `/rate` trần; tắt xong phải xoá và thêm lại bot.
+2. Lấy chat id của group (số âm): gửi 1 tin trong group rồi mở
+   `https://api.telegram.org/bot<TOKEN>/getUpdates`, đọc `message.chat.id`. Group nâng cấp lên supergroup thì chat id đổi.
+3. GitHub repo → **Settings → Secrets and variables → Actions**, thêm:
+   - `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
+   - `ANTHROPIC_API_KEY` (không bắt buộc; thiếu thì bot dùng câu mẫu cố định)
+   - Biến (Variables) `ANTHROPIC_MODEL` nếu muốn đổi model (mặc định `claude-opus-5-5`; `claude-haiku-5-5` rẻ hơn nhiều).
+4. Chạy thử từng workflow bằng **Run workflow**: *Morning rate post*, *Rate alerts*.
 
-- **Daily post**: 02:00 UTC (09:00 Vietnam). Edit the cron in `.github/workflows/daily.yml`.
-- **Commands**: polled every 5 minutes (GitHub's minimum), so replies can take a few
-  minutes and cron runs are best-effort. For instant replies, run `python -m bot poll`
-  in a loop on any always-on machine, or move to a webhook host.
-- Polling costs ~8,600 runner-minutes/month. That is free on a public repo but exceeds
-  the 2,000 free minutes of a private one; use a public repo, or drop the poll workflow
-  and keep only the daily post.
-- `getUpdates` doesn't work while a webhook is set on the bot.
+Bot là **bot** (Telegram luôn gắn nhãn BOT). Nên đặt tên bot rõ ràng và báo trước cho cả nhóm.
 
-## Local use
+## Cách hoạt động
 
-Python 3.10+, no dependencies.
+- `daily` (09:10 giờ VN), `check` (mỗi giờ) và `poll` (mỗi 5 phút) là 3 workflow riêng.
+- Trạng thái (mốc hiện tại, số tin đã gửi, các lần `/doi`, vài tin gần nhất để không lặp) lưu trong
+  `state.json` trên nhánh `bot-state` (`scripts/state.sh`), nên không cần database. Hai workflow ghi cùng lúc hiếm khi mất 1 bản cập nhật.
+- Lời bình: Claude nhận số liệu + ~15 câu mẫu của Abe (`bot/style_examples.txt`, đã bỏ tên/số điện thoại).
+  Kết quả bị loại (và thay bằng câu mẫu) nếu nhắc con số không phải mốc, có link, quá dài, bị từ chối hoặc API lỗi.
+- Lệnh được **poll mỗi 5 phút** (mức nhỏ nhất của GitHub cron) nên trả lời có thể trễ vài phút. Cần trả lời tức thì thì chạy
+  `python -m bot poll` trong vòng lặp trên máy luôn bật.
+- Poll tốn ~8,600 phút runner/tháng: miễn phí với repo public, vượt hạn mức 2,000 phút của repo private
+  (khi đó bỏ workflow `poll`, hoặc giảm tần suất).
+- `getUpdates` không dùng được khi bot đã đặt webhook.
+
+## Chạy local
+
+Python 3.10+. Chỉ cần `pip install -r requirements.txt` nếu muốn gọi Claude.
 
 ```sh
-python -m bot preview          # print the daily message, nothing is sent
+python -m bot preview                       # in bản tin sáng, không gửi gì
+BOT_STATE_FILE=/tmp/s.json python -m bot check --dry-run
+ANTHROPIC_API_KEY=... python -m bot preview # xem Claude viết gì
 python -m unittest discover -s tests -t .
-TELEGRAM_BOT_TOKEN=... TELEGRAM_CHAT_ID=... python -m bot daily
 ```

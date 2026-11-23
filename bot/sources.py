@@ -7,14 +7,18 @@ import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from datetime import date
 
 USER_AGENT = "Mozilla/5.0 (compatible; auto-exchange-rate-bot)"
 TIMEOUT = 20
 
 MID_MARKET_URL = "https://open.er-api.com/v6/latest/{base}"
 VCB_LIVE_URL = "https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx?b=10"
-VCB_DAY_URL = "https://www.vietcombank.com.vn/api/exchangerates?date={day}"
+VPBANK_URL = "https://www.vpbank.com.vn/uiux-api/api/exchange-rate"
+WISE_LIVE_URL = "https://wise.com/rates/live?source={base}&target={quote}"
+WISE_HISTORY_URL = (
+    "https://wise.com/rates/history+live?source={base}&target={quote}"
+    "&length={days}&resolution=hourly&unit=day"
+)
 
 
 class SourceError(Exception):
@@ -22,13 +26,18 @@ class SourceError(Exception):
 
 
 @dataclass(frozen=True)
-class VcbRate:
-    """VCB quotes in VND per 1 unit of foreign currency. None = not quoted."""
+class BankRate:
+    """A bank's quote in VND per 1 unit of foreign currency. None = not quoted.
 
+    'buy' is the bank BUYING your foreign currency, i.e. what you receive when you
+    sell SGD to the bank. 'sell' is the bank selling SGD to you.
+    """
+
+    bank: str
     currency: str
-    cash_buy: float | None  # VCB buys your foreign cash (what you get for cash)
-    transfer_buy: float | None  # VCB buys via bank transfer
-    sell: float | None  # VCB sells foreign currency to you
+    cash_buy: float | None
+    transfer_buy: float | None
+    sell: float | None
 
 
 def _get(url: str) -> bytes:
@@ -74,14 +83,15 @@ def fetch_mid_market(base: str = "SGD", quote: str = "VND") -> float:
 # --- Vietcombank -------------------------------------------------------------
 
 
-def parse_vcb_xml(payload: bytes, currency: str) -> VcbRate:
+def parse_vcb_xml(payload: bytes, currency: str) -> BankRate:
     try:
         root = ET.fromstring(payload)
     except ET.ParseError as exc:
         raise SourceError(f"bad VCB XML: {exc}") from exc
     for node in root.iter("Exrate"):
         if node.get("CurrencyCode") == currency:
-            return VcbRate(
+            return BankRate(
+                "VCB",
                 currency,
                 _num(node.get("Buy")),
                 _num(node.get("Transfer")),
@@ -90,27 +100,61 @@ def parse_vcb_xml(payload: bytes, currency: str) -> VcbRate:
     raise SourceError(f"{currency} not found in VCB XML")
 
 
-def parse_vcb_json(payload: bytes, currency: str) -> VcbRate:
-    try:
-        data = json.loads(payload)
-        for row in data["Data"]:
-            if row.get("currencyCode") == currency:
-                return VcbRate(
-                    currency,
-                    _num(row.get("cash")),
-                    _num(row.get("transfer")),
-                    _num(row.get("sell")),
-                )
-    except (ValueError, KeyError, TypeError) as exc:
-        raise SourceError(f"bad VCB JSON: {exc}") from exc
-    raise SourceError(f"{currency} not found in VCB JSON")
-
-
-def fetch_vcb_live(currency: str = "SGD") -> VcbRate:
+def fetch_vcb_live(currency: str = "SGD") -> BankRate:
     """Current VCB board rate. VCB asks for at most one request per 5 minutes."""
     return parse_vcb_xml(_get(VCB_LIVE_URL), currency)
 
 
-def fetch_vcb_day(day: date, currency: str = "SGD") -> VcbRate:
-    """VCB's published rate for a past day (used for the 'vs yesterday' delta)."""
-    return parse_vcb_json(_get(VCB_DAY_URL.format(day=day.isoformat())), currency)
+# --- VPBank ------------------------------------------------------------------
+
+
+def parse_vpbank(payload: bytes, currency: str) -> BankRate:
+    """VPBank returns one snapshot per update during the day; use the latest one."""
+    try:
+        snapshots = json.loads(payload)
+        for snap in sorted(snapshots, key=lambda s: s["effectiveTime"], reverse=True):
+            for row in snap["exchangeRates"]:
+                if row.get("currency") == currency:
+                    return BankRate(
+                        "VPBank",
+                        currency,
+                        _num(str(row["buyCash"]) if row.get("buyCash") is not None else None),
+                        _num(str(row["buyTransfer"]) if row.get("buyTransfer") is not None else None),
+                        _num(str(row["sellTransfer"]) if row.get("sellTransfer") is not None else None),
+                    )
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SourceError(f"bad VPBank payload: {exc}") from exc
+    raise SourceError(f"{currency} not found in VPBank payload")
+
+
+def fetch_vpbank(currency: str = "SGD") -> BankRate:
+    return parse_vpbank(_get(VPBANK_URL), currency)
+
+
+# --- Wise (public rate endpoints used by wise.com itself; unofficial) --------
+
+
+def parse_wise_live(payload: bytes) -> float:
+    try:
+        return float(json.loads(payload)["value"])
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SourceError(f"bad Wise live payload: {exc}") from exc
+
+
+def parse_wise_history(payload: bytes) -> list[tuple[float, float]]:
+    """Return [(epoch_seconds, rate)] sorted by time."""
+    try:
+        points = [(float(p["time"]) / 1000.0, float(p["value"])) for p in json.loads(payload)]
+    except (ValueError, KeyError, TypeError) as exc:
+        raise SourceError(f"bad Wise history payload: {exc}") from exc
+    if not points:
+        raise SourceError("empty Wise history")
+    return sorted(points)
+
+
+def fetch_wise_live(base: str = "SGD", quote: str = "VND") -> float:
+    return parse_wise_live(_get(WISE_LIVE_URL.format(base=base, quote=quote)))
+
+
+def fetch_wise_history(days: int = 8, base: str = "SGD", quote: str = "VND") -> list[tuple[float, float]]:
+    return parse_wise_history(_get(WISE_HISTORY_URL.format(base=base, quote=quote, days=days)))
