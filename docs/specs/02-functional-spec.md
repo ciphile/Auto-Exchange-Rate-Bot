@@ -214,14 +214,14 @@ F-10 Dọn dẹp
 ## Phụ lục C — Bảng ATR bảo mật (skill 6.17) — đánh số bỏ qua 13
 | ATR | Kiểm | Trạng thái | Bằng chứng / việc phải làm |
 |---|---|---|---|
-| ATR-1 | Webhook kiểm `secret_token` **trước khi đọc** tin, so thời gian cố định; mỗi bot 1 mã riêng | Thiếu (chưa code) | Test "thiếu / sai mã → 401" |
+| ATR-1 | Webhook kiểm `secret_token` **trước khi đọc** tin, so thời gian cố định; mỗi bot 1 mã riêng | Một phần | `src/shared/secret-compare.ts` (so băm, thời gian cố định) + test `tests/telegram.test.ts`; còn: route webhook trả 401 |
 | ATR-2 | Chỉ nhận IP của Telegram | Không áp dụng (bắt buộc) | Có ATR-1; có thể thêm sau |
 | ATR-3 | `/api/tick` kiểm `Bearer`; khóa chống chạy chồng; việc 1 lần / ngày có cờ đã chạy | Thiếu | Test "thiếu mã → 401", "chạy 2 lần → 1 lần" |
-| ATR-4 | Chỉ phục vụ đúng nhóm A / nhóm B / chat riêng của Khang; chat lạ → im | Thiếu | Test chat lạ → không phản hồi |
+| ATR-4 | Chỉ phục vụ đúng nhóm A / nhóm B / chat riêng của Khang; chat lạ → im | Một phần | `routeMessage` (`src/services/access.service.ts`) + test nhóm chưa gắn / nhóm lạ / người lạ → im; còn: nối vào webhook |
 | ATR-5 | Mọi lệnh đổi cấu hình + nhắn thay qua **thẻ xác nhận** | Thiếu | Test bấm ✅ / ❌ |
 | ATR-6 | Phiên web | Không áp dụng | Không có web |
 | ATR-7 | Mật khẩu / PIN | Không áp dụng | Nhận diện Khang bằng mã tài khoản Telegram |
-| ATR-8 | Phân quyền mọi điểm vào (lệnh Khang chỉ từ mã tài khoản Khang) | Thiếu | Test người khác gõ lệnh Khang → im |
+| ATR-8 | Phân quyền mọi điểm vào (lệnh Khang chỉ từ mã tài khoản Khang) | Một phần | `routeMessage` + test người khác gõ `/gannhom` / chat riêng → im; còn: kiểm người bấm nút thẻ xác nhận = Khang |
 | ATR-9 | RLS bật **mọi bảng**, chỉ máy chủ dùng khóa service-role | Thiếu | Test tự động kiểm RLS |
 | ATR-10 | Khóa máy chủ không lọt ra ngoài | Không áp dụng phần trình duyệt | Khóa chỉ ở biến môi trường Vercel |
 | ATR-11 | Bí mật ≥ 32 ký tự ngẫu nhiên, mỗi cái khác nhau, có cách đổi (2 token bot, 2 mã webhook, mã tick, khóa mã hóa, khóa Gemini, khóa Supabase) | Một phần | `src/config/env.ts` kiểm dạng + độ dài + khác nhau (test `tests/env.test.ts`); cách đổi ở phụ lục D + hướng dẫn cài đặt |

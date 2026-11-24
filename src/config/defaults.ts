@@ -54,3 +54,10 @@ export const LIVE_FETCH_COOLDOWN_MS = 5 * 60 * 1000;
 export const LIVE_SOURCE_FOR_ANY = 'wise' as const;
 // BR-30: Rây hỏi "lấy nguồn nào?" — câu trả lời trong 10 phút được hiểu là trả lời câu hỏi đó.
 export const SOURCE_QUESTION_TTL_MS = 10 * 60 * 1000;
+// Kỹ thuật: Telegram.
+export const TELEGRAM_API_BASE = 'https://api.telegram.org';
+export const TELEGRAM_CHUNK_CHARS = 4000; // Telegram cho tối đa 4096 ký tự / tin — chừa chỗ an toàn
+export const TELEGRAM_MAX_RETRY_WAIT_MS = 5_000; // bị Telegram bảo chờ lâu hơn mức này → không thử lại, báo lỗi
+export const MAX_INCOMING_TEXT_CHARS = 4_000; // cắt tin đến quá dài trước khi lưu / gửi AI (prompt không phình)
+// BR-17: tên gọi của từng bot (so không phân biệt hoa thường; có hoặc không "ơi").
+export const BOT_CALL_NAMES = { ray: ['rây', 'ray'], lui: ['lũi', 'lui'] } as const;
