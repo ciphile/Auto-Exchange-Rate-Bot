@@ -19,7 +19,6 @@ Bước 1 (phỏng vấn SME) **đang dở**: xong biên bản lượt 1, chờ 
 
 ## Câu hỏi chờ Khang
 - Có việc nào Khang làm ngoài chat (GitHub, tạo bot với BotFather, thêm bot vào group…) mà Kat chưa ghi vào sổ quy trình không?
-- Chữ "Prime" (tên công ty SGP) và tên các đồng nghiệp: có được xuất hiện trong repo / prompt không? (Hiện Kat **không** ghi tên công ty.)
 
 ## Bug đang mở
 - Không có.

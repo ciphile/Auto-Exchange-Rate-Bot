@@ -90,14 +90,16 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 2. **Rule 2 — Sổ quy trình.** Mỗi hành động quan trọng → ghi NGAY 1 mục vào cuối `docs/quy-trinh-note.md` (mẫu `docs/SKILL_TAM.md` 9.4). Không ghi bí mật.
 3. **Rule 3 — Tổng kết = 5 bước** (`docs/QUY_TAC_GHI_CHEP.md` mục 4.1): history → commit + push → PR → kêu Khang merge (không tự merge; CI đỏ thì không kêu) → báo cáo ngắn + kích thước `CLAUDE.md`.
 4. **Rule 4 — Bí mật.** Token Telegram, khóa Claude API… không bao giờ vào chat / repo / log / ảnh. Chỉ ở GitHub Secrets / biến môi trường (Khang tự thêm); repo chỉ có `.env.example` (tên biến). Lỡ lộ → thu hồi ngay. Mỗi bí mật ghi sẵn cách đổi.
-5. **Rule 5 — Riêng tư.** Dữ liệu riêng của đồng nghiệp trong group (tên, số điện thoại, tài khoản, chuyện lương) **không** vào repo, prompt gửi AI, log. Câu mẫu giọng Abe chỉ lấy câu ngắn về tỉ giá, đã Khang duyệt.
+5. **Rule 5 — Riêng tư.** **Tên người và tên công ty** (và số điện thoại, tài khoản, chuyện lương) **không** vào code, tài liệu, prompt gửi AI, log — chỉ dùng **biệt danh** (Mít, Xoài, Ổi; công ty = "công ty SGP"; group = "nhóm chat"). Bảng đối chiếu tên thật ↔ biệt danh chỉ ở `docs/rieng-tu/BANG-TEN-THAT.md` (Khang quyết 24/11/2026; **xóa trước khi public repo**; lịch sử git vẫn còn → khi public phải tạo repo mới sạch). Câu mẫu giọng Mít chỉ lấy câu ngắn về tỉ giá, đã Khang duyệt.
 6. **Rule 6 — Theo chế độ.** Khang chỉ hỏi → chỉ trả lời. "Khoan làm gì hết" / "ghi pending, đừng fix" → không sửa code. Việc trong "Giới hạn cứng" (mục Chế độ làm việc) luôn phải hỏi.
 7. **Rule 7 — Soạn skill chính thức cuối dự án:** đọc toàn bộ `docs/quy-trinh-note.md`, đưa dàn ý cho Khang duyệt, đạt `SKILL_CHECKLIST`.
 8. **Rule 8 — Bug:** theo bảng "LỊCH GHI SỔ" (`docs/QUY_TAC_GHI_CHEP.md` mục 4); hồ sơ đủ 10 ý (mẫu 9.5).
 9. **Rule 9 — Truy vết 1 phút:** `BR-xx` → `grep -rn "BR-xx"` → FS (lý do) → history (đổi lúc nào) → `docs/bugs/`.
 
 ## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1, chờ Khang duyệt)
-Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND mỗi sáng + cảnh báo khi vượt mốc; lời bình do AI viết theo giọng Abe, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính).
+Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND mỗi sáng + cảnh báo khi vượt mốc; lời bình do AI viết theo giọng Mít, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính).
+
+**Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; Gemini free cấm `thinkingConfig` + công cụ tra web) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
 
 ## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.

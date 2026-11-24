@@ -12,7 +12,7 @@
 
 Telegram bot cho nhóm làm remote ở VN, nhận lương SGD qua Wise rồi đổi sang VND.
 Bot đăng bản tin tỉ giá mỗi sáng, **báo khi tỉ giá cắt các mốc nhóm hay than** (20,000 / 20,100…),
-và trả lời lệnh trong group. Lời bình do Claude viết theo giọng Abe; **mọi con số do code tính**.
+và trả lời lệnh trong group. Lời bình do Claude viết theo giọng Mít; **mọi con số do code tính**.
 
 ## Nguồn tỉ giá (không cần API key)
 
@@ -59,7 +59,7 @@ Bot là **bot** (Telegram luôn gắn nhãn BOT). Nên đặt tên bot rõ ràng
 - `daily` (09:10 giờ VN), `check` (mỗi giờ) và `poll` (mỗi 5 phút) là 3 workflow riêng.
 - Trạng thái (mốc hiện tại, số tin đã gửi, các lần `/doi`, vài tin gần nhất để không lặp) lưu trong
   `state.json` trên nhánh `bot-state` (`scripts/state.sh`), nên không cần database. Hai workflow ghi cùng lúc hiếm khi mất 1 bản cập nhật.
-- Lời bình: Claude nhận số liệu + ~15 câu mẫu của Abe (`bot/style_examples.txt`, đã bỏ tên/số điện thoại).
+- Lời bình: Claude nhận số liệu + ~15 câu mẫu của Mít (`bot/style_examples.txt`, đã bỏ tên/số điện thoại).
   Kết quả bị loại (và thay bằng câu mẫu) nếu nhắc con số không phải mốc, có link, quá dài, bị từ chối hoặc API lỗi.
 - Lệnh được **poll mỗi 5 phút** (mức nhỏ nhất của GitHub cron) nên trả lời có thể trễ vài phút. Cần trả lời tức thì thì chạy
   `python -m bot poll` trong vòng lặp trên máy luôn bật.

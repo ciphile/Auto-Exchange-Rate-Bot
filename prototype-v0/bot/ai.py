@@ -1,4 +1,4 @@
-"""Ask Claude for a short comment in Abe's voice. The numbers in the message are
+"""Ask Claude for a short comment in Mít's voice. The numbers in the message are
 always produced by code; the model only writes the one-line comment, and the
 comment is rejected (-> template fallback) if it mentions numbers we did not give it."""
 
@@ -17,9 +17,9 @@ MAX_LEN = 220
 
 SYSTEM = """Bạn là bot trong group Telegram của 5 đồng nghiệp người Việt làm remote cho một công ty Singapore. \
 Lương trả bằng SGD qua Wise; mọi người đổi SGD sang VND (chợ đen hoặc ngân hàng) nên hay than phiền khi tỉ giá lên xuống. \
-Nhiệm vụ của bạn: viết bình luận ngắn về tỉ giá SGD→VND bằng giọng của Abe, một đồng nghiệp trong nhóm.
+Nhiệm vụ của bạn: viết bình luận ngắn về tỉ giá SGD→VND bằng giọng của Mít, một đồng nghiệp trong nhóm.
 
-Giọng Abe: thân mật, ngắn gọn như nhắn tin; viết tắt (ko, dc, bít, thoy, r, h, e, a); thỉnh thoảng "haha", ":))", "Ahihi". \
+Giọng Mít: thân mật, ngắn gọn như nhắn tin; viết tắt (ko, dc, bít, thoy, r, h, e, a); thỉnh thoảng "haha", ":))", "Ahihi". \
 Không trang trọng, không hashtag, tối đa 1 emoji.
 
 Quy tắc cứng:
@@ -37,7 +37,7 @@ KIND_INSTRUCTIONS = {
         "'Tăng cao đẩy euro và bảng Anh lao dốc'. Chỉ trả về cụm đó, không lặp lại phần 'Giá SGD hôm nay'."
     ),
     "alert": (
-        "Tỉ giá vừa cắt một mốc quan trọng. Viết 1-2 câu phản ứng ngắn của Abe (như 'Pùn :))' hoặc 'Nhích dc 1 xíu'), "
+        "Tỉ giá vừa cắt một mốc quan trọng. Viết 1-2 câu phản ứng ngắn của Mít (như 'Pùn :))' hoặc 'Nhích dc 1 xíu'), "
         "nhắc đến mốc đó nếu hợp lý."
     ),
 }
@@ -49,7 +49,7 @@ def load_examples() -> list[str]:
 
 def build_user_prompt(kind: str, facts: dict, recent: list[str]) -> str:
     parts = [
-        "Các câu mẫu thật của Abe (chỉ để học giọng, đừng chép lại):",
+        "Các câu mẫu thật của Mít (chỉ để học giọng, đừng chép lại):",
         *[f"- {ex}" for ex in load_examples()],
         "",
         "Dữ kiện (JSON):",

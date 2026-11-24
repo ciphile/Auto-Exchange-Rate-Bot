@@ -7,7 +7,7 @@
 ### 2026-11-23 14:42 (giờ VN) — Khang — Tạo repo, gửi 9 ảnh chụp group Telegram
 - **Loại:** Khởi tạo
 - **Yêu cầu gốc:** (không kèm chữ, chỉ 9 ảnh chụp group Telegram của đồng nghiệp; giờ suy ra từ commit đầu `52a46cb`)
-- **Đầu vào cần có:** ảnh chụp chat: tỉ giá Wise / VCB / DBS, chuyện đổi chợ đen, bản tin "Giá … hôm nay" của Abe
+- **Đầu vào cần có:** ảnh chụp chat: tỉ giá Wise / VCB / DBS, chuyện đổi chợ đen, bản tin "Giá … hôm nay" của Mít
 - **Kết quả:** repo trống (chỉ `.gitattributes`)
 - **Bài học cho skill:** đầu vào chỉ có ảnh, không có chữ → việc đầu tiên là **hỏi mục tiêu** (phỏng vấn lượt 1), không đoán rồi làm.
 
@@ -26,7 +26,7 @@
 
 ### 2026-11-23 17:36 (giờ VN) — Kat — Commit bản nháp 2: cảnh báo mốc, AI viết lời, 3 nguồn
 - **Loại:** Code
-- **Yêu cầu gốc:** Khang hỏi "liệu mình có thể viết 1 bot … cảnh báo tỉ giá … giống cách nói của Abe … gọi AI API … doable?" rồi trả lời 4 câu (ngưỡng theo chat, bản tin sáng như Abe, nguồn chợ đen, nhóm đồng ý) và nhắn thêm "gởi nhiều nguồn: Wise, VCB, VPBank"
+- **Yêu cầu gốc:** Khang hỏi "liệu mình có thể viết 1 bot … cảnh báo tỉ giá … giống cách nói của Mít … gọi AI API … doable?" rồi trả lời 4 câu (ngưỡng theo chat, bản tin sáng như Mít, nguồn chợ đen, nhóm đồng ý) và nhắn thêm "gởi nhiều nguồn: Wise, VCB, VPBank"
 - **Kết quả:** commit `bff1195`; 37 test đạt (unittest, không gọi dịch vụ thật); chưa thử Telegram / Claude / GitHub Actions thật
 - **Bài học cho skill:** Khang hỏi "doable?" = **câu hỏi** → trả lời, không tự code (Rule 6). Dù Khang đã trả lời vài câu, Khang vẫn báo "mình vẫn chưa nói xong".
 
@@ -56,3 +56,10 @@
 - **Yêu cầu gốc:** "Số phận code nháp: giữ lại làm nguyên mẫu, đổi tên thư mục để không lẫn lộn, cần thì lấy lại. Stack: đây là thứ cần bàn sau khi chốt requirement"
 - **Kết quả:** `git mv` bot, tests, scripts, requirements.txt, README.md và 4 workflow vào `prototype-v0/` (lịch sử git giữ nguyên); README gốc viết mới (trỏ tới docs); README nguyên mẫu có biển cảnh báo + cách lấy lại (commit `41c0108`). Workflow dời đi để **không tự chạy** nếu nhánh được merge. 37 test + bản tin thử vẫn chạy ở chỗ mới. `CLAUDE.md` mục Kiến trúc sửa đè.
 - **Bài học cho skill:** khi đóng băng code nháp, nhớ **gỡ workflow đang có lịch chạy** (cron) ra khỏi `.github/workflows/`; nếu không, merge nhầm là bot tự chạy. Chốt stack **sau** requirement là đúng thứ tự skill (mục 2 bước 3).
+
+### 2026-11-24 20:43 (giờ VN) — Khang — Trả lời lượt 2 (ràng buộc) + quyết định riêng tư
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "không ghi tên đồng nghiệp vào code và tài liệu, ghi 1 file riêng để tham chiếu sau, xóa file đó khi public repo (hoặc file đó lưu bộ nhớ cloud)" · lượt 1 "vẫn hiệu lực" · ngân sách "free hoàn toàn, gemini free" · repo "private" · riêng tư "tên từng người và tên công ty, có thể gọi biệt danh" · phase 1 "bàn sau" · hạn chót "t5 tuần sau"
+- **Kết quả:** biên bản `00-phong-van.md` thêm lượt 2 (chờ duyệt kết luận) và đánh dấu lượt 1 ✅ ĐÃ CHỐT; `CLAUDE.md` Rule 5 + ràng buộc sửa đè. Kat chọn biệt danh (Mít, Xoài, Ổi, "công ty SGP", "nhóm chat"), thay trong ~10 file (chỉ chú thích / chữ, không đổi logic; 37 test nguyên mẫu vẫn đạt), tạo `docs/rieng-tu/BANG-TEN-THAT.md`.
+- **Chưa rõ:** "xem đính kèm" (Gemini) — Kat chưa nhận được đính kèm; "t5 tuần sau" Kat hiểu là 03/12/2026.
+- **Bài học cho skill:** (1) ràng buộc **tên người / tên công ty** cần hỏi ngay ở phỏng vấn lượt riêng tư, **trước** khi Kat chép bất cứ thứ gì từ ảnh chụp chat vào repo; (2) xóa file đối chiếu trước khi public **không đủ** vì lịch sử git còn → ghi sẵn cách xử lý (repo mới sạch); (3) nên có **barie** quét tên thật ngoài file đối chiếu (luật máy kiểm được → barie, mục 6.18).

@@ -191,11 +191,11 @@ class AiTests(unittest.TestCase):
         self.assertEqual(out, "Pùn :))")
         kw = fake.calls[0]
         self.assertEqual(kw["model"], config.MODEL)
-        self.assertIn("Abe", kw["system"])
+        self.assertIn("Mít", kw["system"])
         prompt = kw["messages"][0]["content"]
         self.assertIn("Pùn :))", prompt)  # a style example
         self.assertIn("tin cũ", prompt)  # anti-repeat memory
-        self.assertNotIn("Hồng", prompt)  # no names / phone numbers from the chat
+        self.assertNotIn("Xchange", prompt)  # no names / business names from the chat
         self.assertNotIn("+84", prompt)
 
     def test_rejections_return_none(self):

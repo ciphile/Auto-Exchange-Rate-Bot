@@ -2,7 +2,7 @@ name: Morning rate post
 
 on:
   schedule:
-    - cron: "10 2 * * *" # 02:10 UTC = 09:10 Vietnam (Abe usually posts around 9:15). GitHub may delay cron.
+    - cron: "10 2 * * *" # 02:10 UTC = 09:10 Vietnam (Mít usually posts around 9:15). GitHub may delay cron.
   workflow_dispatch:
 
 permissions:
