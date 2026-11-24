@@ -15,17 +15,17 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 # A. Quyết định
 ## A1. Đang chờ
 <a id="d1"></a>
-### D1 — Tên người / tên nhóm trong prompt gửi AI ⏳
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
-- **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T04, FS. **Bối cảnh:** Khang muốn prompt giàu bối cảnh "có tên từng người, tên nhóm"; Rule 5 (Khang chốt 20:43) cấm tên người / tên nhóm vào prompt AI; Gemini free có thể dùng dữ liệu để cải thiện sản phẩm, có thể có người đọc. **Lựa chọn:** (a) gửi tên thật; (b) **thay tên bằng mã / biệt danh trước khi gửi, code đổi lại tên khi nhận** (AI vẫn đủ bối cảnh: ai là ai, vai trò, quan hệ); (c) không gửi thông tin người. **Kat đề xuất:** (b). **Đã chốt:** —
+### D1 — Tên người / tên nhóm trong prompt gửi AI
+> **Nhãn:** ✅ ĐÃ CHỐT 24/11/2026 22:15 — (a) gửi tên thật, log prompt mã hóa giữ ≤ 1 ngày · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T04, FS. **Bối cảnh:** Khang muốn prompt giàu bối cảnh "có tên từng người, tên nhóm"; Rule 5 (Khang chốt 20:43) cấm tên người / tên nhóm vào prompt AI; Gemini free có thể dùng dữ liệu để cải thiện sản phẩm, có thể có người đọc. **Lựa chọn:** (a) gửi tên thật; (b) **thay tên bằng mã / biệt danh trước khi gửi, code đổi lại tên khi nhận** (AI vẫn đủ bối cảnh: ai là ai, vai trò, quan hệ); (c) không gửi thông tin người. **Kat đề xuất:** (b). **Đã chốt:** (a) — Khang: "cứ ghi tên thật vào prompt AI cũng được… prompt ghi log lại nhưng xóa sau 1 ngày và log prompt mã hóa là được".
 <a id="d2"></a>
 ### D2 — Quy tắc cụ thể của "mức hóng chuyện 1–10" ⏳
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T05, FS. **Lựa chọn:** bảng mức → xác suất chen vào mỗi "đợt" trò chuyện + trần lượt / ngày; ban đêm 20:00–06:00 có chen vào không (Kat đề xuất: không tự chen, vẫn trả lời khi được gọi tên). **Đã chốt:** —
 <a id="d4"></a>
-### D4 — Cách lưu cho "tóm tắt chat cuối ngày" ⏳
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
-- **Ghi nhận:** 2026-11-24 (Khang bổ sung lúc tổng kết). **Bắt buộc đã chốt:** mã hóa + xóa 01:00 mỗi ngày + chỉ gửi Khang. **Lựa chọn:** (a) tóm từng câu ngay khi nhận (1 lượt AI / tin nhắn); (b) lưu câu gốc đã mã hóa, gọi AI 1 lần khi Khang hỏi; (c) tóm theo đợt trò chuyện. **Kat đề xuất:** (b). **Đã chốt:** —
+### D4 — Cách lưu cho "tóm tắt chat cuối ngày"
+> **Nhãn:** ✅ ĐÃ CHỐT 24/11/2026 22:15 — (b) · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ghi nhận:** 2026-11-24 (Khang bổ sung lúc tổng kết). **Bắt buộc đã chốt:** mã hóa + xóa 01:00 mỗi ngày + chỉ gửi Khang. **Lựa chọn:** (a) tóm từng câu ngay khi nhận (1 lượt AI / tin nhắn); (b) lưu câu gốc đã mã hóa, gọi AI 1 lần khi Khang hỏi; (c) tóm theo đợt trò chuyện. **Kat đề xuất:** (b). **Đã chốt:** (b) — Khang: lưu nguyên văn, không tóm từng câu, chỉ gửi AI khi Khang hỏi.
 <a id="d3"></a>
 ### D3 — Hạn chót ⏳
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
@@ -44,6 +44,8 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 | 24/11/2026 21:53 | Nhắn thay Khang: cả 2 bot, chỉ chữ, thẻ xác nhận, `/thuhoi`; Rây làm trước | Khang, trong chat | 00-phong-van |
 | 24/11/2026 22:00 | Mốc cảnh báo phương án C: 19,800 · 19,900 · 20,000 · 20,100 · 20,200 · 20,300; lệnh chỉnh mốc; lệnh bật / tắt lắng nghe (cả 2 bot); lệnh chọn xưng hô; ngưỡng `CLAUDE.md` 70 KB | Khang, trong chat | 00-phong-van (căn cứ giả lập) |
 | 24/11/2026 22:05 | Lắng nghe = đọc mọi tin, tự quyết khi nào nói; mức hóng chuyện 1–10; nói có quan điểm | Khang, trong chat | D2 (chi tiết chờ) |
+| 24/11/2026 22:15 | D1: prompt AI được chứa tên thật; log prompt mã hóa, giữ ≤ 1 ngày (ngoại lệ Rule 5; thay đề xuất "che tên bằng mã" lúc 21:48 → ⛔) | Khang, trong chat | `CLAUDE.md` Rule 5 |
+| 24/11/2026 22:15 | D4: tóm tắt chat cuối ngày = lưu nguyên văn mã hóa, chỉ gửi AI khi Khang hỏi, xóa 01:00 mỗi ngày | Khang, trong chat | `CLAUDE.md` Mục tiêu |
 
 <a id="sb"></a>
 # B. Việc dở dang
@@ -61,9 +63,10 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Khang gửi sau
 <a id="t04"></a>
-### [ ] T04 — Tên người / tên nhóm trong prompt AI · [tổng kết 24/11/2026] · `QĐ`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T04 — Tên người / tên nhóm trong prompt AI · [tổng kết 24/11/2026] · `QĐ`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** chờ D1
+- ✅ 2026-11-24 22:15: Khang chốt D1 (a) — xem A1 D1
 <a id="t05"></a>
 ### [ ] T05 — Quy tắc mức hóng chuyện 1–10 · [tổng kết 24/11/2026] · `QĐ`
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
@@ -172,7 +175,7 @@ Case: Vercel Hobby cron chỉ 1 lần / ngày, Gemini free dùng dữ liệu đ�
 - Nguyên mẫu dời vào `prototype-v0/`, workflow không tự chạy; 37 test vẫn đạt sau khi đổi tên thật → biệt danh.
 - Tài liệu gọi AI của Khang lưu nguyên văn (so `cmp` khớp) + thành chuẩn 6.10a. Khang gửi lại 2 lần: 1 bản giống hệt, 1 bản cũ hơn (443 dòng đầu giống hệt, thiếu phần "cơ chế gọi AI") → không đổi gì.
 - Biên bản phỏng vấn lượt 1–5 + căn cứ mốc; 11 quyết định ở A2.
-**Dang dở:** D4 (tóm tắt chat cuối ngày — Khang bổ sung lúc tổng kết) · T01–T12 (Lũi: lĩnh vực, tính cách, giọng văn; D1 tên trong prompt; D2 mức hóng chuyện; việc 3–5; barie; tạo bot).
+**Dang dở:** T01–T03, T05 (D2), T06–T12. **Tổng kết bổ sung 22:15:** Khang chốt D1 (tên thật vào prompt AI được, log prompt mã hóa ≤ 1 ngày) và D4 (lưu nguyên văn mã hóa, chỉ gửi AI khi Khang hỏi) (Lũi: lĩnh vực, tính cách, giọng văn; D1 tên trong prompt; D2 mức hóng chuyện; việc 3–5; barie; tạo bot).
 **Phát hiện hay:** Vercel Hobby cron chỉ 1 lần / ngày (cần nhịp lịch khác); Gemini free có thể dùng dữ liệu và có người đọc; Wise chỉ cho tải tối đa 30 ngày theo giờ; mốc cách 50 đ gây báo qua lại. BUG-0001 (riêng tư, **tái phát 2 lần** — lần 2 bắt được nhờ rà tên trước khi tạo PR). Bug nhỏ test bắt được (nguyên mẫu, 23/11): bộ kiểm lời AI từ chối nhầm "1 xíu" → đã sửa.
 **Trạng thái cuối phiên:** chưa có code chính thức; nhánh `claude/new-session-5jra1l`; môi trường cloud `auto-exchange-rate-bot` (5 host nguồn tỉ giá). Chưa có CI (barie chờ chốt stack).
 **Việc nên làm tiếp:** T04 + T05 (Khang chốt D1, D2) → T06 → T07 (việc 3) → T08 → T09; song song T01–T03 khi Khang gửi.

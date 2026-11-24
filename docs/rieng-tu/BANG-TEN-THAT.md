@@ -1,6 +1,6 @@
 # ⚠️ BẢNG ĐỐI CHIẾU TÊN THẬT ↔ BIỆT DANH — RIÊNG TƯ
 
-> **File DUY NHẤT được chứa tên thật.** Mọi code, tài liệu, prompt gửi AI, log chỉ dùng **biệt danh** (Khang quyết 24/11/2026).
+> **File DUY NHẤT trong repo được chứa tên thật.** Mọi code, tài liệu, commit, log kỹ thuật chỉ dùng **biệt danh** (Khang quyết 24/11/2026). **Ngoại lệ (D1):** prompt gửi AI lúc bot chạy được dùng tên thật — lấy từ cấu hình trong database, **không** lấy từ file này; log prompt mã hóa, giữ ≤ 1 ngày.
 > **XÓA FILE NÀY TRƯỚC KHI ĐỔI REPO SANG PUBLIC** (hoặc chuyển sang kho riêng trên cloud).
 > ⚠️ Xóa file **không** xóa khỏi lịch sử git. Trước khi public: tạo repo mới từ bản chụp sạch (không mang lịch sử), hoặc viết lại lịch sử.
 > **Quy ước (Khang chốt 24/11/2026):** khi nói chuyện với Kat, Khang **chỉ dùng tên thật**; Kat **tự đổi** sang biệt danh khi ghi bất cứ thứ gì vào repo / prompt / log. Không bao giờ chép tên thật ra ngoài file này. Người mới chưa có biệt danh → Kat đặt biệt danh mới và thêm vào bảng.

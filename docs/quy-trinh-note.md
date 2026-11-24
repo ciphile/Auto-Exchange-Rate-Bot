@@ -142,3 +142,9 @@
 - **Yêu cầu gốc:** "bot sẽ tóm tắt mỗi câu người dùng vào thành 1 câu ngắn ghi vào cache… cuối ngày khi Khang hỏi tóm tắt họ đang bàn về việc gì trong group B thì app gọi API AI đọc lại toàn bộ cache json ngày đó… cache json này định kỳ xóa lúc 1am mỗi ngày vì dữ liệu riêng tư và phải có mã hóa"
 - **Kết quả:** ghi biên bản, `CLAUDE.md`, history (D4), STATUS. PR #1 (nhánh → `main`) đã tạo trước khi tin này tới; commit này tự vào PR.
 - **Bài học cho skill:** yêu cầu tới **giữa lúc tổng kết** → vẫn ghi đủ các sổ rồi push vào cùng PR (PR tự cập nhật), không cần PR mới.
+
+### 2026-11-24 22:15 (giờ VN) — Khang — Chốt D4 (lưu nguyên văn mã hóa, chỉ gửi AI khi Khang hỏi) và D1 (tên thật vào prompt AI được, log prompt mã hóa ≤ 1 ngày)
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** D4 "(b)… chỉ gởi AI khi Khang hỏi, đảm bảo bot không gởi AI API mỗi lần có 1 thành viên trong nhóm nhắn 1 câu linh tinh. Bot chỉ ghi nguyên văn vào file tạm" · D1 "cứ ghi tên thật vào prompt AI cũng được không sao, prompt ghi log lại nhưng xóa sau 1 ngày và log prompt mã hóa là được"
+- **Kết quả:** `CLAUDE.md` Rule 5 viết lại (repo + log kỹ thuật vẫn cấm tên thật; prompt AI là ngoại lệ), Mục tiêu sửa đè; biên bản, history (A1 → A2, đổi nhãn, T04 xong), STATUS (tổng kết bổ sung) cập nhật; push vào PR #1. Đề xuất "che tên bằng mã" (Khang đồng ý 21:48) → hết hiệu lực.
+- **Bài học cho skill:** quyết định riêng tư có **phạm vi**: "không tên thật" ở repo / log khác với ở prompt lúc chạy → ghi rõ phạm vi từng chỗ; tên thật cho prompt lấy từ **cấu hình trong database**, không từ repo.
