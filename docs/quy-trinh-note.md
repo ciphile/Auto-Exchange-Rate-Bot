@@ -88,3 +88,9 @@
 - **Yêu cầu gốc:** (tin dài) 2 group, 2 bot; Rây hiểu câu tự nhiên, cảnh báo như người, tuần lương báo giờ ngẫu nhiên; Lũi cào tin 2 lần / ngày, xếp hạng, nhắn giờ ngẫu nhiên, đọc chat tham gia; Khang chỉnh mọi thứ; nhờ Kat tư vấn chỗ chạy 24/24 miễn phí + tính năng thêm (tối giản)
 - **Kết quả:** biên bản lượt 5 (biệt danh, không tên thật); `CLAUDE.md` Mục tiêu sửa đè (từ 1 bot thành 2 bot); bảng tên thật thêm Mận + nhóm A / nhóm B. Kat tra cứu giới hạn gói miễn phí (Vercel cron, Supabase, Gemini free, Cloudflare Workers) trước khi tư vấn.
 - **Bài học cho skill:** phỏng vấn theo lượt có thể **chưa chạm phạm vi thật** cho tới khi người dùng được "kể tự do" — nên có 1 lượt **"kể tự do"** sớm (ngay sau lượt mục tiêu), rồi mới hỏi chi tiết. Khi tư vấn nền tảng miễn phí: **tra giới hạn hiện hành** trước, đừng dựa trí nhớ.
+
+### 2026-11-24 21:47 (giờ VN) — Khang — Chốt 2 bot riêng, khung cảnh báo 14 ngày, lấy giá mỗi 5 tiếng; dặn ghi pending tính cách Lũi
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "2 bot" · cảnh báo "2 tuần trước ngày nhận lương" · "cả giảm và cả tăng" · "mỗi 5 tiếng" · nhóm B "đã đồng ý" · cấu hình "chỉ Khang" · Lũi "sẽ gởi sau, nhớ ghi pending, cả tính cách của lũi, giọng văn" · "Khi mình nói chuyện vs bạn mình chỉ nói tên thật đồng nghiệp bạn tự map ra tên biệt danh để ghi repo" · chính trị trong nước "trung lập" · Lũi đọc mọi tin nhắn, link chỉ mở khi được yêu cầu
+- **Kết quả:** biên bản lượt 5 bổ sung; `CLAUDE.md` (Rule 5 + Mục tiêu) sửa đè; bảng tên thật: nhóm A / nhóm B xác nhận + quy ước "Khang nói tên thật, Kat tự đổi"; **STATUS cập nhật ngay** (Khang nói rõ "ghi pending") — đồng thời xóa các dòng đã xong.
+- **Bài học cho skill:** khi người dùng hỏi "lộ token thì sao", cần giải thích **"mất" là mất quyền điều khiển bot, không phải mất group** — Kat đã dùng chữ "mất 1 group" thiếu chính xác ở lượt trước; tư vấn bảo mật phải dùng chữ đúng nghĩa.
