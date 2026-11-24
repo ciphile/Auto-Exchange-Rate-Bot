@@ -48,3 +48,5 @@ export const BURST_SILENCE_MS = 3 * 60 * 1000;
 // Kỹ thuật: gọi nguồn tỉ giá.
 export const HTTP_TIMEOUT_MS = 20_000;
 export const HTTP_USER_AGENT = 'Mozilla/5.0 (compatible; auto-exchange-rate-bot)';
+// BR-30: lấy giá ngay theo yêu cầu — mỗi nguồn tối đa 1 lần đọc / 5 phút (VCB yêu cầu ≤ 1 lần / 5 phút).
+export const LIVE_FETCH_COOLDOWN_MS = 5 * 60 * 1000;

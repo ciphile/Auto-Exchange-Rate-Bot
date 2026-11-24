@@ -137,6 +137,7 @@
 | — | **D1 — CHỐT** (Khang 24/11/2026 22:15) | **Ghi tên thật vào prompt AI được.** Log prompt **mã hóa**, **xóa sau 1 ngày**. (Thay cho đề xuất "che tên bằng mã" mà Khang đồng ý lúc 21:48 → hết hiệu lực) |
 | — | **D2 — nguyên tắc CHỐT** (Khang 24/11/2026 22:19) | "Quy tắc suy luận khi nào nên lên tiếng nên được giải quyết bằng **rule thuần code** chứ không thông qua gọi AI cho tốn lượt. Khi nào logic code quyết định lên tiếng (mức hóng chuyện đạt yêu cầu) thì mới gọi AI để chen vào câu chuyện." Bảng chi tiết mức 1–10: Kat soạn nháp phiên sau |
 | — | **Tóm tắt chat cuối ngày — phạm vi** (Khang 24/11/2026 22:19) | **Cả 2 bot** (Rây nhóm A, Lũi nhóm B) — "vì cả 2 đều có tính năng đọc trộm tin nhắn user" |
+| — | **Hỏi giá: không dùng AI để tìm** (Khang 24/11/2026 22:36) | "ê Rây, tỉ giá sgd hôm nay bao nhiêu rồi" → trả lời từ giá **đã lấy theo lịch**, **nói rõ lấy lúc nào, ngày nào, mấy giờ, nguồn nào**. "mày lấy tỉ giá thời điểm hiện tại đi" → từ chối + nói lý do, **hoặc** AI hiểu thành action gọi **hàm thuần code** đọc web nguồn (vd VCB), có thể **hỏi lại nguồn nào**. Kat chọn (Mode 2): làm action → FS BR-29, BR-30 |
 | — | Lũi đọc tin nhắn | **Lũi đọc tất cả tin nhắn trong nhóm B.** Link: Lũi **không** tự mở link; chỉ đọc chữ đi kèm / tiêu đề xem trước để đoán ý người gửi; **chỉ mở link khi được yêu cầu**. (Có cần danh sách trang được phép mở không → bàn ở ATR) |
 
 **Căn cứ mốc (Kat giả lập 24/11/2026, lấy giá mỗi 5 tiếng, chỉ tính 14 ngày cuối tháng, tối đa 4 lần / ngày, cách 3 giờ, im lặng 20:00–06:00):**

@@ -160,3 +160,9 @@
 - **Yêu cầu gốc:** "giờ Kat làm tiếp việc đi mình đi ngủ… mode 2" · "ở dự án này không cần TS, BRD cũng không cần, chỉ cần FS" · "viết FS xong code được gì trước (mà không cần Khang confirm) thì bạn code đi" · "Gemini là free nên luôn có giới hạn… nhưng cũng đừng nên tiết kiệm AI API quá"
 - **Kết quả:** nhánh làm lại từ `main`; KC tra 4 điểm (Supabase Cron, hạn mức Gemini, Vercel 300 giây, `secret_token` Telegram); FS v0.1; code đợt 1 không thư viện ngoài; audit 2 lần; CI; tổng kết + PR #2.
 - **Bài học cho skill:** "chỉ cần FS" → phải nói rõ **chỗ mới** cho ADR / ATR (phụ lục FS), vì skill coi ATR là bắt buộc; ở Mode 2, chỉ code phần **thuần logic** (không cần tài khoản, không cần cài thư viện) để khỏi đụng giới hạn cứng; Node ≥ 22 chạy TypeScript trực tiếp → test không cần cài gói.
+
+### 2026-11-24 22:36 (giờ VN) — Khang — Hỏi giá: AI không tự tìm; ghi nguồn + thời điểm; "lấy giá ngay" bằng hàm code
+- **Loại:** Spec
+- **Yêu cầu gốc:** "bot không được dùng AI API để tìm vì AI API không tìm kiếm được, mà phải dựa vào tỉ giá đã cào… nói rõ là thông tin tỉ giá này được lấy vào lúc nào ngày nào mấy giờ… 'mày lấy tỉ giá thời điểm hiện tại đi' thì từ chối… hoặc… AI gọi hàm thuần code để đọc tỉ giá qua web VCB… có thể hỏi lại người dùng muốn lấy tỉ giá từ nguồn nào… nhớ nói tỉ giá lấy từ nguồn nào"
+- **Kết quả:** FS 0.2: BR-29, BR-30 + action `lay_ty_gia_ngay`; hàm `describeRateSource` + test; `CLAUDE.md`, biên bản, history cập nhật; push vào PR #2.
+- **Bài học cho skill:** AI chỉ **chọn action + viết lời**; mọi việc **lấy dữ liệu** là hàm code (đúng mô hình "luật – AI – luật"); câu trả lời có số liệu luôn kèm **nguồn + thời điểm** để người dùng tự đánh giá độ mới.

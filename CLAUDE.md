@@ -120,7 +120,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 Nguyên mẫu cũ đóng băng ở `prototype-v0/` (không sửa, không coi là nguồn đúng).
 
 ## Quy tắc nghiệp vụ
-Định nghĩa đầy đủ (lý do + ai chốt + ngày) ở **FS `docs/specs/02-functional-spec.md` mục 2: BR-01 → BR-28** (bỏ số 13). Hay dùng: ngày lương = ngày cuối tháng (BR-01) · tuần lương 7 ngày / khung cảnh báo 14 ngày (BR-02, BR-03) · lấy giá 01:00 · 06:00 · 11:00 · 16:00 · 21:00 (BR-04) · mốc 19800…20300, đệm ±10, 2 chiều (BR-06, BR-07) · ≤ 4 cảnh báo / ngày, cách ≥ 3 giờ (BR-08) · giờ nghỉ 20:00–06:00 (BR-09) · báo 4–6 lần / tuần lương, không nghỉ 2 ngày liền, ngày lương luôn báo (BR-10) · chợ đen = Wise × 1,004 (BR-12) · quyết định chen chuyện = luật thuần code, bảng mức 1–10 ở FS mục 6 (BR-18).
+Định nghĩa đầy đủ (lý do + ai chốt + ngày) ở **FS `docs/specs/02-functional-spec.md` mục 2: BR-01 → BR-28** (bỏ số 13). Hay dùng: ngày lương = ngày cuối tháng (BR-01) · tuần lương 7 ngày / khung cảnh báo 14 ngày (BR-02, BR-03) · lấy giá 01:00 · 06:00 · 11:00 · 16:00 · 21:00 (BR-04) · mốc 19800…20300, đệm ±10, 2 chiều (BR-06, BR-07) · ≤ 4 cảnh báo / ngày, cách ≥ 3 giờ (BR-08) · giờ nghỉ 20:00–06:00 (BR-09) · báo 4–6 lần / tuần lương, không nghỉ 2 ngày liền, ngày lương luôn báo (BR-10) · chợ đen = Wise × 1,004 (BR-12) · quyết định chen chuyện = luật thuần code, bảng mức 1–10 ở FS mục 6 (BR-18). · **AI không bao giờ đi tìm tỉ giá; mọi câu về giá ghi nguồn + thời điểm** (BR-29) · "lấy giá ngay" = action gọi **hàm code** đọc nguồn, thiếu nguồn thì hỏi lại, ≤ 1 lần / 5 phút mỗi nguồn (BR-30).
 
 ## Coding standards — chi tiết `docs/CODING_STANDARDS.md` (đọc TOÀN BỘ 1 lần / phiên khi bắt đầu code)
 - Mức **production-ready**; module / chức năng lớn xong → **audit ≥ 2 lần** + báo cáo bảng cho Khang.

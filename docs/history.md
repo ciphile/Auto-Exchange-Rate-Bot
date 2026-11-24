@@ -53,6 +53,7 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 | 24/11/2026 22:31 | Viết FS xong thì **code luôn phần không cần Khang xác nhận** | Khang | quy-trinh-note |
 | 24/11/2026 22:32 | Lượt AI: Gemini free có giới hạn (vài trăm / ngày) nhưng **đừng tiết kiệm quá** (group nhắn ít) | Khang | `CLAUDE.md`, `CODING_STANDARDS` 6.10a |
 | 24/11/2026 22:34 | **FS v0.1** (Rây đầy đủ, Lũi khung): BR-01…28, F-01…10, bảng mức hóng chuyện (chốt D2 ở Mode 2), ADR-01…07, KC-01…05, bảng ATR | Kat (Mode 2 = chốt thật; Khang sửa được) | `docs/specs/02-functional-spec.md` |
+| 24/11/2026 22:36 | **BR-29 / BR-30**: hỏi giá không dùng AI tìm; luôn ghi nguồn + thời điểm; "lấy giá ngay" = action gọi hàm code đọc nguồn (hỏi lại nếu thiếu nguồn, ≤ 1 lần / 5 phút) — FS bản 0.2 | Khang (yêu cầu) · Kat (chọn làm action, Mode 2) | FS mục 2, F-04 |
 
 <a id="sb"></a>
 # B. Việc dở dang
@@ -233,3 +234,4 @@ Xem `docs/bugs/README.md`.
 **Trạng thái cuối phiên:** nhánh `claude/new-session-5jra1l` (làm lại từ `main` sau khi mợt PR #1); PR #2 mở; chưa nối dịch vụ thật.
 **Việc nên làm tiếp:** T17 (Khang xem FS) → T14 (Khang tạo dịch vụ) → T16 (code đợt 2) ; T15 ; Lũi khi có T01–T03.
 **Kích thước CLAUDE.md:** 23,2 KB
+**Bổ sung sau tổng kết (22:36):** Khang thêm lưu ý hỏi giá → FS 0.2 (BR-29, BR-30) + hàm `describeRateSource` + test; push vào PR #2.

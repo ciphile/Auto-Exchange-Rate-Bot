@@ -1,6 +1,6 @@
 # FS — Functional Spec — Auto-Exchange-Rate-Bot (Rây + Lũi)
 
-> **Bản 0.1 · 24/11/2026 · Kat viết ở Mode 2** (Khang vắng; theo bộ quy tắc, FS viết đủ ở Mode 2 = chốt thật, Khang có quyền sửa bất kỳ mục nào).
+> **Bản 0.2 · 24/11/2026 (0.1: 24/11/2026) · Kat viết ở Mode 2** (Khang vắng; theo bộ quy tắc, FS viết đủ ở Mode 2 = chốt thật, Khang có quyền sửa bất kỳ mục nào).
 > **Dự án này chỉ có FS** (Khang chốt 24/11/2026: không BRD, không TS). Cổng chặn: **FS chốt mới được code**. Kiến trúc (ADR), kiểm chứng (KC), bảng ATR bảo mật nằm ở **phụ lục** của FS.
 > Nguồn yêu cầu: `docs/specs/00-phong-van.md` (lượt 1–5). Tên người dùng **biệt danh** (Rule 5). Mã quy tắc `BR-xx`, mã chức năng `F-xx`, mã lỗi `E-...` — **bỏ qua số 13**.
 > **Phạm vi bản này:** **Rây đầy đủ** (ưu tiên, hạn chót thứ Năm 03/12/2026 — chờ Khang xác nhận ngày). **Lũi: khung + phần dùng chung**; tính cách, giọng văn, lĩnh vực tin **chờ Khang gửi** (mục 8).
@@ -51,6 +51,8 @@
 | **BR-26** | Bot bị hỏi thẳng "mày là bot à" → **không chối**. Ngoài ra nói chuyện như người (không khuôn mẫu), có quan điểm riêng theo tính cách. | Telegram luôn gắn nhãn BOT; trung thực. | Khang (đồng ý đề xuất) · 24/11/2026 |
 | **BR-27** | **Xưng hô**: Khang chọn cách bot xưng và gọi người dùng (vd "tao – mày", "em – anh") bằng lệnh; prompt luôn mang theo lựa chọn hiện hành. | Theo lời Khang. | Khang · 24/11/2026 |
 | **BR-28** | **Tâm trạng / phong cách**: Khang chọn tâm trạng (vui, cáu, thất tình — nói cộc lốc, muốn nói nhiều…) và phong cách; prompt mang theo. Cảnh báo phải **than như người** (học giọng Xoài, Ổi, Mít), báo giá **như Mít báo** — không khuôn máy móc. | Theo lời Khang. | Khang · 24/11/2026 |
+| **BR-29** | Mọi câu nói về giá (báo, cảnh báo, trả lời) **phải nói rõ nguồn + thời điểm lấy** (vd "theo Wise, lấy lúc 11:00 ngày 24/11"). **AI không bao giờ đi tìm tỉ giá** (Gemini không tra được; tra web gói free gần như 0 lượt): số luôn lấy từ **kho bản chụp** (BR-04) hoặc BR-30. | Người dùng phải biết số đó cũ hay mới, của ai. | Khang · 24/11/2026 |
+| **BR-30** | **Lấy giá ngay theo yêu cầu** ("mày lấy tỉ giá thời điểm hiện tại đi"): AI chỉ **chọn action** `lay_ty_gia_ngay`; **code thuần** đọc thẳng nguồn được chọn (Wise / VCB / VPBank — không qua AI, không tìm web) rồi AI viết lời, nói rõ nguồn + giờ (BR-29). **Thiếu nguồn → hỏi lại** người dùng muốn nguồn nào. Mỗi nguồn tối đa **1 lần đọc / 5 phút** (VCB yêu cầu ≤ 1 lần / 5 phút) — trong 5 phút dùng lại kết quả vừa đọc, kèm giờ. Nguồn lỗi → nói thật chưa lấy được + đưa bản gần nhất trong kho kèm giờ. Kết quả lấy ngay **không** dùng để cảnh báo (cảnh báo chỉ theo lịch BR-04). Là action **chỉ xem** → chạy luôn, không cần thẻ xác nhận. | Khang (đề xuất action thay vì từ chối) · Kat (5 phút, không dùng cho cảnh báo — Mode 2) | Khang · 24/11/2026 |
 
 ---
 
@@ -67,7 +69,7 @@
   ```
   <câu bình tự nhiên>
 
-  🌐 Wise (mid-market): 19,975.2  ▲ +1.5 / 24h
+  🌐 Wise (mid-market): 19,975.2  ▲ +1.5 / 24h  · lấy lúc 11:00 24/11
   🕶 Chợ đen (ước tính): ~20,060
   🏦 NH mua SGD: VCB 19,682 · VPBank 19,698
   ```
@@ -81,6 +83,7 @@
 ### F-04 Trả lời khi được gọi (cả 2 bot)
 - **Khi** có tin gọi tên bot (BR-17) **thì**: lệnh `/` → chạy thẳng, **không gọi AI**; câu tự nhiên → **1 lần gọi AI chọn action** trong danh sách đóng (theo tài liệu gọi AI của Khang) → code kiểm tên action + tham số → chạy action → (nếu cần lời) **gọi AI lần 2 soạn câu trả lời** đúng xưng hô / tâm trạng / tính cách.
 - **Danh sách action của Rây:** `xem_ty_gia` (giá hôm nay, cao hay thấp so với 7 ngày / mốc) · `quy_doi` (số tiền SGD ↔ VND theo Wise, chợ đen ước tính, NH mua) · `hoi_vi_mo` (**hỏi đáp tự do**: vì sao tỉ giá lên xuống, vàng, coin, Trump, dự đoán… — dùng bối cảnh số liệu trong kho + **kho tin của Lũi**; không tra web) · `tro_chuyen` (**tán gẫu / không thuộc loại nào**). Hai action cuối là **bắt buộc** theo tài liệu của Khang.
+- **Thêm action `lay_ty_gia_ngay`** (BR-30), tham số `nguon`: `wise | vcb | vpbank` (không bắt buộc — thiếu thì hỏi lại). Ví dụ: "mày lấy tỉ giá thời điểm hiện tại đi", "check VCB giùm cái". Mọi câu trả lời về giá ghi **nguồn + thời điểm** (BR-29); `xem_ty_gia` đọc kho, **không** đi lấy mới.
 - Ví dụ phải hiểu đúng: "Rây ơi tỉ giá hôm nay thế nào?", "Tỉ giá hôm nay cao hay thấp?", "cập nhật đi Rây", "giá hôm nay sao rồi" → `xem_ty_gia`.
 - **Khi** AI lỗi **thì** đường lui bằng từ khóa; vẫn không hiểu → câu "chưa hiểu" kiểu người + gợi ý lệnh (BR-24).
 
