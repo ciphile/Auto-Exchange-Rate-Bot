@@ -18,13 +18,13 @@ function readRealNames(): string[] {
   const names = new Set<string>();
   for (const line of readFileSync(file, 'utf8').split('\n')) {
     const cells = line.split('|').map((c) => c.trim());
-    if (cells.length < 4 || !cells[2].startsWith('**')) continue;
-    const real = cells[1];
-    const nick = cells[2].replace(/\*/g, '').trim();
+    const [, real = '', nickCell = ''] = cells;
+    if (cells.length < 4 || !nickCell.startsWith('**')) continue;
+    const nick = nickCell.replace(/\*/g, '').trim();
     if (!real || real.startsWith('(') || real === nick) continue;
-    const head = real.split('(')[0].trim();
-    if (head) { names.add(head); names.add(head.split(' ')[0]); }
-    for (const m of real.matchAll(/"([^"]+)"/g)) names.add(m[1]);
+    const head = (real.split('(')[0] ?? '').trim();
+    if (head) { names.add(head); names.add(head.split(' ')[0] ?? head); }
+    for (const m of real.matchAll(/"([^"]+)"/g)) if (m[1]) names.add(m[1]);
   }
   return [...names].filter((n) => n.length >= 3);
 }
@@ -67,4 +67,13 @@ test('Không bí mật gõ cứng trong code (B5): token bot Telegram, khóa Goo
 test('Không gửi thinkingConfig cho Gemini (Bẫy 42, tài liệu gọi AI của Khang)', () => {
   const bad = srcFiles().filter((f) => readFileSync(f, 'utf8').includes('thinkingConfig'));
   assert.deepEqual(bad, []);
+});
+
+test('KC-07 barie: Vercel chỉ phát thư mục public/ và không tải docs/, prototype-v0/ lên (chống lộ tài liệu riêng)', () => {
+  const config = JSON.parse(readFileSync('vercel.json', 'utf8')) as { outputDirectory?: string };
+  assert.equal(config.outputDirectory, 'public');
+  const ignore = readFileSync('.vercelignore', 'utf8').split('\n').map((l) => l.trim());
+  for (const must of ['docs/', 'prototype-v0/', 'tests/', '.claude/', 'CLAUDE.md', '.env']) assert.ok(ignore.includes(must), `.vercelignore thiếu ${must}`);
+  const publicFiles = trackedFiles().filter((f) => f.startsWith('public/'));
+  assert.deepEqual(publicFiles, ['public/robots.txt'], 'public/ chỉ được có robots.txt');
 });

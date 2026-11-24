@@ -1,0 +1,10 @@
+# KC-07: KHÔNG tải lên Vercel những thứ không cần chạy bot (repo private nhưng địa chỉ .vercel.app ai cũng mở được).
+docs/
+prototype-v0/
+tests/
+.claude/
+.github/
+CLAUDE.md
+README.md
+.env
+.env.*

@@ -39,7 +39,7 @@ export function planPaydayWeek(random: () => number): number[] {
     const skips = new Set<number>();
     while (skips.size < skipCount && candidates.length > 0) {
       const pick = candidates.splice(Math.floor(random() * candidates.length), 1)[0];
-      if (!skips.has(pick + 1) && !skips.has(pick - 1)) skips.add(pick);
+      if (pick !== undefined && !skips.has(pick + 1) && !skips.has(pick - 1)) skips.add(pick);
     }
     if (skips.size === skipCount) {
       return [6, 5, 4, 3, 2, 1, 0].filter((d) => !skips.has(d));
