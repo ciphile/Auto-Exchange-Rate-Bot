@@ -108,6 +108,22 @@ Trước khi chạy lệnh cài gói lạ: `npm view <gói>` (người phát hà
 - **Lỗi tạm thời** (nghẽn, mất mạng) → nghỉ ngắn vài phút; **hết lượt** → nghỉ tới mốc làm mới, có trần. Gemini bản miễn phí: **cấm `thinkingConfig` và công cụ tra web** (lỗi 400).
 - Log mọi lần gọi vào `ai_calls`. Test không gọi AI thật.
 
+### 6.10a. Chuẩn gọi AI của Khang — LÀM THEO 100% (Khang yêu cầu 24/11/2026)
+> **Nguồn:** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md` (tài liệu của Khang, bản 1.1, 22/11/2026; rút từ dự án Focus Tracker). File nằm trong `docs/rieng-tu/` vì có thông tin riêng → **xóa / làm sạch trước khi public**.
+> **Cách dùng:** file dài (hàng trăm dòng) → **grep đúng mục**, nhưng **khi code phần gọi AI phải đọc đủ** các phần: bối cảnh + prompt (mục 3), phân loại rủi ro + lớp bảo vệ (mục 5–6), khuôn prompt (mục 7), 2 bảng kiểm (mục 12 và bảng kiểm "phần gọi API cho dự án mới" ở phần cuối), cùng các phần cơ chế gọi AI (một cửa, model, lỗi, cache, log, dọn dẹp, kinh nghiệm lỗi thật).
+> **Không tự bỏ mục nào.** Phần nào không áp dụng (vd nhận lệnh bằng câu tự nhiên nếu phase 1 không có) → ghi vào bảng **"mục → áp dụng / không áp dụng + lý do"** trong TS để Khang duyệt. Mỗi dòng của 2 bảng kiểm phải có bằng chứng (test / file) — thành **barie** (mục 6.18).
+Những điều bắt buộc (tóm tắt để nhớ, **bản gốc mới là chuẩn**):
+- **Một hàm duy nhất** gọi AI, trả `(text, model)`, lỗi ném `AIError`; mọi nơi khác gọi qua nó, truyền `purpose`. Hàm đó tự gắn khối **BỐI CẢNH** (câu đầu: "bạn không có trí nhớ giữa các lần gọi") nếu nơi gọi quên.
+- Gọi REST bằng thư viện chuẩn (không SDK); **key trong header**, không trong URL; che key (`redact`) ở **mọi** đường ra (log, audit, tin Telegram); ảnh không lưu.
+- Model số 1 dùng tên `-latest`; danh sách dự phòng cùng nhóm rồi nhóm lớn hơn; tự hỏi danh sách model (không tốn quota), lưu 30 ngày; **không gửi `thinkingConfig`**, không gửi `temperature`; bỏ phần "thought" khi đọc.
+- Xử lý **từng mã lỗi** riêng (404 · 429 ngày · 429 phút · 429 khi tra web · 5xx · 400 · 401/403); mọi model hết quota → ngừng gọi một khoảng, không gọi mạng vô ích; file trạng thái model ghi nguyên tử + có khóa luồng, tự dọn khi đọc.
+- **Mỗi tính năng có đường lui khi AI lỗi** (câu soạn sẵn đã kiểm duyệt / từ khóa); lỗi `permanent` thì không thử lại.
+- Tra web chỉ bật cho lần gọi thật sự cần; bị 429 / 400 khi tra web → gọi lại cùng model không tra web + dặn AI không bịa số.
+- **App tính số, AI chỉ viết lại thành câu**; định dạng đầu ra quan trọng thì **code kiểm / lọc lại**, đừng chỉ dặn trong prompt; thứ cần chính xác tuyệt đối thì app đưa danh sách, AI chỉ chọn.
+- **Prompt không phình theo thời gian** (giới hạn mọi danh sách gửi kèm, vd 5 câu gần nhất); tin nhắn người dùng bọc `"""…"""` và cắt độ dài; ngày hôm nay do code điền; quy tắc chỉ thêm sau lỗi thật, mỗi lỗi một dòng.
+- Kết quả AI tốn kém → lưu cache (khóa gồm số liệu + mã bối cảnh); log nguyên văn prompt + trả lời theo ngày (che key, tự xóa sau N ngày, cấu hình được); đếm lượt + số từ chỉ để xem, không chặn; có lệnh xem tình trạng AI / xóa cache / liệt kê model / gọi thử.
+- Việc dọn dẹp hằng ngày 1 lần (log prompt, audit, cache, file tạm).
+
 ### 6.11. Dọn dẹp định kỳ
 - Không tạo file tạm trên máy chủ; thứ cần giữ → database / Storage.
 - **Mỗi bảng / thùng có thể phình phải có thời hạn giữ** (tham số) + 1 việc dọn + test. **Thêm bảng mà không khai thời hạn = chưa xong.**
@@ -267,4 +283,7 @@ ATR-1 webhook kiểm mã trước khi đọc · ATR-2 nguồn gửi (IP) · ATR-
 | 39 | File người dùng gửi có tên không ghi kỳ → dùng nhầm tháng | Đọc phần đầu file (kỳ, tài khoản) để xác nhận trước khi test / nạp |
 | 40 | Test với dữ liệu thật có thể ghi nhầm vào bản thật | Chép sang bản sao trên máy ảo; kết nối bản thật ở chế độ **chỉ đọc (`READ ONLY`)**; gỡ biến kết nối thật khi chạy bộ test |
 | 41 | Ảnh banner / email in sẵn chữ có năm, quý → năm sau sai | Ảnh chỉ trang trí; chữ động là chữ thật từ dữ liệu; test quét không có năm cố định |
+| 42 | Gửi `thinkingConfig` cho model Gemini 3.x → lỗi **400 "invalid argument"** | Chỉ gửi tham số tối thiểu; **không** `thinkingConfig`, không `temperature`; test chặn ai thêm lại. Model `-latest` đổi bản bất cứ lúc nào *(Focus Tracker, 14/10/2026)* |
+| 43 | Gọi có tra web bị **429** dù lượt thường còn (quota tra Google của gói free tính riêng, rất thấp) | Tính năng phụ lỗi → **bỏ tính năng phụ, giữ câu trả lời**: gọi lại cùng model không tra web + dặn AI không bịa số *(Focus Tracker, 16/10/2026)* |
+| 44 | Key lọt vào log / tin báo lỗi / ảnh chụp (body lỗi của Google đôi khi chép lại key) | Key chỉ ở biến môi trường, gửi qua header; **che key ở mọi đường ra**; không chụp màn hình có key *(Focus Tracker)* |
 

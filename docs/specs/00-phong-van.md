@@ -34,7 +34,7 @@
 
 | # | Câu hỏi | Khang trả lời |
 |---|---|---|
-| 1 | Ngân sách | **Miễn phí hoàn toàn.** AI = **Gemini bản miễn phí**. Khang nhắc "xem đính kèm" nhưng **Kat chưa nhận được đính kèm** → chờ Khang gửi lại |
+| 1 | Ngân sách | **Miễn phí hoàn toàn.** AI = **Gemini bản miễn phí**. Tài liệu đính kèm Khang gửi 24/11/2026 (đã lưu: `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`) = **chuẩn gọi AI, Kat phải làm theo 100%** (đã vào `CODING_STANDARDS` mục 6.10a) |
 | 2 | Repo public hay private | **Private** |
 | 3 | Dữ liệu tuyệt đối không vào repo / prompt AI | **Tên từng người và tên công ty.** Dùng **biệt danh** thay thế; tên thật chỉ ở 1 file riêng (`docs/rieng-tu/BANG-TEN-THAT.md`), **xóa trước khi public** (hoặc chuyển sang kho cloud) |
 | 4 | Phase 1 gồm gì (bản tin sáng + cảnh báo mốc; lệnh trong group để phase 2?) | **Bàn sau** |
@@ -45,8 +45,10 @@
 - Phase 1 chưa chốt.
 - Hệ quả Kat ghi nhận cho bước kiến trúc (chưa quyết gì): (a) nguyên mẫu dùng Claude API → bản chính thức dùng Gemini free; (b) skill 6.10: Gemini free **cấm `thinkingConfig` và công cụ tra web** (lỗi 400); (c) cần **kiểm chứng**: giới hạn gói free của Gemini, điều khoản dùng dữ liệu của gói free (có thể Google dùng prompt gói free để cải thiện sản phẩm) — liên quan ATR-12; (d) repo private + GitHub Actions → có hạn mức phút miễn phí hàng tháng, cần tính lại tần suất chạy (nguyên mẫu poll 5 phút sẽ không vừa).
 
+## Lượt 3 — Dữ liệu nguồn (Kat hỏi 24/11/2026) — ⏳ chờ Khang trả lời
+Câu hỏi: (1) rủi ro nguồn Wise không chính thức + dự phòng · (2) cần VCB, VPBank; có DBS không · (3) độ trễ chấp nhận được · (4) giá chợ đen thật để hiệu chỉnh · (5) nguồn nào là "chuẩn" khi các nguồn lệch nhau. **Khang trả lời:** —
+
 ## Các lượt còn lại (chưa hỏi)
-- **Lượt 3 — Dữ liệu nguồn:** nguồn nào là "chuẩn" của nhóm, độ trễ chấp nhận được, có dữ liệu chợ đen thật để hiệu chỉnh không.
 - **Lượt 4 — Quy tắc nghiệp vụ:** mốc cảnh báo chính thức, giờ im lặng, số tin tối đa / ngày, số nào phải khớp số nào, ngày lương, ai chốt.
 - **Lượt 5 — Người dùng & quyền:** ai ra lệnh được cho bot, ai báo giá đổi thật, thiết bị.
 - **Lượt 6 — Đầu ra & giọng văn:** giờ đăng, độ dài, mức hài hước, câu mẫu của Mít nào được dùng, bot xưng hô thế nào trong group.

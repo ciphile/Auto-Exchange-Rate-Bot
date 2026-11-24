@@ -99,7 +99,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 ## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1, chờ Khang duyệt)
 Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND mỗi sáng + cảnh báo khi vượt mốc; lời bình do AI viết theo giọng Mít, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính).
 
-**Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; Gemini free cấm `thinkingConfig` + công cụ tra web) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
+**Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; **gọi AI theo 100% tài liệu của Khang** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`; cấm `thinkingConfig`) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
 
 ## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
@@ -111,6 +111,7 @@ Chưa có `BR-xx` (chờ FS). Tham số **nháp** đang nằm trong code, chưa 
 - Mức **production-ready**; module / chức năng lớn xong → **audit ≥ 2 lần** + báo cáo bảng cho Khang.
 - Phân tầng Controller → Service → Repository / Adapter; không nhảy tầng; thư mục phẳng; file ≲ 300 dòng, hàm ≲ 50 dòng.
 - **Không hard-code**: bí mật ở biến môi trường, nghiệp vụ ở `settings`, câu chữ ở `messages`, mã lỗi `E-<NHÓM>-<số>` có 2 câu (báo lỗi + cách xử lý).
+- **Gọi AI: làm theo 100% tài liệu của Khang** (`CODING_STANDARDS` mục 6.10a): 1 hàm duy nhất, REST + key ở header, che key, model `-latest` + dự phòng, xử lý từng mã lỗi, đường lui khi AI lỗi, log prompt, cache, dọn dẹp; không tự bỏ mục nào (mục không áp dụng → bảng trong TS, Khang duyệt).
 - **AI không bao giờ quyết con số**: chỉ viết lời; code kiểm đầu ra, hỏng → dùng mẫu soạn sẵn; gọi AI qua 1 adapter, log mọi lần gọi.
 - Dữ liệu ngoài (tỉ giá…) lấy sẵn bằng việc định kỳ; dịch vụ lỗi → dùng bản gần nhất + ghi rõ ngày.
 - Tiền là số nguyên đơn vị nhỏ nhất; ngày giờ ISO có múi giờ, hiển thị giờ VN.

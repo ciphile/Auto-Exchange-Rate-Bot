@@ -63,3 +63,10 @@
 - **Kết quả:** biên bản `00-phong-van.md` thêm lượt 2 (chờ duyệt kết luận) và đánh dấu lượt 1 ✅ ĐÃ CHỐT; `CLAUDE.md` Rule 5 + ràng buộc sửa đè. Kat chọn biệt danh (Mít, Xoài, Ổi, "công ty SGP", "nhóm chat"), thay trong ~10 file (chỉ chú thích / chữ, không đổi logic; 37 test nguyên mẫu vẫn đạt), tạo `docs/rieng-tu/BANG-TEN-THAT.md`.
 - **Chưa rõ:** "xem đính kèm" (Gemini) — Kat chưa nhận được đính kèm; "t5 tuần sau" Kat hiểu là 03/12/2026.
 - **Bài học cho skill:** (1) ràng buộc **tên người / tên công ty** cần hỏi ngay ở phỏng vấn lượt riêng tư, **trước** khi Kat chép bất cứ thứ gì từ ảnh chụp chat vào repo; (2) xóa file đối chiếu trước khi public **không đủ** vì lịch sử git còn → ghi sẵn cách xử lý (repo mới sạch); (3) nên có **barie** quét tên thật ngoài file đối chiếu (luật máy kiểm được → barie, mục 6.18).
+
+### 2026-11-24 20:47 (giờ VN) — Khang — Gửi tài liệu chuẩn gọi AI (Gemini miễn phí), yêu cầu làm theo 100%
+- **Loại:** Quy trình
+- **Yêu cầu gốc:** "về 'xem đính kèm' (về Gemini miễn phí), Kat xem và lưu, make sure làm theo 100%" · "đọc xong thì Kat phỏng vấn đi để hoàn thiện requirement"
+- **Đầu vào cần có:** `Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md` (788 dòng; Kat đọc 2 lượt vì giới hạn công cụ đọc)
+- **Kết quả:** lưu nguyên văn (so sánh `cmp` khớp) vào `docs/rieng-tu/` vì có thông tin riêng; `CODING_STANDARDS` thêm mục 6.10a (chuẩn gọi AI, bắt buộc, kèm cách xử lý mục không áp dụng) + 3 dòng "Bẫy đã gặp" (42–44); `CLAUDE.md` sửa đè; biên bản phỏng vấn cập nhật + mở Lượt 3.
+- **Bài học cho skill:** tài liệu Khang đưa vào thường **chứa thông tin riêng** → đặt thẳng vào thư mục riêng tư; chuẩn do Khang viết cho dự án khác phải qua bước **"mục → áp dụng / không áp dụng"** trước khi "làm theo 100%". Skill nên có chỗ cho "tài liệu tham khảo bắt buộc của Khang" (hiện chỉ có CODING_STANDARDS).
