@@ -96,8 +96,11 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 8. **Rule 8 — Bug:** theo bảng "LỊCH GHI SỔ" (`docs/QUY_TAC_GHI_CHEP.md` mục 4); hồ sơ đủ 10 ý (mẫu 9.5).
 9. **Rule 9 — Truy vết 1 phút:** `BR-xx` → `grep -rn "BR-xx"` → FS (lý do) → history (đổi lúc nào) → `docs/bugs/`.
 
-## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1, chờ Khang duyệt)
-Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND **chỉ trong 7 ngày cuối tháng** (ngày nhận lương = ngày cuối tháng): 2–3 lần cảnh báo / báo cách ngày, **ngày cuối tháng luôn báo** (cao hay thấp), các ngày khác **im lặng** (Khang 24/11/2026, lượt 4 — chờ duyệt); lời bình do AI viết theo giọng Mít, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính). Hình dạng tin: phương án 2 (gọn, có dòng NH mua). Lỗi kỹ thuật: nhắn riêng Khang. Phase 1: "tất cả tính năng về tỉ giá" (chi tiết chờ Khang).
+## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1–5, chờ Khang duyệt)
+**Hai bot Telegram, trực 24/24, miễn phí 100%** (Khang 24/11/2026, lượt 5):
+- **Rây — nhóm A** (đồng nghiệp thân: lương, thuế, công ty): tỉ giá SGD→VND. Hiểu câu tự nhiên → danh sách action cố định → trả lời tự nhiên đúng phong cách. Tỉ giá do **app lấy theo lịch cố định**, lưu cache (có dọn dẹp); AI chỉ soạn lời. **Tuần lương** (7 ngày tới ngày cuối cùng của tháng): tự báo gần như mỗi ngày / cách ngày, **giờ ngẫu nhiên**, trừ 20:00–06:00; **ngày cuối tháng luôn báo**. **Cảnh báo vượt ngưỡng** ngay lúc vượt, ≤ 4 lần / ngày, cách nhau ≥ 3 giờ, giờ nghỉ thì chờ. Than / báo như người (giọng Mít, Ổi, Xoài). Tán gẫu kinh tế vĩ mô, vàng, coin. Khang chỉnh phong cách, tâm trạng, lịch, giờ nghỉ, nguồn. Mất nguồn → báo riêng Khang (mã lỗi + diễn giải), không nhắn group.
+- **Lũi — nhóm B** (rộng hơn, thời sự): cào tin báo chính thống **2 lần / ngày** (lịch cố định), cache có dọn dẹp, xếp hạng tin theo rule (mức nóng, mức nghiêm trọng; Khang chỉnh ngưỡng), nhắn **giờ ngẫu nhiên** trừ 20:00–06:00. Bàn chính trường, **tính cách đặc biệt (Khang mô tả sau)**. Tính năng bật / tắt: đọc chat và tham gia như bạn.
+- Nguồn tỉ giá: Wise (mid-market, chuẩn cho mốc), VCB, VPBank (NH mua / NH bán), chợ đen (ước tính Wise +0,4%).
 
 **Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; **gọi AI theo 100% tài liệu của Khang** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`; cấm `thinkingConfig`) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
 

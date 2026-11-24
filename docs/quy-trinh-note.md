@@ -82,3 +82,9 @@
 - **Yêu cầu gốc:** "A. phương án 2 · B. Bot không cần nhắn mỗi ngày… trong vòng 1 tuần trước [ngày cuối tháng] bot chỉ cần nhắn 2-3 lần để cảnh báo tỉ giá và báo tỉ giá cách ngày… các ngày còn lại im lặng · C. ngày cuối tháng đảm bảo bot báo dù cao hay thấp · D. lỗi kỹ thuật nhắn riêng Khang · E. tất cả tính năng về tỉ giá" · "giờ mình muốn nói về con bot làm gì, bạn cho phép mình nói được chưa?"
 - **Kết quả:** biên bản lượt 4 ghi đủ; `CLAUDE.md` Mục tiêu + Quy tắc nghiệp vụ sửa đè (lịch cũ "mỗi sáng" đã lỗi thời). Khang xin nói tự do về bot → Kat nghe, ghi nguyên văn, chưa hỏi dồn.
 - **Bài học cho skill:** câu trả lời của Khang có thể **đảo yêu cầu lượt trước** (ở đây: từ "mỗi sáng" sang "7 ngày cuối tháng") → skill nên có bước **"đối chiếu yêu cầu lượt trước"** sau mỗi lượt, và ghi rõ chỗ bị thay (đổi nhãn, không xóa).
+
+### 2026-11-24 21:34 (giờ VN) — Khang — Kể yêu cầu thật: 2 bot (Rây tỉ giá ở nhóm A, Lũi tin tức ở nhóm B), trực 24/24, miễn phí 100%
+- **Loại:** Spec
+- **Yêu cầu gốc:** (tin dài) 2 group, 2 bot; Rây hiểu câu tự nhiên, cảnh báo như người, tuần lương báo giờ ngẫu nhiên; Lũi cào tin 2 lần / ngày, xếp hạng, nhắn giờ ngẫu nhiên, đọc chat tham gia; Khang chỉnh mọi thứ; nhờ Kat tư vấn chỗ chạy 24/24 miễn phí + tính năng thêm (tối giản)
+- **Kết quả:** biên bản lượt 5 (biệt danh, không tên thật); `CLAUDE.md` Mục tiêu sửa đè (từ 1 bot thành 2 bot); bảng tên thật thêm Mận + nhóm A / nhóm B. Kat tra cứu giới hạn gói miễn phí (Vercel cron, Supabase, Gemini free, Cloudflare Workers) trước khi tư vấn.
+- **Bài học cho skill:** phỏng vấn theo lượt có thể **chưa chạm phạm vi thật** cho tới khi người dùng được "kể tự do" — nên có 1 lượt **"kể tự do"** sớm (ngay sau lượt mục tiêu), rồi mới hỏi chi tiết. Khi tư vấn nền tảng miễn phí: **tra giới hạn hiện hành** trước, đừng dựa trí nhớ.

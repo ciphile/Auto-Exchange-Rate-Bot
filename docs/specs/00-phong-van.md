@@ -74,6 +74,37 @@
 - Hình dạng tin theo phương án 2. Lỗi kỹ thuật chỉ nhắn riêng Khang.
 - Điểm Kat cần Khang làm rõ **sau khi Khang nói xong về bot** (chưa hỏi): (i) "1 tuần" = 7 ngày kể cả ngày cuối tháng hay 7 ngày trước đó; (ii) "cách ngày" tính từ ngày nào; (iii) ngoài khung 7 ngày, giá cắt mốc 20,000 / 20,100 có phá lệ im lặng không; (iv) 2–3 lần có gồm tin cuối tháng không.
 
+## Lượt 5 — Khang kể về bot (24/11/2026) — ⏳ chờ Khang nói thêm (tính cách Lũi) + duyệt
+> Ghi theo ý Khang, tên người đã đổi sang biệt danh (Mít, Ổi, Xoài, Mận). "Ngày cuối tuần của tháng" ở lượt 4 = **ngày cuối cùng của tháng** (Khang xác nhận).
+
+**Hai group, hai bot:**
+- **Nhóm A** (đồng nghiệp thân: lương, thuế, chuyện công ty) → bot **Rây**, chuyên tỉ giá.
+- **Nhóm B** (rộng hơn, có đồng nghiệp cũ; không bàn lương / thuế / tỉ giá, bàn thời sự tin tức) → bot **Lũi**, chuyên tin tức.
+- Cả hai **trực 24/24**, **miễn phí 100%**. Máy cá nhân của Khang tắt sau 23:00 → không dùng được làm chỗ chạy chính. Khang hỏi: Vercel? Python hay ngôn ngữ nào?
+
+**Rây (nhóm A):**
+1. Người dùng nhắn **ngôn ngữ tự nhiên** (hoặc lệnh `/`) → Rây trả lời đúng. Ví dụ: "Rây ơi tỉ giá hôm nay thế nào?", "Tỉ giá hôm nay cao hay thấp?", "cập nhật đi Rây?", "giá hôm nay sao rồi".
+2. Rây có **danh sách action cố định**; câu tự nhiên → AI map đúng action → trả lời bằng lời tự nhiên **đúng phong cách** (theo tài liệu chuẩn gọi AI của Khang).
+3. **Số liệu tỉ giá: app tự lấy theo lịch cố định** (đầu ngày mỗi sáng), lưu cache, **có dọn dẹp**. Khi nói về tỉ giá, AI **chỉ soạn lời**, không đi tìm tỉ giá.
+4. **Tuần lương:** lương nhận **ngày cuối cùng của tháng**; trong 1 tuần đó Rây **tự gửi tỉ giá** kèm nhận xét tự nhiên (như Mít hay nói), gần như mỗi ngày 1 lần hoặc nói rồi nghỉ 1 ngày rồi nói tiếp. **Giờ nói ngẫu nhiên**, không cố định (lúc 11:00, lúc 14:00…), **trừ 20:00–06:00**.
+5. **Cảnh báo vượt ngưỡng: nhắn ngay lúc vượt** — tối đa **4 lần / ngày**, mỗi lần **cách nhau ≥ 3 tiếng**; rơi vào 20:00–06:00 thì **chờ tới sau giờ nghỉ**. Lời cảnh báo phải **than y như cách Xoài, Ổi, Mít than** khi tỉ giá không như ý — **không máy móc**, để người đọc cảm giác Rây là đồng nghiệp than thở như người thật.
+6. Báo tỉ giá thì **như cách Mít báo**, không theo khuôn mẫu máy móc.
+7. **Tán gẫu**: tỉ giá, kinh tế, giá vàng, coin, tài chính vĩ mô, kinh tế chính trị (vd "vì sao tỉ giá đi xuống", "Trump có làm gì không", "vì sao SGD chênh nhiều so với USD", "dự đoán tháng sau", "tháng sau có chiến tranh không") → AI trả lời bằng lời tự nhiên.
+8. **Khang điều chỉnh được**: phong cách nói; **tâm trạng** (vui, cáu, "bị bồ đá" nói cộc lốc, muốn nói nhiều…); ngày giờ hoạt động; giờ nghỉ (20:00–06:00); nguồn tỉ giá (vd chỉ VCB hoặc chỉ Wise).
+9. **Mất nguồn tỉ giá / rớt mạng → báo Khang**, ghi **mã lỗi + diễn giải** cho Khang hiểu; **không nhắn gì vào group**.
+10. Nói như người, không khuôn mẫu, **nhưng theo rule**: cảnh báo khi nào, báo khi nào đều có rule cài sẵn. **Lịch lấy tỉ giá cố định; lúc nhắn người dùng ngẫu nhiên** (trừ cảnh báo).
+11. Kat tư vấn thêm tính năng nếu hay, **tối giản**.
+
+**Lũi (nhóm B):**
+1. Khang gửi các **lĩnh vực tin** nhóm hay bàn (không phải tin nào cũng cần).
+2. Lũi **cào tin** từ báo chính thống (Dân trí, Tuổi Trẻ…; Khang gợi ý có thể lấy từ bot Telegram của báo) theo **lịch cố định 2 lần / ngày** (vd 06:00 và 12:00), lưu cache, **dọn dẹp chắc chắn 100%** sau một thời gian.
+3. Tới **thời điểm ngẫu nhiên** (trừ 20:00–06:00) Lũi nhắn **tin nổi bật**; tin được **xếp hạng theo rule** (mức nóng / hot, mức nghiêm trọng / to lớn); **Khang chỉnh ngưỡng** để Lũi chỉ nói tin thuộc mức nhất định.
+4. Khang chỉnh **phong cách nói, ngày giờ được / không được nói**, như Rây.
+5. Lũi **bàn chuyện chính trường**, có **tính cách thật đặc biệt** — **Khang sẽ mô tả sau**; Kat phải mô tả tính cách thật kỹ, ràng buộc bằng **rule + tham số** để AI nói đúng 100% phong cách đó.
+6. Tính năng **bật / tắt bởi Khang**: Lũi **đọc chat trong group** và tham gia như một người bạn (thời sự, AI, chính trị, Trump, bất động sản, gái xinh…).
+7. Nhóm B có Mít, Ổi, Xoài, Khang, Mận và vài đồng nghiệp khác.
+8. Kat tư vấn thêm tính năng nếu hay, **tối giản**.
+
 ## Các lượt còn lại (chưa hỏi)
 - **Lượt 5 — Người dùng & quyền:** ai ra lệnh được cho bot, ai báo giá đổi thật, thiết bị.
 - **Lượt 6 — Đầu ra & giọng văn:** giờ đăng, độ dài, mức hài hước, câu mẫu của Mít nào được dùng, bot xưng hô thế nào trong group.
