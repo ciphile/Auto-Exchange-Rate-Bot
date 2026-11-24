@@ -44,3 +44,9 @@
 - **Kết quả:** `CLAUDE.md` (15,7 KB, Mode 1, ghi dùng bản tạm v0.1) · `docs/STATUS.md` · `docs/history.md` (khung) · `docs/quy-trinh-note.md` · `docs/bugs/README.md` · `docs/specs/00-phong-van.md` (biên bản lượt 1) · `docs/QUY_TAC_GHI_CHEP.md` (mục 3–5) · `docs/CODING_STANDARDS.md` (mục 6–8) · `docs/SKILL_TAM.md` (bản gốc) · `.claude/do-ngu-canh.js` + `.claude/settings.json`. Thử hook 3 ngưỡng: 60% / 70% / 75% đạt, 50% im lặng, file hỏng thì im lặng.
 - **Chưa làm (cố ý):** barie tối thiểu + CI xanh (mục 6.18) — phụ thuộc quyết định stack (STATUS việc 4, 5); khối hook barie kiến trúc (chưa có test barie); `docs/huong-dan-cai-dat.md`, `.env.example`.
 - **Bài học cho skill:** `CODING_STANDARDS` mẫu viết cho TypeScript / Next.js; dự án Python cần bước "chọn stack + ADR" **trước** khi tách chuẩn code; mục 7 (web) không áp dụng nếu dự án không có web.
+
+### 2026-11-24 20:29 (giờ VN) — Khang — Chốt thứ tự làm việc trước khi code
+- **Loại:** Quy trình
+- **Yêu cầu gốc:** "xong rồi mình cần làm 3 việc với bạn: kể lại requirement, bối cảnh · mình chỉnh sửa requirement · bàn thiết kế bảo mật, cấu trúc, khả thi · chốt ATR bảo mật · làm FS · rồi mới code"
+- **Kết quả:** thứ tự: (1) Kat kể lại requirement + bối cảnh → (2) Khang chỉnh → (3) bàn kiến trúc / bảo mật / khả thi → (4) chốt ATR → (5) FS → (6) code. Skill còn đòi thêm BRD và TS trước khi code (Kat đã hỏi Khang chọn gọn hay đủ).
+- **Bài học cho skill:** Khang tự đặt thứ tự và hỏi "skill có nhắc việc này không" → skill nên có **bảng "bước nào ở đâu trong skill"** (mục 2 bước 3, mục 6.15, 6.17, 9.6) để tra nhanh.
