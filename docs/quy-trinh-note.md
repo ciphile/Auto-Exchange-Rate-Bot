@@ -100,3 +100,9 @@
 - **Yêu cầu gốc:** (Kat tự phát hiện khi rà) · Khang: "còn các điều khác mình đồng ý vs bạn"
 - **Kết quả:** thay tên thật nhóm B trong `00-phong-van.md` bằng "nhóm B"; tên đó **vẫn còn trong lịch sử git** (commit `5409d28`, repo private — đã có quy ước tạo repo sạch trước khi public). Ghi các đề xuất Khang đồng ý (Vercel + Supabase, TypeScript, không chối là bot, che tên trước khi gửi AI, chat giữ 24 giờ, RSS) vào biên bản + `CLAUDE.md`.
 - **Bài học cho skill:** Kat **vẫn lỡ tay** dù đã có Rule 5 → luật "không tên thật ngoài file riêng" phải thành **barie** (test quét repo theo danh sách tên trong file riêng, đỏ là không commit), đúng tinh thần mục 6.18 "biển báo thì AI quên". Đưa vào bộ barie tối thiểu.
+
+### 2026-11-24 21:49 (giờ VN) — Khang — Bổ sung tính năng "bot nhắn thay Khang"
+- **Loại:** Spec
+- **Yêu cầu gốc:** "có 1 tính năng bot nhắn thay Khang, vd Khang soạn 1 command kêu Lũi nhắn 'mọi người thôi đi ăn cơm đi' -> Lũi nhắn đúng y chang câu đó vào group mà không nói gì hơn (không biết là Khang nhắn)"
+- **Kết quả:** ghi vào biên bản lượt 5 + `CLAUDE.md`; Kat đề xuất cách làm an toàn (chat riêng, chỉ Khang, không qua AI, thẻ xác nhận), chờ Khang chốt.
+- **Bài học cho skill:** tính năng "đăng ra ngoài" (gửi tin vào group) là thao tác **không quay lại được** → theo tài liệu gọi AI của Khang (mục 5) phải có **thẻ xác nhận**; nội dung nguyên văn thì **không gửi AI** (vừa đúng ý, vừa giữ riêng tư).
