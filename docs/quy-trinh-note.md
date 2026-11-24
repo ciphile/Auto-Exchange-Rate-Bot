@@ -76,3 +76,9 @@
 - **Yêu cầu gốc:** "1. a · 2. không cần DBS · 3. không cần chính xác giờ đâu · 4. b · 5. wise — giờ phỏng vấn lại bot làm gì đi, mình cập nhật requirement về bot"
 - **Kết quả:** biên bản `00-phong-van.md` ghi lượt 3 (chờ duyệt kết luận) + mở lượt 4; `CLAUDE.md` thêm đoạn "Dữ liệu nguồn". Hệ quả Kat ghi nhận: chọn 4b → lệnh báo giá đổi thật (`/doi`) của nguyên mẫu không còn cần.
 - **Bài học cho skill:** đưa câu hỏi dạng **lựa chọn có chữ cái + đề xuất sẵn** giúp Khang trả lời 1 dòng cho cả lượt; nên làm thành mẫu hỏi chuẩn trong skill (mục 2.1).
+
+### 2026-11-24 21:06 (giờ VN) — Khang — Trả lời lượt 4 (bot làm gì): bot chỉ nhắn 7 ngày cuối tháng
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "A. phương án 2 · B. Bot không cần nhắn mỗi ngày… trong vòng 1 tuần trước [ngày cuối tháng] bot chỉ cần nhắn 2-3 lần để cảnh báo tỉ giá và báo tỉ giá cách ngày… các ngày còn lại im lặng · C. ngày cuối tháng đảm bảo bot báo dù cao hay thấp · D. lỗi kỹ thuật nhắn riêng Khang · E. tất cả tính năng về tỉ giá" · "giờ mình muốn nói về con bot làm gì, bạn cho phép mình nói được chưa?"
+- **Kết quả:** biên bản lượt 4 ghi đủ; `CLAUDE.md` Mục tiêu + Quy tắc nghiệp vụ sửa đè (lịch cũ "mỗi sáng" đã lỗi thời). Khang xin nói tự do về bot → Kat nghe, ghi nguyên văn, chưa hỏi dồn.
+- **Bài học cho skill:** câu trả lời của Khang có thể **đảo yêu cầu lượt trước** (ở đây: từ "mỗi sáng" sang "7 ngày cuối tháng") → skill nên có bước **"đối chiếu yêu cầu lượt trước"** sau mỗi lượt, và ghi rõ chỗ bị thay (đổi nhãn, không xóa).

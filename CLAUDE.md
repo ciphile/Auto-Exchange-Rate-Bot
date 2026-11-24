@@ -97,7 +97,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 9. **Rule 9 — Truy vết 1 phút:** `BR-xx` → `grep -rn "BR-xx"` → FS (lý do) → history (đổi lúc nào) → `docs/bugs/`.
 
 ## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1, chờ Khang duyệt)
-Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND mỗi sáng + cảnh báo khi vượt mốc; lời bình do AI viết theo giọng Mít, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính).
+Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND **chỉ trong 7 ngày cuối tháng** (ngày nhận lương = ngày cuối tháng): 2–3 lần cảnh báo / báo cách ngày, **ngày cuối tháng luôn báo** (cao hay thấp), các ngày khác **im lặng** (Khang 24/11/2026, lượt 4 — chờ duyệt); lời bình do AI viết theo giọng Mít, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính). Hình dạng tin: phương án 2 (gọn, có dòng NH mua). Lỗi kỹ thuật: nhắn riêng Khang. Phase 1: "tất cả tính năng về tỉ giá" (chi tiết chờ Khang).
 
 **Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; **gọi AI theo 100% tài liệu của Khang** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`; cấm `thinkingConfig`) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
 
@@ -107,7 +107,7 @@ Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
 
 ## Quy tắc nghiệp vụ
-Chưa có `BR-xx` (chờ FS). Tham số **nháp** đang nằm trong code, chưa chốt: mốc 19900 · 19950 · 20000 · 20100 · 20200 · 20300; đệm ±10 VND; im lặng 22:00–07:00; tối đa 4 tin / ngày; chênh chợ đen mặc định +0,4% so với Wise.
+Chưa có `BR-xx` (chờ FS). Tham số **nháp** của nguyên mẫu, chưa chốt: mốc 19900 · 19950 · 20000 · 20100 · 20200 · 20300; đệm ±10 VND; chênh chợ đen +0,4% so với Wise (đã chốt ở lượt 3). Lịch nhắn của nguyên mẫu (mỗi sáng, 4 tin / ngày, im lặng 22:00–07:00) **đã lỗi thời** — lịch mới: 7 ngày cuối tháng, xem Mục tiêu.
 
 ## Coding standards — chi tiết `docs/CODING_STANDARDS.md` (đọc TOÀN BỘ 1 lần / phiên khi bắt đầu code)
 - Mức **production-ready**; module / chức năng lớn xong → **audit ≥ 2 lần** + báo cáo bảng cho Khang.

@@ -57,8 +57,22 @@
 
 **Kết luận lượt 3 (Kat tóm tắt, chờ Khang duyệt):** mốc cảnh báo so với **giá Wise (mid-market)**; nguồn trong bản tin: Wise, VCB, VPBank (không DBS); chợ đen = Wise × 1,004 (**ước tính**, không có cơ chế học từ giá thật → lệnh báo giá đổi thật không còn cần thiết); Wise hỏng → nguồn dự phòng 1 lần / ngày, ghi rõ trong tin; tần suất kiểm không quan trọng → chốt ở TS theo hạn mức gói miễn phí.
 
-## Lượt 4 — Bot làm gì: bản tin, cảnh báo, lỗi, phạm vi phase 1 (Kat hỏi 24/11/2026) — ⏳ chờ Khang trả lời
-Câu hỏi: (A) hình dạng bản tin sáng · (B) mốc + chiều báo + giờ im lặng + số tin tối đa · (C) nhắc riêng cuối tháng · (D) kênh báo lỗi kỹ thuật · (E) phase 1 gồm gì. **Khang trả lời:** —
+## Lượt 4 — Bot làm gì (Khang trả lời 24/11/2026) — ⏳ chờ Khang nói thêm + duyệt kết luận
+
+| # | Nhóm | Khang trả lời (nguyên ý) |
+|---|---|---|
+| A | Hình dạng bản tin | **Phương án 2** (gọn, có dòng ngân hàng NH mua). Chưa trả lời: giờ đăng, đăng cuối tuần hay không — sẽ do lịch mới bên dưới chi phối |
+| B | Tần suất + cảnh báo | "Bot **không cần nhắn mỗi ngày**. Ngày nhận lương là **ngày cuối cùng của tháng**. Trong vòng **1 tuần trước** [Khang gõ "ngày cuối tuần của tháng" — Kat hiểu là *ngày cuối tháng*, chờ xác nhận] bot chỉ cần nhắn **2–3 lần** để **cảnh báo tỉ giá** và **báo tỉ giá cách ngày**. Các ngày còn lại trong tháng bot **im lặng** là đủ." |
+| C | Nhắc cuối tháng | Ngày cuối tháng (ngày nhận lương): bot **luôn báo tỉ giá, cao hay thấp đều báo** |
+| D | Báo lỗi kỹ thuật | **Nhắn riêng cho Khang** |
+| E | Phase 1 | "**Tất cả tính năng về tỉ giá**" (Kat hiểu: mọi tính năng liên quan tỉ giá, không chỉ bản tin + cảnh báo; Khang sẽ nói chi tiết ở bước tới) |
+
+**Chưa được trả lời trực tiếp (chờ Khang nói về bot):** danh sách mốc (nháp 6 mốc, 20,000 và 20,100 là hai mốc chính) · chiều báo (giảm / tăng) · "không báo lặp" khi giá sát mốc · giờ im lặng · số tin tối đa / ngày · cảnh báo kiểu khác.
+
+**Kết luận lượt 4 (Kat tóm tắt, chờ Khang duyệt):**
+- **Thay đổi lớn so với lượt 1:** bot **không còn đăng mỗi sáng**. Chỉ hoạt động trong **7 ngày cuối tháng**: nhắn 2–3 lần (cảnh báo + báo cách ngày), và **ngày cuối tháng luôn báo**. Các ngày khác trong tháng: **im lặng**.
+- Hình dạng tin theo phương án 2. Lỗi kỹ thuật chỉ nhắn riêng Khang.
+- Điểm Kat cần Khang làm rõ **sau khi Khang nói xong về bot** (chưa hỏi): (i) "1 tuần" = 7 ngày kể cả ngày cuối tháng hay 7 ngày trước đó; (ii) "cách ngày" tính từ ngày nào; (iii) ngoài khung 7 ngày, giá cắt mốc 20,000 / 20,100 có phá lệ im lặng không; (iv) 2–3 lần có gồm tin cuối tháng không.
 
 ## Các lượt còn lại (chưa hỏi)
 - **Lượt 5 — Người dùng & quyền:** ai ra lệnh được cho bot, ai báo giá đổi thật, thiết bị.
