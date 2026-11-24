@@ -129,6 +129,9 @@
 | — | Lệnh bật / tắt "lắng nghe" | **Cả Rây và Lũi** có lệnh để Khang **bật / tắt việc đọc tin nhắn trong group** |
 | — | Xưng hô | Khang **chọn cách mỗi bot xưng hô và gọi người dùng** (vd "tao – mày") bằng lệnh |
 | — | Tài liệu chuẩn gọi AI | Khang gửi lại (24/11/2026 ~22:00) — **giống hệt** bản đã lưu, không đổi gì |
+| — | **Prompt gửi AI phải giàu bối cảnh** (Khang 24/11/2026) | Ví dụ "Lũi mày thấy tao nên nghỉ phép ngày mai không?" → ngoài câu hỏi, prompt phải có: bối cảnh, **tên từng người**, **tên nhóm**, nhóm hay bàn gì, **nhóm đang nói gì**, các thông số, các quy tắc, cách xưng hô, tính cách… — theo tài liệu chuẩn gọi AI của Khang (mục 3.1 khối BỐI CẢNH). ⚠️ **Đụng Rule 5** (tên người / tên nhóm không vào prompt AI) → Kat đề xuất cách giải, **chờ Khang chốt** |
+| — | **Lắng nghe = đọc mọi tin, tự quyết khi nào nói** (cả 2 bot) | Khi bật lắng nghe, bot **không chỉ phản hồi khi được gọi** ("Rây ơi", "Lũi ơi", hoặc chỉ chữ "Lũi") mà **đọc tất cả tin nhắn và trả lời khi thấy cần**. (Thay câu Kat hỏi "Rây chỉ trả lời khi được gọi?" → **không**, Rây cũng tự chen vào) |
+| — | **Mức hóng chuyện 1–10** (Khang chỉnh) | Càng cao càng nói nhiều; càng thấp càng ít nói, **bỏ qua đa số** trường hợp. Khi nói thì **thêm quan điểm của bot**, vd nhóm bàn sếp khó tính soi xét → bot chen: "tao nghĩ không nên nói nhiều về sếp xui lắm" |
 | — | Lũi đọc tin nhắn | **Lũi đọc tất cả tin nhắn trong nhóm B.** Link: Lũi **không** tự mở link; chỉ đọc chữ đi kèm / tiêu đề xem trước để đoán ý người gửi; **chỉ mở link khi được yêu cầu**. (Có cần danh sách trang được phép mở không → bàn ở ATR) |
 
 **Căn cứ mốc (Kat giả lập 24/11/2026, lấy giá mỗi 5 tiếng, chỉ tính 14 ngày cuối tháng, tối đa 4 lần / ngày, cách 3 giờ, im lặng 20:00–06:00):**

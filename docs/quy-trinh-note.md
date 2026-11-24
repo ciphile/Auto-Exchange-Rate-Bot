@@ -124,3 +124,9 @@
 - **Yêu cầu gốc:** "phải có command cho Khang điều chỉnh [ngưỡng]" · "Lũi và Rây phải có command để Khang bật tính năng lắng nghe / đọc tin nhắn" · "thêm tính năng để Khang lựa chọn cách 2 bot này xưng hô (vd mày tao)" · "ok C nha" · CLAUDE.md "khi nào vượt 70kb rồi tính sau" · gửi lại tài liệu chuẩn gọi AI (so `cmp`: giống hệt bản đã lưu)
 - **Kết quả:** biên bản + `CLAUDE.md` cập nhật (mốc chốt, nhóm lệnh điều khiển của Khang, ngưỡng 70 KB).
 - **Bài học cho skill:** người dùng gửi lại file cùng tên → **so sánh trước** (`cmp` / `diff`) thay vì đọc lại cả file; ngưỡng kích thước `CLAUDE.md` là tham số do chủ dự án đặt, ghi ngay vào `CLAUDE.md`.
+
+### 2026-11-24 22:05 (giờ VN) — Khang — Prompt giàu bối cảnh (có tên người, tên nhóm); lắng nghe = đọc mọi tin + mức hóng chuyện 1–10
+- **Loại:** Spec
+- **Yêu cầu gốc:** "phải soạn prompt thật dài gồm bối cảnh tên từng người tên nhóm nhóm hay bàn về việc gì nhóm đang nói về gì, các thông số, các quy tắc, cách xưng hô, tính cách… xem file đính kèm" · "bot đọc tất cả tin nhắn mọi người soạn và trả lời khi thấy cần, thêm mức độ hóng chuyện nhiều chuyện từ 1 tới 10… khi nói thì hay thêm quan điểm của bot vào"
+- **Kết quả:** biên bản + `CLAUDE.md` cập nhật. Kat phát hiện **mâu thuẫn với Rule 5** (tên người / tên nhóm không vào prompt AI; Gemini free có thể dùng dữ liệu) → đề xuất "thay tên bằng mã trước khi gửi, đổi lại tên khi nhận", chờ Khang chốt.
+- **Bài học cho skill:** yêu cầu mới phải được **đối chiếu với quy tắc đã chốt** (riêng tư, bảo mật) trước khi ghi là "chốt"; chỗ mâu thuẫn → nêu rõ + đưa phương án, không tự chọn.
