@@ -45,10 +45,21 @@
 - Phase 1 chưa chốt.
 - Hệ quả Kat ghi nhận cho bước kiến trúc (chưa quyết gì): (a) nguyên mẫu dùng Claude API → bản chính thức dùng Gemini free; (b) skill 6.10: Gemini free **cấm `thinkingConfig` và công cụ tra web** (lỗi 400); (c) cần **kiểm chứng**: giới hạn gói free của Gemini, điều khoản dùng dữ liệu của gói free (có thể Google dùng prompt gói free để cải thiện sản phẩm) — liên quan ATR-12; (d) repo private + GitHub Actions → có hạn mức phút miễn phí hàng tháng, cần tính lại tần suất chạy (nguyên mẫu poll 5 phút sẽ không vừa).
 
-## Lượt 3 — Dữ liệu nguồn (Kat hỏi 24/11/2026) — ⏳ chờ Khang trả lời
-Câu hỏi: (1) rủi ro nguồn Wise không chính thức + dự phòng · (2) cần VCB, VPBank; có DBS không · (3) độ trễ chấp nhận được · (4) giá chợ đen thật để hiệu chỉnh · (5) nguồn nào là "chuẩn" khi các nguồn lệch nhau. **Khang trả lời:** —
+## Lượt 3 — Dữ liệu nguồn (Khang trả lời 24/11/2026) — ⏳ chờ Khang duyệt kết luận
+
+| # | Câu hỏi | Khang trả lời |
+|---|---|---|
+| 1 | Nguồn Wise là đường dẫn công khai **không chính thức**; nếu hỏng thì sao | **(a)** dùng nguồn dự phòng cập nhật 1 lần / ngày và **ghi rõ trong tin** |
+| 2 | Có cần DBS không | **Không cần** |
+| 3 | Độ trễ chấp nhận được của cảnh báo | **Không cần chính xác giờ** (độ trễ không quan trọng) |
+| 4 | Giá chợ đen thật để hiệu chỉnh | **(b)** chỉ dùng mức mặc định **Wise +0,4%**; không cần dữ liệu thật |
+| 5 | Nguồn "chuẩn" để so với mốc | **Wise** |
+
+**Kết luận lượt 3 (Kat tóm tắt, chờ Khang duyệt):** mốc cảnh báo so với **giá Wise (mid-market)**; nguồn trong bản tin: Wise, VCB, VPBank (không DBS); chợ đen = Wise × 1,004 (**ước tính**, không có cơ chế học từ giá thật → lệnh báo giá đổi thật không còn cần thiết); Wise hỏng → nguồn dự phòng 1 lần / ngày, ghi rõ trong tin; tần suất kiểm không quan trọng → chốt ở TS theo hạn mức gói miễn phí.
+
+## Lượt 4 — Bot làm gì: bản tin, cảnh báo, lỗi, phạm vi phase 1 (Kat hỏi 24/11/2026) — ⏳ chờ Khang trả lời
+Câu hỏi: (A) hình dạng bản tin sáng · (B) mốc + chiều báo + giờ im lặng + số tin tối đa · (C) nhắc riêng cuối tháng · (D) kênh báo lỗi kỹ thuật · (E) phase 1 gồm gì. **Khang trả lời:** —
 
 ## Các lượt còn lại (chưa hỏi)
-- **Lượt 4 — Quy tắc nghiệp vụ:** mốc cảnh báo chính thức, giờ im lặng, số tin tối đa / ngày, số nào phải khớp số nào, ngày lương, ai chốt.
 - **Lượt 5 — Người dùng & quyền:** ai ra lệnh được cho bot, ai báo giá đổi thật, thiết bị.
 - **Lượt 6 — Đầu ra & giọng văn:** giờ đăng, độ dài, mức hài hước, câu mẫu của Mít nào được dùng, bot xưng hô thế nào trong group.

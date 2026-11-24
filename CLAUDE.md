@@ -101,6 +101,8 @@ Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP
 
 **Ràng buộc (Khang chốt 24/11/2026, lượt 2 — chờ duyệt kết luận):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; **gọi AI theo 100% tài liệu của Khang** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`; cấm `thinkingConfig`) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (chờ Khang xác nhận) · phạm vi phase 1: bàn sau.
 
+**Dữ liệu nguồn (Khang chốt 24/11/2026, lượt 3 — chờ duyệt kết luận):** mốc so với **giá Wise** · không DBS · chợ đen = Wise +0,4% (ước tính, không hiệu chỉnh bằng giá thật) · Wise hỏng → nguồn dự phòng 1 lần / ngày + **ghi rõ trong tin** · độ trễ cảnh báo không quan trọng.
+
 ## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
 

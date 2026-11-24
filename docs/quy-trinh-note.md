@@ -70,3 +70,9 @@
 - **Đầu vào cần có:** `Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md` (788 dòng; Kat đọc 2 lượt vì giới hạn công cụ đọc)
 - **Kết quả:** lưu nguyên văn (so sánh `cmp` khớp) vào `docs/rieng-tu/` vì có thông tin riêng; `CODING_STANDARDS` thêm mục 6.10a (chuẩn gọi AI, bắt buộc, kèm cách xử lý mục không áp dụng) + 3 dòng "Bẫy đã gặp" (42–44); `CLAUDE.md` sửa đè; biên bản phỏng vấn cập nhật + mở Lượt 3.
 - **Bài học cho skill:** tài liệu Khang đưa vào thường **chứa thông tin riêng** → đặt thẳng vào thư mục riêng tư; chuẩn do Khang viết cho dự án khác phải qua bước **"mục → áp dụng / không áp dụng"** trước khi "làm theo 100%". Skill nên có chỗ cho "tài liệu tham khảo bắt buộc của Khang" (hiện chỉ có CODING_STANDARDS).
+
+### 2026-11-24 20:52 (giờ VN) — Khang — Trả lời lượt 3 (dữ liệu nguồn), yêu cầu phỏng vấn tiếp phần "bot làm gì"
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "1. a · 2. không cần DBS · 3. không cần chính xác giờ đâu · 4. b · 5. wise — giờ phỏng vấn lại bot làm gì đi, mình cập nhật requirement về bot"
+- **Kết quả:** biên bản `00-phong-van.md` ghi lượt 3 (chờ duyệt kết luận) + mở lượt 4; `CLAUDE.md` thêm đoạn "Dữ liệu nguồn". Hệ quả Kat ghi nhận: chọn 4b → lệnh báo giá đổi thật (`/doi`) của nguyên mẫu không còn cần.
+- **Bài học cho skill:** đưa câu hỏi dạng **lựa chọn có chữ cái + đề xuất sẵn** giúp Khang trả lời 1 dòng cho cả lượt; nên làm thành mẫu hỏi chuẩn trong skill (mục 2.1).
