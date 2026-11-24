@@ -106,3 +106,9 @@
 - **Yêu cầu gốc:** "có 1 tính năng bot nhắn thay Khang, vd Khang soạn 1 command kêu Lũi nhắn 'mọi người thôi đi ăn cơm đi' -> Lũi nhắn đúng y chang câu đó vào group mà không nói gì hơn (không biết là Khang nhắn)"
 - **Kết quả:** ghi vào biên bản lượt 5 + `CLAUDE.md`; Kat đề xuất cách làm an toàn (chat riêng, chỉ Khang, không qua AI, thẻ xác nhận), chờ Khang chốt.
 - **Bài học cho skill:** tính năng "đăng ra ngoài" (gửi tin vào group) là thao tác **không quay lại được** → theo tài liệu gọi AI của Khang (mục 5) phải có **thẻ xác nhận**; nội dung nguyên văn thì **không gửi AI** (vừa đúng ý, vừa giữ riêng tư).
+
+### 2026-11-24 21:50 (giờ VN) — Khang — Tên group không ghi ở đâu cả, chỉ gọi nhóm A / nhóm B
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "Prime Optimus là tên thật của group nha, đổi tên khác đi ghi nhóm A hay B là đủ"
+- **Kết quả:** bỏ tên thật của cả 2 group khỏi bảng đối chiếu (trước đó chỉ còn ở đây); repo giờ không còn tên group nào. Lịch sử git vẫn còn (repo private, quy ước tạo repo sạch trước khi public). Từ nay Kat cũng chỉ gọi "nhóm A / nhóm B" khi trả lời Khang.
+- **Bài học cho skill:** tên **group / kênh chat** cũng là thông tin định danh như tên người → đưa vào danh sách "không ghi" ngay từ lượt riêng tư; và **Kat không nhắc lại tên thật trong câu trả lời** dù Khang dùng tên thật.
