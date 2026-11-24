@@ -112,3 +112,9 @@
 - **Yêu cầu gốc:** "Prime Optimus là tên thật của group nha, đổi tên khác đi ghi nhóm A hay B là đủ"
 - **Kết quả:** bỏ tên thật của cả 2 group khỏi bảng đối chiếu (trước đó chỉ còn ở đây); repo giờ không còn tên group nào. Lịch sử git vẫn còn (repo private, quy ước tạo repo sạch trước khi public). Từ nay Kat cũng chỉ gọi "nhóm A / nhóm B" khi trả lời Khang.
 - **Bài học cho skill:** tên **group / kênh chat** cũng là thông tin định danh như tên người → đưa vào danh sách "không ghi" ngay từ lượt riêng tư; và **Kat không nhắc lại tên thật trong câu trả lời** dù Khang dùng tên thật.
+
+### 2026-11-24 21:53 (giờ VN) — Khang + Kat — Chốt nhắn thay (cả 2 bot), Rây trước; Kat giả lập mốc cảnh báo trên giá thật
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** nhắn thay "cả hai bot đều có" · "chữ cho phase 1" · thẻ xác nhận + /thuhoi "có" · mốc "giữ, bạn tư vấn xem mốc vậy ổn không? nhớ là SGD nhé" · "Rây trước, Rây ưu tiên hơn"
+- **Kết quả:** biên bản + `CLAUDE.md` cập nhật. Kat lấy giá Wise theo giờ 30 ngày (thư mục nháp, không vào repo), giả lập 4 phương án mốc theo đúng rule đã chốt (5 tiếng, 14 ngày, 4 lần / ngày, cách 3 giờ, giờ nghỉ). Bản nháp báo 7 lần, trong đó 4 lần "qua lại" mốc 19,950; phương án cách đều 100 báo 3 lần đúng 3 sự kiện đáng nói → đề xuất, chờ Khang chốt.
+- **Bài học cho skill:** câu hỏi "tham số này ổn không?" → trả lời bằng **giả lập trên dữ liệu thật + đúng rule đã chốt**, không trả lời bằng cảm giác. Ghi căn cứ vào biên bản để sau này truy vết (Rule 9).

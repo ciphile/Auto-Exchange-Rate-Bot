@@ -121,7 +121,17 @@
 | — | Rây dùng chung kho tin Lũi làm bối cảnh trả lời câu vĩ mô | Đồng ý (Kat đề xuất) |
 | — | Các đề xuất còn lại của Kat (tin 24/11/2026 ~21:35) | **Khang: "còn các điều khác mình đồng ý"** → gồm: 2 bot chung 1 bộ code · chỗ chạy **Vercel + Supabase** (phương án A, chốt bằng ADR ở việc 3 sau khi kiểm chứng) · ngôn ngữ **TypeScript** (Kat đề xuất) · Rây bị hỏi thẳng "là bot à" thì **không chối** · trước khi gửi AI **thay tên người bằng biệt danh**, chỉ gửi vài tin gần nhất, **tin chat xóa sau 24 giờ** · Lũi dùng **RSS** của báo, chỉ đăng tiêu đề + 1–2 câu tóm tắt + link · câu dự đoán phải nói rõ là đoán |
 | — | **Tính năng mới: bot nhắn thay Khang** (Khang bổ sung 24/11/2026) | Khang gõ 1 lệnh, vd kêu Lũi nhắn "mọi người thôi đi ăn cơm đi" → Lũi nhắn **đúng y chang câu đó** vào group, **không nói gì thêm**, người trong group **không biết là Khang nhắn**. Kat đề xuất (chờ Khang chốt): chỉ Khang dùng · gõ trong **chat riêng** với bot (gõ trong group thì lộ) · **không qua AI** (giữ nguyên chữ, không gửi Google) · thẻ xác nhận trước khi gửi · có áp dụng cho Rây không? |
+| — | Nhắn thay Khang — chốt (24/11/2026) | **Cả 2 bot** (Rây ở nhóm A, Lũi ở nhóm B) · **chỉ chữ** ở phase 1 · **có thẻ xác nhận** · **có `/thuhoi`** (bot xóa tin vừa nhắn thay, Telegram cho phép trong 48 giờ) |
+| — | Thứ tự làm | **Rây trước, Rây ưu tiên hơn** (hạn chót 03/12 áp cho Rây; Lũi làm sau khi Khang gửi tính cách) |
+| — | Mốc cảnh báo | Khang: **giữ 6 mốc**, nhờ Kat tư vấn (giá **SGD**). Kat giả lập trên giá Wise theo giờ 30 ngày (25/10–24/11; Wise không cho tải quá 30 ngày): xem "Căn cứ mốc" bên dưới. **Chờ Khang chốt** giữa bản nháp và đề xuất C |
 | — | Lũi đọc tin nhắn | **Lũi đọc tất cả tin nhắn trong nhóm B.** Link: Lũi **không** tự mở link; chỉ đọc chữ đi kèm / tiêu đề xem trước để đoán ý người gửi; **chỉ mở link khi được yêu cầu**. (Có cần danh sách trang được phép mở không → bàn ở ATR) |
+
+**Căn cứ mốc (Kat giả lập 24/11/2026, lấy giá mỗi 5 tiếng, chỉ tính 14 ngày cuối tháng, tối đa 4 lần / ngày, cách 3 giờ, im lặng 20:00–06:00):**
+- Giá Wise 30 ngày: thấp 19,900.5 · cao 20,227.7. Sau 5 tiếng giá đổi: trung vị 7.5 đ · 90% dưới 30.8 đ · lớn nhất 95.3 đ.
+- A. 6 mốc nháp (19,900 · **19,950** · 20,000 · 20,100 · 20,200 · 20,300), đệm ±10 → **7 cảnh báo**, trong đó **4 lần qua lại mốc 19,950 trong 3 ngày** (18–20/11) → ồn, máy móc.
+- B. 6 mốc nháp, đệm ±30 → 3 cảnh báo, nhưng **bỏ sót 2 lần cắt mốc 20,000** (mốc nhóm quan tâm nhất).
+- **C. cách đều 100: 19,800 · 19,900 · 20,000 · 20,100 · 20,200 · 20,300, đệm ±10 → 3 cảnh báo, đúng 3 sự kiện đáng nói** (27/10 giảm dưới 20,200 · 21/11 lên trên 20,000 · 24/11 xuống dưới 20,000). **Kat đề xuất C.**
+- D. cách đều 100, đệm ±30 → chỉ 1 cảnh báo (quá im).
 
 **Hệ quả Kat ghi nhận:** Rây có 2 khung thời gian: **báo tỉ giá chủ động** trong 7 ngày cuối tháng; **cảnh báo vượt ngưỡng** trong 14 ngày cuối tháng. Giá lấy mỗi 5 tiếng → cảnh báo trễ tối đa ~5 tiếng (khớp "không cần chính xác giờ"). **Còn mở:** danh sách mốc (nháp 6 mốc: 19,900 · 19,950 · 20,000 · 20,100 · 20,200 · 20,300).
 
