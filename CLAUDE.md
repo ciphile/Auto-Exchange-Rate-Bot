@@ -99,8 +99,8 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 ## Mục tiêu (TẠM — theo `docs/specs/00-phong-van.md` lượt 1, chờ Khang duyệt)
 Bot Telegram trong group 5 đồng nghiệp ở VN (làm remote cho công ty SGP, lương SGD qua Wise, đổi SGD→VND qua chợ đen): nhắn tỉ giá SGD→VND mỗi sáng + cảnh báo khi vượt mốc; lời bình do AI viết theo giọng Abe, **số liệu do code tính**. Nguồn: Wise (ghi rõ mid-market), VCB, VPBank (ghi rõ NH mua / NH bán), chợ đen (ước tính).
 
-## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR)
-Bản **nháp** trên nhánh `claude/new-session-5jra1l` (chưa merge, **chưa qua cổng chặn** — Kat viết trước khi có spec, đã báo Khang 24/11/2026): Python 3.12 + SDK `anthropic`, GitHub Actions (daily / check / poll), trạng thái ở nhánh `bot-state`. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Giữ hay đổi do Khang quyết (STATUS).
+## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
+Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
 
 ## Quy tắc nghiệp vụ
 Chưa có `BR-xx` (chờ FS). Tham số **nháp** đang nằm trong code, chưa chốt: mốc 19900 · 19950 · 20000 · 20100 · 20200 · 20300; đệm ±10 VND; im lặng 22:00–07:00; tối đa 4 tin / ngày; chênh chợ đen mặc định +0,4% so với Wise.

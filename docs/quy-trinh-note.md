@@ -50,3 +50,9 @@
 - **Yêu cầu gốc:** "xong rồi mình cần làm 3 việc với bạn: kể lại requirement, bối cảnh · mình chỉnh sửa requirement · bàn thiết kế bảo mật, cấu trúc, khả thi · chốt ATR bảo mật · làm FS · rồi mới code"
 - **Kết quả:** thứ tự: (1) Kat kể lại requirement + bối cảnh → (2) Khang chỉnh → (3) bàn kiến trúc / bảo mật / khả thi → (4) chốt ATR → (5) FS → (6) code. Skill còn đòi thêm BRD và TS trước khi code (Kat đã hỏi Khang chọn gọn hay đủ).
 - **Bài học cho skill:** Khang tự đặt thứ tự và hỏi "skill có nhắc việc này không" → skill nên có **bảng "bước nào ở đâu trong skill"** (mục 2 bước 3, mục 6.15, 6.17, 9.6) để tra nhanh.
+
+### 2026-11-24 20:32 (giờ VN) — Khang + Kat — Chốt số phận code nháp: giữ làm nguyên mẫu, dời vào `prototype-v0/`
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "Số phận code nháp: giữ lại làm nguyên mẫu, đổi tên thư mục để không lẫn lộn, cần thì lấy lại. Stack: đây là thứ cần bàn sau khi chốt requirement"
+- **Kết quả:** `git mv` bot, tests, scripts, requirements.txt, README.md và 4 workflow vào `prototype-v0/` (lịch sử git giữ nguyên); README gốc viết mới (trỏ tới docs); README nguyên mẫu có biển cảnh báo + cách lấy lại (commit `41c0108`). Workflow dời đi để **không tự chạy** nếu nhánh được merge. 37 test + bản tin thử vẫn chạy ở chỗ mới. `CLAUDE.md` mục Kiến trúc sửa đè.
+- **Bài học cho skill:** khi đóng băng code nháp, nhớ **gỡ workflow đang có lịch chạy** (cron) ra khỏi `.github/workflows/`; nếu không, merge nhầm là bot tự chạy. Chốt stack **sau** requirement là đúng thứ tự skill (mục 2 bước 3).
