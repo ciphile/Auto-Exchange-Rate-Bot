@@ -115,10 +115,11 @@
 | 5 | Nhóm B đồng ý bot đọc chat + gửi Google | **Đã đồng ý** |
 | 6 | Lệnh chỉnh cấu hình | **Chỉ Khang** |
 | 7 | Lĩnh vực tin, tính cách, giọng văn của Lũi | **Khang gửi sau** → đã ghi pending ở `docs/STATUS.md` |
-| — | Tên nhóm | nhóm A = group lương / thuế; nhóm B = "group báo đời" (tên thật ở file riêng) |
+| — | Tên nhóm | nhóm A = group lương / thuế; nhóm B = group thời sự rộng hơn (tên thật ở file riêng) |
 | — | Chính trị trong nước | **Trung lập** (đồng ý đề xuất của Kat) |
 | — | Giới hạn lượt AI | Khang: không đáng lo, Rây im lặng phần lớn tháng |
 | — | Rây dùng chung kho tin Lũi làm bối cảnh trả lời câu vĩ mô | Đồng ý (Kat đề xuất) |
+| — | Các đề xuất còn lại của Kat (tin 24/11/2026 ~21:35) | **Khang: "còn các điều khác mình đồng ý"** → gồm: 2 bot chung 1 bộ code · chỗ chạy **Vercel + Supabase** (phương án A, chốt bằng ADR ở việc 3 sau khi kiểm chứng) · ngôn ngữ **TypeScript** (Kat đề xuất) · Rây bị hỏi thẳng "là bot à" thì **không chối** · trước khi gửi AI **thay tên người bằng biệt danh**, chỉ gửi vài tin gần nhất, **tin chat xóa sau 24 giờ** · Lũi dùng **RSS** của báo, chỉ đăng tiêu đề + 1–2 câu tóm tắt + link · câu dự đoán phải nói rõ là đoán |
 | — | Lũi đọc tin nhắn | **Lũi đọc tất cả tin nhắn trong nhóm B.** Link: Lũi **không** tự mở link; chỉ đọc chữ đi kèm / tiêu đề xem trước để đoán ý người gửi; **chỉ mở link khi được yêu cầu**. (Có cần danh sách trang được phép mở không → bàn ở ATR) |
 
 **Hệ quả Kat ghi nhận:** Rây có 2 khung thời gian: **báo tỉ giá chủ động** trong 7 ngày cuối tháng; **cảnh báo vượt ngưỡng** trong 14 ngày cuối tháng. Giá lấy mỗi 5 tiếng → cảnh báo trễ tối đa ~5 tiếng (khớp "không cần chính xác giờ"). **Còn mở:** danh sách mốc (nháp 6 mốc: 19,900 · 19,950 · 20,000 · 20,100 · 20,200 · 20,300).

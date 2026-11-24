@@ -94,3 +94,9 @@
 - **Yêu cầu gốc:** "2 bot" · cảnh báo "2 tuần trước ngày nhận lương" · "cả giảm và cả tăng" · "mỗi 5 tiếng" · nhóm B "đã đồng ý" · cấu hình "chỉ Khang" · Lũi "sẽ gởi sau, nhớ ghi pending, cả tính cách của lũi, giọng văn" · "Khi mình nói chuyện vs bạn mình chỉ nói tên thật đồng nghiệp bạn tự map ra tên biệt danh để ghi repo" · chính trị trong nước "trung lập" · Lũi đọc mọi tin nhắn, link chỉ mở khi được yêu cầu
 - **Kết quả:** biên bản lượt 5 bổ sung; `CLAUDE.md` (Rule 5 + Mục tiêu) sửa đè; bảng tên thật: nhóm A / nhóm B xác nhận + quy ước "Khang nói tên thật, Kat tự đổi"; **STATUS cập nhật ngay** (Khang nói rõ "ghi pending") — đồng thời xóa các dòng đã xong.
 - **Bài học cho skill:** khi người dùng hỏi "lộ token thì sao", cần giải thích **"mất" là mất quyền điều khiển bot, không phải mất group** — Kat đã dùng chữ "mất 1 group" thiếu chính xác ở lượt trước; tư vấn bảo mật phải dùng chữ đúng nghĩa.
+
+### 2026-11-24 21:48 (giờ VN) — Kat — Lỡ ghi tên thật của nhóm B vào biên bản → sửa ngay; ghi "Khang đồng ý các đề xuất còn lại"
+- **Loại:** Bảo mật
+- **Yêu cầu gốc:** (Kat tự phát hiện khi rà) · Khang: "còn các điều khác mình đồng ý vs bạn"
+- **Kết quả:** thay tên thật nhóm B trong `00-phong-van.md` bằng "nhóm B"; tên đó **vẫn còn trong lịch sử git** (commit `5409d28`, repo private — đã có quy ước tạo repo sạch trước khi public). Ghi các đề xuất Khang đồng ý (Vercel + Supabase, TypeScript, không chối là bot, che tên trước khi gửi AI, chat giữ 24 giờ, RSS) vào biên bản + `CLAUDE.md`.
+- **Bài học cho skill:** Kat **vẫn lỡ tay** dù đã có Rule 5 → luật "không tên thật ngoài file riêng" phải thành **barie** (test quét repo theo danh sách tên trong file riêng, đỏ là không commit), đúng tinh thần mục 6.18 "biển báo thì AI quên". Đưa vào bộ barie tối thiểu.

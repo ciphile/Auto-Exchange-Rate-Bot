@@ -107,6 +107,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 **Dữ liệu nguồn (Khang chốt 24/11/2026, lượt 3 — chờ duyệt kết luận):** mốc so với **giá Wise** · không DBS · chợ đen = Wise +0,4% (ước tính, không hiệu chỉnh bằng giá thật) · Wise hỏng → nguồn dự phòng 1 lần / ngày + **ghi rõ trong tin** · độ trễ cảnh báo không quan trọng.
 
 ## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
+**Hướng Khang đã đồng ý (24/11/2026), chốt bằng ADR ở việc 3 sau kiểm chứng:** 2 bot (2 token) chung 1 bộ code · **Vercel (Hobby) + Supabase (Postgres)** · Telegram webhook · **TypeScript** · Gemini free theo tài liệu của Khang · Lũi lấy tin qua **RSS** · tên người → biệt danh trước khi gửi AI, tin chat giữ tối đa 24 giờ · Rây / Lũi không chối là bot khi bị hỏi thẳng. Cần kiểm chứng: nhịp lịch 10–15 phút (Vercel Hobby cron chỉ 1 lần / ngày), quota Gemini free theo khóa, RSS từng báo.
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
 
 ## Quy tắc nghiệp vụ
