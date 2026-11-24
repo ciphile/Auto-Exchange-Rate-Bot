@@ -1,4 +1,4 @@
-# Cổng chặn tự động (CODING_STANDARDS 6.18): mọi push / PR chạy toàn bộ test + barie. Đỏ → không mợt.
+# Cổng chặn tự động (CODING_STANDARDS 6.18): mọi push / PR chạy typecheck + toàn bộ test + barie + npm audit. Đỏ → không mợt.
 name: CI
 on:
   push:
@@ -15,4 +15,5 @@ jobs:
         with:
           node-version: "22"
       - run: node --version
-      - run: npm run check
+      - run: npm ci
+      - run: npm run check # typecheck + toàn bộ test + npm audit (ATR-16)

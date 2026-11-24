@@ -50,3 +50,7 @@ export const HTTP_TIMEOUT_MS = 20_000;
 export const HTTP_USER_AGENT = 'Mozilla/5.0 (compatible; auto-exchange-rate-bot)';
 // BR-30: lấy giá ngay theo yêu cầu — mỗi nguồn tối đa 1 lần đọc / 5 phút (VCB yêu cầu ≤ 1 lần / 5 phút).
 export const LIVE_FETCH_COOLDOWN_MS = 5 * 60 * 1000;
+// BR-30: người dùng nói "tùy mày / nguồn nào cũng được" → đọc nguồn chuẩn để so mốc (BR-05).
+export const LIVE_SOURCE_FOR_ANY = 'wise' as const;
+// BR-30: Rây hỏi "lấy nguồn nào?" — câu trả lời trong 10 phút được hiểu là trả lời câu hỏi đó.
+export const SOURCE_QUESTION_TTL_MS = 10 * 60 * 1000;

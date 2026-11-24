@@ -4,9 +4,17 @@
   "private": true,
   "description": "Hai bot Telegram Rây (tỉ giá) và Lũi (tin tức) — xem docs/specs/02-functional-spec.md",
   "type": "module",
-  "engines": { "node": ">=22.18" },
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
     "test": "node --test \"tests/**/*.test.ts\"",
-    "check": "node --test \"tests/**/*.test.ts\""
+    "typecheck": "tsc -p .",
+    "audit": "npm audit --audit-level=moderate",
+    "check": "npm run typecheck && npm test && npm run audit"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "6.0.3"
   }
 }

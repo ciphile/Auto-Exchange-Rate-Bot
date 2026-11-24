@@ -1,15 +1,15 @@
 // ADR-06 + BR-19: mã hóa AES-256-GCM ở tầng ứng dụng cho kho tin nhắn tạm và log prompt.
-// Khóa 32 byte, mã base64, nằm ở biến môi trường (không nằm chung database). Dạng lưu: base64(iv | tag | cipher).
+// Khóa 32 byte, viết dạng 64 ký tự hex (lệnh `openssl rand -hex 32`), nằm ở biến môi trường (không nằm chung database). Dạng lưu: base64(iv | tag | cipher).
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 const IV_BYTES = 12;
 const TAG_BYTES = 16;
 
 /** ATR-11: khóa phải đúng 32 byte; sai → ném lỗi ngay lúc khởi động. */
-export function parseEncryptionKey(base64Key: string | undefined): Buffer {
-  const key = Buffer.from(base64Key ?? '', 'base64');
-  if (key.length !== 32) throw new Error('E-CFG-001: DATA_ENCRYPTION_KEY phải là 32 byte mã base64');
-  return key;
+export function parseEncryptionKey(hexKey: string | undefined): Buffer {
+  const text = (hexKey ?? '').trim();
+  if (!/^[0-9a-fA-F]{64}$/.test(text)) throw new Error('E-CFG-001: DATA_ENCRYPTION_KEY phải là 64 ký tự hex (32 byte)');
+  return Buffer.from(text, 'hex');
 }
 
 export function encryptText(plain: string, key: Buffer): string {

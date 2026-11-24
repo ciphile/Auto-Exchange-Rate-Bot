@@ -1,9 +1,9 @@
 # FS — Functional Spec — Auto-Exchange-Rate-Bot (Rây + Lũi)
 
-> **Bản 0.2 · 24/11/2026 (0.1: 24/11/2026) · Kat viết ở Mode 2** (Khang vắng; theo bộ quy tắc, FS viết đủ ở Mode 2 = chốt thật, Khang có quyền sửa bất kỳ mục nào).
+> **Bản 0.3 · 24/11/2026 (0.1, 0.2: 24/11/2026) · Kat viết ở Mode 2 · Khang đã duyệt bản 0.2 (24/11/2026 22:40)** — Khang có quyền sửa bất kỳ mục nào.
 > **Dự án này chỉ có FS** (Khang chốt 24/11/2026: không BRD, không TS). Cổng chặn: **FS chốt mới được code**. Kiến trúc (ADR), kiểm chứng (KC), bảng ATR bảo mật nằm ở **phụ lục** của FS.
 > Nguồn yêu cầu: `docs/specs/00-phong-van.md` (lượt 1–5). Tên người dùng **biệt danh** (Rule 5). Mã quy tắc `BR-xx`, mã chức năng `F-xx`, mã lỗi `E-...` — **bỏ qua số 13**.
-> **Phạm vi bản này:** **Rây đầy đủ** (ưu tiên, hạn chót thứ Năm 03/12/2026 — chờ Khang xác nhận ngày). **Lũi: khung + phần dùng chung**; tính cách, giọng văn, lĩnh vực tin **chờ Khang gửi** (mục 8).
+> **Phạm vi bản này:** **Rây đầy đủ** (ưu tiên, hạn chót **thứ Năm 03/12/2026** — Khang xác nhận 24/11/2026). **Lũi: khung + phần dùng chung**; tính cách, giọng văn, lĩnh vực tin **chờ Khang gửi** (mục 8).
 
 ---
 
@@ -52,7 +52,7 @@
 | **BR-27** | **Xưng hô**: Khang chọn cách bot xưng và gọi người dùng (vd "tao – mày", "em – anh") bằng lệnh; prompt luôn mang theo lựa chọn hiện hành. | Theo lời Khang. | Khang · 24/11/2026 |
 | **BR-28** | **Tâm trạng / phong cách**: Khang chọn tâm trạng (vui, cáu, thất tình — nói cộc lốc, muốn nói nhiều…) và phong cách; prompt mang theo. Cảnh báo phải **than như người** (học giọng Xoài, Ổi, Mít), báo giá **như Mít báo** — không khuôn máy móc. | Theo lời Khang. | Khang · 24/11/2026 |
 | **BR-29** | Mọi câu nói về giá (báo, cảnh báo, trả lời) **phải nói rõ nguồn + thời điểm lấy** (vd "theo Wise, lấy lúc 11:00 ngày 24/11"). **AI không bao giờ đi tìm tỉ giá** (Gemini không tra được; tra web gói free gần như 0 lượt): số luôn lấy từ **kho bản chụp** (BR-04) hoặc BR-30. | Người dùng phải biết số đó cũ hay mới, của ai. | Khang · 24/11/2026 |
-| **BR-30** | **Lấy giá ngay theo yêu cầu** ("mày lấy tỉ giá thời điểm hiện tại đi"): AI chỉ **chọn action** `lay_ty_gia_ngay`; **code thuần** đọc thẳng nguồn được chọn (Wise / VCB / VPBank — không qua AI, không tìm web) rồi AI viết lời, nói rõ nguồn + giờ (BR-29). **Thiếu nguồn → hỏi lại** người dùng muốn nguồn nào. Mỗi nguồn tối đa **1 lần đọc / 5 phút** (VCB yêu cầu ≤ 1 lần / 5 phút) — trong 5 phút dùng lại kết quả vừa đọc, kèm giờ. Nguồn lỗi → nói thật chưa lấy được + đưa bản gần nhất trong kho kèm giờ. Kết quả lấy ngay **không** dùng để cảnh báo (cảnh báo chỉ theo lịch BR-04). Là action **chỉ xem** → chạy luôn, không cần thẻ xác nhận. | Khang (đề xuất action thay vì từ chối) · Kat (5 phút, không dùng cho cảnh báo — Mode 2) | Khang · 24/11/2026 |
+| **BR-30** | **Lấy giá ngay theo yêu cầu** ("mày lấy tỉ giá thời điểm hiện tại đi"): AI chỉ **chọn action** `lay_ty_gia_ngay`; **code thuần** đọc thẳng nguồn được chọn (Wise / VCB / VPBank — không qua AI, không tìm web) rồi AI viết lời, nói rõ nguồn + giờ (BR-29). **Thiếu nguồn → hỏi lại** người dùng muốn nguồn nào. Mỗi nguồn tối đa **1 lần đọc / 5 phút** (VCB yêu cầu ≤ 1 lần / 5 phút) — trong 5 phút dùng lại kết quả vừa đọc, kèm giờ. Nguồn lỗi → nói thật chưa lấy được + đưa bản gần nhất trong kho kèm giờ. Kết quả lấy ngay **không** dùng để cảnh báo (cảnh báo chỉ theo lịch BR-04). Là action **chỉ xem** → chạy luôn, không cần thẻ xác nhận. **Cách hiểu nguồn** (Khang dặn 24/11/2026 22:40; Kat chốt cách làm, Mode 2): nêu tên ("check VCB", "vietcombank", "VP bank với Wise") → đúng các nguồn đó · **"tùy mày" / "nguồn nào cũng được" / "sao cũng được"** → **Wise** (nguồn chuẩn BR-05; Wise đang tắt → nguồn bật đầu tiên) · **"tất cả nguồn" / "cả 3" / "lấy hết"** → **mọi nguồn Khang đang bật** · không nói nguồn → **hỏi lại**; câu trả lời cho câu hỏi đó trong **10 phút** (reply tin hỏi, hoặc gọi tên) được hiểu là trả lời câu hỏi · nguồn được hỏi đang bị Khang tắt (`/nguon`) → nói nguồn đó đang tắt, kể các nguồn đang bật. **Luật trước, AI sau:** khi đang chờ câu trả lời "nguồn nào?", code đọc từ khóa trước — rõ ràng thì không gọi AI; mơ hồ / có ý loại trừ ("tất cả trừ VCB") → để AI chọn tham số, code kiểm lại. | Khang (đề xuất action thay vì từ chối) · Kat (5 phút, không dùng cho cảnh báo — Mode 2) | Khang · 24/11/2026 |
 
 ---
 
@@ -83,7 +83,7 @@
 ### F-04 Trả lời khi được gọi (cả 2 bot)
 - **Khi** có tin gọi tên bot (BR-17) **thì**: lệnh `/` → chạy thẳng, **không gọi AI**; câu tự nhiên → **1 lần gọi AI chọn action** trong danh sách đóng (theo tài liệu gọi AI của Khang) → code kiểm tên action + tham số → chạy action → (nếu cần lời) **gọi AI lần 2 soạn câu trả lời** đúng xưng hô / tâm trạng / tính cách.
 - **Danh sách action của Rây:** `xem_ty_gia` (giá hôm nay, cao hay thấp so với 7 ngày / mốc) · `quy_doi` (số tiền SGD ↔ VND theo Wise, chợ đen ước tính, NH mua) · `hoi_vi_mo` (**hỏi đáp tự do**: vì sao tỉ giá lên xuống, vàng, coin, Trump, dự đoán… — dùng bối cảnh số liệu trong kho + **kho tin của Lũi**; không tra web) · `tro_chuyen` (**tán gẫu / không thuộc loại nào**). Hai action cuối là **bắt buộc** theo tài liệu của Khang.
-- **Thêm action `lay_ty_gia_ngay`** (BR-30), tham số `nguon`: `wise | vcb | vpbank` (không bắt buộc — thiếu thì hỏi lại). Ví dụ: "mày lấy tỉ giá thời điểm hiện tại đi", "check VCB giùm cái". Mọi câu trả lời về giá ghi **nguồn + thời điểm** (BR-29); `xem_ty_gia` đọc kho, **không** đi lấy mới.
+- **Thêm action `lay_ty_gia_ngay`** (BR-30), tham số `nguon`: `"wise" | "vcb" | "vpbank"` hoặc **mảng** các tên đó · `"tat_ca"` ("tất cả nguồn", "cả 3") · `"tuy_bot"` ("tùy mày", "nguồn nào cũng được") · `null` (không nói → hỏi lại). Giá trị lạ → coi như thiếu → hỏi lại (code kiểm, không đoán). Ví dụ: "mày lấy tỉ giá thời điểm hiện tại đi", "check VCB giùm cái". Mọi câu trả lời về giá ghi **nguồn + thời điểm** (BR-29); `xem_ty_gia` đọc kho, **không** đi lấy mới.
 - Ví dụ phải hiểu đúng: "Rây ơi tỉ giá hôm nay thế nào?", "Tỉ giá hôm nay cao hay thấp?", "cập nhật đi Rây", "giá hôm nay sao rồi" → `xem_ty_gia`.
 - **Khi** AI lỗi **thì** đường lui bằng từ khóa; vẫn không hiểu → câu "chưa hiểu" kiểu người + gợi ý lệnh (BR-24).
 
@@ -108,6 +108,7 @@
 | `/tamtrang <vui|cau|thatinh|noinhieu|binhthuong>` · `/phongcach <mô tả>` | Tâm trạng, phong cách (BR-28) | đổi |
 | `/gionghi 20:00-06:00` | Giờ nghỉ (BR-09) | đổi |
 | `/nguon wise,vcb,vpbank` | Nguồn tỉ giá được dùng (Rây) | đổi |
+| `/gannhom` | **Gõ trong group** (chỉ Khang): gắn group này làm group của bot (nhóm A cho Rây, nhóm B cho Lũi) → thẻ xác nhận. Group chưa gắn → bot im lặng ở đó (ATR-4). Không cần tra mã group | đổi |
 | `/thanhvien` | Xem / sửa danh sách thành viên dùng trong prompt (tên thật, vai trò, cách gọi) — lưu database, không repo (BR-21) | đổi |
 | `/noi`, `/thuhoi` | F-07 | đổi |
 | `/tomtat` | F-06 | xem (gọi AI) |
@@ -207,6 +208,8 @@ F-10 Dọn dẹp
 | KC-03 | `secret_token` của Telegram webhook → header `X-Telegram-Bot-Api-Secret-Token`, so thời gian cố định | Nhiều nguồn khớp; đối chiếu tài liệu chính thức khi code |
 | KC-04 | Vercel Hobby: hàm tối đa 300 giây | Tài liệu Vercel (có 1 trang ghi khác) — 300 giây đủ dùng |
 | KC-05 | RSS các báo (Lũi) | Làm khi tới Lũi |
+| KC-06 | Vercel build được hàm TypeScript dùng `import './x.ts'` (đuôi `.ts`) bằng `typescript` 6.0.3 của dự án | Thử ở lần deploy đầu có code `api/`; lỗi → đổi cấu hình biên dịch, không đổi logic |
+| KC-07 | **Không lộ file tĩnh**: Vercel không phát `docs/`, `prototype-v0/`… ra địa chỉ công khai (repo private nhưng địa chỉ `.vercel.app` ai cũng mở được) | Đã chặn 2 lớp: `vercel.json` (`outputDirectory: public` — chỉ thư mục rỗng `public/`) + `.vercelignore` (không tải `docs/`, `prototype-v0/`, `tests/`…). Sau deploy đầu: mở `https://<app>.vercel.app/docs/specs/02-functional-spec.md` phải ra **404** |
 
 ## Phụ lục C — Bảng ATR bảo mật (skill 6.17) — đánh số bỏ qua 13
 | ATR | Kiểm | Trạng thái | Bằng chứng / việc phải làm |
@@ -221,7 +224,7 @@ F-10 Dọn dẹp
 | ATR-8 | Phân quyền mọi điểm vào (lệnh Khang chỉ từ mã tài khoản Khang) | Thiếu | Test người khác gõ lệnh Khang → im |
 | ATR-9 | RLS bật **mọi bảng**, chỉ máy chủ dùng khóa service-role | Thiếu | Test tự động kiểm RLS |
 | ATR-10 | Khóa máy chủ không lọt ra ngoài | Không áp dụng phần trình duyệt | Khóa chỉ ở biến môi trường Vercel |
-| ATR-11 | Bí mật ≥ 32 ký tự ngẫu nhiên, mỗi cái khác nhau, có cách đổi (2 token bot, 2 mã webhook, mã tick, khóa mã hóa, khóa Gemini, khóa Supabase) | Thiếu | App tự kiểm độ dài khi khởi động; cách đổi ghi trong hướng dẫn cài đặt |
+| ATR-11 | Bí mật ≥ 32 ký tự ngẫu nhiên, mỗi cái khác nhau, có cách đổi (2 token bot, 2 mã webhook, mã tick, khóa mã hóa, khóa Gemini, khóa Supabase) | Một phần | `src/config/env.ts` kiểm dạng + độ dài + khác nhau (test `tests/env.test.ts`); cách đổi ở phụ lục D + hướng dẫn cài đặt |
 | ATR-12 | Dữ liệu ra ngoài: Gemini free nhận **tên thật + đoạn chat** khi bot nói / tóm tắt (Khang đồng ý D1; nhóm B đã đồng ý; Google có thể dùng dữ liệu gói free) · Telegram · nguồn tỉ giá chỉ đọc | Đã được Khang đồng ý | Chỉ gửi khi cần (BR-18, BR-20) |
 | ATR-14 | Theo dõi + báo động: lỗi → nhắn riêng Khang (BR-15) | Thiếu | Test mọi mã lỗi có 2 câu + gửi Khang |
 | ATR-15 | Sao lưu + khôi phục | Chấp nhận rủi ro | Dữ liệu chủ yếu tạm (xóa hằng ngày); cấu hình nhỏ — `/trangthai` đủ để nhập lại |
@@ -229,3 +232,21 @@ F-10 Dọn dẹp
 | ATR-17 | Barie tự động cho mọi dòng kiểm được, **gồm quét tên thật** (BUG-0001) | Thiếu | Bộ barie tối thiểu trước tính năng đầu tiên |
 
 **Phát hành khi:** không còn dòng "Thiếu".
+
+## Phụ lục D — Biến môi trường (thêm / đổi 1 biến = sửa đủ 4 nơi cùng commit — barie `tests/env.test.ts`)
+Bốn nơi: `src/config/env.ts` · `.env.example` · `docs/huong-dan-cai-dat.md` · bảng này. Giá trị thật **chỉ dán trên Vercel** (Settings → Environment Variables, môi trường **Production**, bật **Sensitive**). App kiểm khi khởi động; sai → `E-CFG-001` kèm **tên** biến (không bao giờ in giá trị).
+
+| Biến | Bắt buộc | Lấy ở đâu | Kiểm | Cách đổi khi lộ |
+|---|---|---|---|---|
+| `RAY_BOT_TOKEN` | Có | @BotFather → `/mybots` → Rây → API Token | dạng `số:chữ` | BotFather → API Token → Revoke current token → dán token mới vào Vercel |
+| `RAY_WEBHOOK_SECRET` | Có | Tự tạo: `openssl rand -hex 32` | 32–256 ký tự, chỉ chữ / số / `_` / `-` | Tạo mã mới → dán Vercel → Redeploy (app tự đăng ký lại webhook) |
+| `LUI_BOT_TOKEN` | Không (trống tới khi làm Lũi) | như Rây | có thì phải đủ cặp với mã webhook | như Rây |
+| `LUI_WEBHOOK_SECRET` | Không | như Rây | như Rây | như Rây |
+| `OWNER_TELEGRAM_ID` | Có | @userinfobot → dòng `Id` | dãy số | Không bí mật — chỉ đổi khi Khang đổi tài khoản Telegram |
+| `GEMINI_API_KEY` | Có | aistudio.google.com → Get API key | ≥ 30 ký tự | AI Studio → xóa khóa cũ → Create API key → dán Vercel |
+| `SUPABASE_URL` | Có | Supabase → Project Settings → Data API → Project URL | `https://<mã>.supabase.co` (app tự bỏ đường dẫn thừa) | Không bí mật |
+| `SUPABASE_SECRET_KEY` | Có | Supabase → Project Settings → API Keys → Secret keys | bắt đầu `sb_secret_` (Bẫy 22: chỉ gửi header `apikey`) | Supabase → API Keys → tạo secret key mới → dán Vercel → xóa khóa cũ |
+| `DATA_ENCRYPTION_KEY` | Có | Tự tạo: `openssl rand -hex 32` | đúng 64 ký tự hex | Tạo mã mới → dán Vercel (kho tin nhắn tạm cũ không đọc được nữa — chấp nhận, vì kho xóa mỗi ngày) |
+| `TICK_SECRET` | Có | Tự tạo: `openssl rand -hex 32` — dán **cùng lúc** vào Vercel và Supabase Vault (hướng dẫn phần 7) | ≥ 32 ký tự | Tạo mã mới → dán cả 2 nơi |
+
+Các mã tự tạo (`*_WEBHOOK_SECRET`, `TICK_SECRET`, `DATA_ENCRYPTION_KEY`) **phải khác nhau từng cái** (ATR-11, app kiểm).

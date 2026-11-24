@@ -23,8 +23,8 @@ export const EMPTY_ALERT_STATE: AlertState = { band: null, pending: null, sentDa
 export function updateBand(prev: number | null, rateVnd: number, levels: readonly number[], h = ALERT_HYSTERESIS_VND): number {
   if (prev === null) return levels.filter((lv) => rateVnd >= lv).length;
   let band = prev;
-  while (band < levels.length && rateVnd >= levels[band] + h) band++;
-  while (band > 0 && rateVnd <= levels[band - 1] - h) band--;
+  while (band < levels.length && rateVnd >= (levels[band] ?? Infinity) + h) band++;
+  while (band > 0 && rateVnd <= (levels[band - 1] ?? -Infinity) - h) band--;
   return band;
 }
 
@@ -34,8 +34,8 @@ export function pickCrossedLevel(prev: number, next: number, levels: readonly nu
   const direction: AlertDirection = next > prev ? 'up' : 'down';
   const crossed = direction === 'up' ? levels.slice(prev, next) : levels.slice(next, prev).reverse();
   const key = crossed.filter((lv) => KEY_ALERT_LEVELS_VND.includes(lv));
-  const chosen = (key.length > 0 ? key : crossed)[(key.length > 0 ? key : crossed).length - 1];
-  return { levelVnd: chosen, direction };
+  const chosen = (key.length > 0 ? key : crossed).at(-1);
+  return chosen === undefined ? null : { levelVnd: chosen, direction };
 }
 
 /** BR-08 + BR-09: có được gửi cảnh báo ngay lúc này không. */
