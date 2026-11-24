@@ -118,3 +118,9 @@
 - **Yêu cầu gốc:** nhắn thay "cả hai bot đều có" · "chữ cho phase 1" · thẻ xác nhận + /thuhoi "có" · mốc "giữ, bạn tư vấn xem mốc vậy ổn không? nhớ là SGD nhé" · "Rây trước, Rây ưu tiên hơn"
 - **Kết quả:** biên bản + `CLAUDE.md` cập nhật. Kat lấy giá Wise theo giờ 30 ngày (thư mục nháp, không vào repo), giả lập 4 phương án mốc theo đúng rule đã chốt (5 tiếng, 14 ngày, 4 lần / ngày, cách 3 giờ, giờ nghỉ). Bản nháp báo 7 lần, trong đó 4 lần "qua lại" mốc 19,950; phương án cách đều 100 báo 3 lần đúng 3 sự kiện đáng nói → đề xuất, chờ Khang chốt.
 - **Bài học cho skill:** câu hỏi "tham số này ổn không?" → trả lời bằng **giả lập trên dữ liệu thật + đúng rule đã chốt**, không trả lời bằng cảm giác. Ghi căn cứ vào biên bản để sau này truy vết (Rule 9).
+
+### 2026-11-24 22:00 (giờ VN) — Khang — Chốt mốc C; thêm lệnh chỉnh mốc, lệnh bật / tắt lắng nghe (cả 2 bot), lệnh chọn xưng hô; ngưỡng CLAUDE.md 70 KB
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "phải có command cho Khang điều chỉnh [ngưỡng]" · "Lũi và Rây phải có command để Khang bật tính năng lắng nghe / đọc tin nhắn" · "thêm tính năng để Khang lựa chọn cách 2 bot này xưng hô (vd mày tao)" · "ok C nha" · CLAUDE.md "khi nào vượt 70kb rồi tính sau" · gửi lại tài liệu chuẩn gọi AI (so `cmp`: giống hệt bản đã lưu)
+- **Kết quả:** biên bản + `CLAUDE.md` cập nhật (mốc chốt, nhóm lệnh điều khiển của Khang, ngưỡng 70 KB).
+- **Bài học cho skill:** người dùng gửi lại file cùng tên → **so sánh trước** (`cmp` / `diff`) thay vì đọc lại cả file; ngưỡng kích thước `CLAUDE.md` là tham số do chủ dự án đặt, ghi ngay vào `CLAUDE.md`.

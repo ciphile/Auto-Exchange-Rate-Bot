@@ -124,6 +124,11 @@
 | — | Nhắn thay Khang — chốt (24/11/2026) | **Cả 2 bot** (Rây ở nhóm A, Lũi ở nhóm B) · **chỉ chữ** ở phase 1 · **có thẻ xác nhận** · **có `/thuhoi`** (bot xóa tin vừa nhắn thay, Telegram cho phép trong 48 giờ) |
 | — | Thứ tự làm | **Rây trước, Rây ưu tiên hơn** (hạn chót 03/12 áp cho Rây; Lũi làm sau khi Khang gửi tính cách) |
 | — | Mốc cảnh báo | Khang: **giữ 6 mốc**, nhờ Kat tư vấn (giá **SGD**). Kat giả lập trên giá Wise theo giờ 30 ngày (25/10–24/11; Wise không cho tải quá 30 ngày): xem "Căn cứ mốc" bên dưới. **Chờ Khang chốt** giữa bản nháp và đề xuất C |
+| — | Mốc cảnh báo — **CHỐT** (Khang 24/11/2026) | **Phương án C:** 19,800 · 19,900 · 20,000 · 20,100 · 20,200 · 20,300 (VND / 1 SGD, so với Wise), đệm ±10 |
+| — | Lệnh chỉnh mốc / ngưỡng | **Bắt buộc có lệnh** để Khang chỉnh mốc (thêm, bớt, đổi). Như mọi lệnh chỉnh cấu hình: chỉ Khang, có thẻ xác nhận |
+| — | Lệnh bật / tắt "lắng nghe" | **Cả Rây và Lũi** có lệnh để Khang **bật / tắt việc đọc tin nhắn trong group** |
+| — | Xưng hô | Khang **chọn cách mỗi bot xưng hô và gọi người dùng** (vd "tao – mày") bằng lệnh |
+| — | Tài liệu chuẩn gọi AI | Khang gửi lại (24/11/2026 ~22:00) — **giống hệt** bản đã lưu, không đổi gì |
 | — | Lũi đọc tin nhắn | **Lũi đọc tất cả tin nhắn trong nhóm B.** Link: Lũi **không** tự mở link; chỉ đọc chữ đi kèm / tiêu đề xem trước để đoán ý người gửi; **chỉ mở link khi được yêu cầu**. (Có cần danh sách trang được phép mở không → bàn ở ATR) |
 
 **Căn cứ mốc (Kat giả lập 24/11/2026, lấy giá mỗi 5 tiếng, chỉ tính 14 ngày cuối tháng, tối đa 4 lần / ngày, cách 3 giờ, im lặng 20:00–06:00):**

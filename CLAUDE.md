@@ -2,6 +2,7 @@
 
 > **Chế độ hiện tại: Mode 1 (Luôn hỏi)** · Đang dùng **bản tạm v0.1** của bộ quy tắc dự án của Khang (`docs/SKILL_TAM.md`, 24/11/2026).
 > Kat = AI cố vấn + thợ thi công. Khang = chủ dự án. Hết phỏng vấn + chốt spec mới được viết code app (xem "Cổng chặn").
+> **Ngưỡng cảnh báo kích thước `CLAUDE.md`: 70 KB** (Khang đặt 24/11/2026; dưới mức này không cần chuyển bớt).
 
 > **QUY TẮC GHI CHÉP (bắt buộc)** — theo `docs/QUY_TAC_GHI_CHEP.md`:
 > - `CLAUDE.md` (tự nạp mỗi phiên) = QUY TẮC + HIỆN TRẠNG MỚI NHẤT. TỰ cập nhật NGAY, không đợi nhắc, khi đổi cách tiếp cận · logic nghiệp vụ · quy tắc (kể cả số lượng) · cấu trúc module · tham số quan trọng. SỬA ĐÈ, không viết "trước đây…".
@@ -101,6 +102,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 - **Rây — nhóm A** (đồng nghiệp thân: lương, thuế, công ty): tỉ giá SGD→VND. Hiểu câu tự nhiên → danh sách action cố định → trả lời tự nhiên đúng phong cách. Tỉ giá do **app lấy theo lịch cố định**, lưu cache (có dọn dẹp); AI chỉ soạn lời. **Tuần lương** (7 ngày tới ngày cuối cùng của tháng): tự báo gần như mỗi ngày / cách ngày, **giờ ngẫu nhiên**, trừ 20:00–06:00; **ngày cuối tháng luôn báo**. **Cảnh báo vượt ngưỡng** (cả **giảm và tăng**) chỉ trong **14 ngày cuối tháng**, giá lấy **mỗi 5 tiếng** (lịch cố định), ≤ 4 lần / ngày, cách nhau ≥ 3 giờ, giờ nghỉ thì chờ. Trả lời câu vĩ mô dùng **chung kho tin của Lũi** làm bối cảnh. Than / báo như người (giọng Mít, Ổi, Xoài). Tán gẫu kinh tế vĩ mô, vàng, coin. Khang chỉnh phong cách, tâm trạng, lịch, giờ nghỉ, nguồn. Mất nguồn → báo riêng Khang (mã lỗi + diễn giải), không nhắn group.
 - **Lũi — nhóm B** (rộng hơn, thời sự): cào tin báo chính thống **2 lần / ngày** (lịch cố định), cache có dọn dẹp, xếp hạng tin theo rule (mức nóng, mức nghiêm trọng; Khang chỉnh ngưỡng), nhắn **giờ ngẫu nhiên** trừ 20:00–06:00. Bàn chính trường (**chính trị trong nước: trung lập**), **tính cách + giọng văn + lĩnh vực tin: Khang gửi sau (pending)**. Tính năng bật / tắt: **đọc mọi tin nhắn nhóm B** và tham gia như bạn (nhóm B đã đồng ý); link chỉ đọc chữ đi kèm, **chỉ mở link khi được yêu cầu**.
 - **Cả 2 bot — nhắn thay Khang:** Khang ra lệnh trong chat riêng → bot nhắn **nguyên văn** vào group của nó, không thêm chữ, không lộ người gửi, **không qua AI**; **thẻ xác nhận** trước khi gửi; **`/thuhoi`** xóa tin vừa nhắn (≤ 48 giờ); phase 1 chỉ chữ.
+- **Cả 2 bot — Khang điều khiển bằng lệnh** (chỉ Khang, mỗi lệnh đổi cấu hình có **thẻ xác nhận**): mốc / ngưỡng · **bật / tắt lắng nghe** (đọc tin nhắn trong group) · **cách xưng hô** (vd "tao – mày") · phong cách, tâm trạng · lịch, giờ nghỉ · nguồn tỉ giá (Rây) · mức tin (Lũi).
 - **Thứ tự: Rây trước (ưu tiên, hạn chót 03/12/2026), Lũi sau** (chờ Khang gửi tính cách, giọng văn, lĩnh vực tin).
 - Nguồn tỉ giá: Wise (mid-market, chuẩn cho mốc), VCB, VPBank (NH mua / NH bán), chợ đen (ước tính Wise +0,4%).
 
@@ -113,7 +115,7 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
 
 ## Quy tắc nghiệp vụ
-Chưa có `BR-xx` (chờ FS). Mốc cảnh báo (VND / 1 SGD, so với giá Wise) — **chờ Khang chốt**: nháp 19900 · 19950 · 20000 · 20100 · 20200 · 20300, hay **Kat đề xuất (giả lập 30 ngày)** 19800 · 19900 · 20000 · 20100 · 20200 · 20300 (cách đều 100); đệm ±10 VND; chênh chợ đen +0,4% so với Wise (đã chốt ở lượt 3). Lịch nhắn của nguyên mẫu (mỗi sáng, 4 tin / ngày, im lặng 22:00–07:00) **đã lỗi thời** — lịch mới: 7 ngày cuối tháng, xem Mục tiêu.
+Chưa có `BR-xx` (chờ FS). **Mốc cảnh báo (CHỐT 24/11/2026, phương án C, căn cứ giả lập 30 ngày trong biên bản):** 19800 · 19900 · 20000 · 20100 · 20200 · 20300 (VND / 1 SGD, so với giá Wise); đệm ±10 VND; **Khang chỉnh mốc bằng lệnh**; chênh chợ đen +0,4% so với Wise (đã chốt ở lượt 3). Lịch nhắn của nguyên mẫu (mỗi sáng, 4 tin / ngày, im lặng 22:00–07:00) **đã lỗi thời** — lịch mới: 7 ngày cuối tháng, xem Mục tiêu.
 
 ## Coding standards — chi tiết `docs/CODING_STANDARDS.md` (đọc TOÀN BỘ 1 lần / phiên khi bắt đầu code)
 - Mức **production-ready**; module / chức năng lớn xong → **audit ≥ 2 lần** + báo cáo bảng cho Khang.
