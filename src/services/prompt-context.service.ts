@@ -3,7 +3,7 @@
 // bot vừa gửi gì). Mọi phần có trần; cả prompt có trần tổng → không phình theo thời gian. Hàm thuần.
 import {
   CHAT_CONTEXT_BUFFER_MAX, CHAT_CONTEXT_MESSAGES, CHAT_CONTEXT_MIN_MESSAGES, CHAT_LINE_MAX_CHARS, FACT_MAX_CHARS,
-  GROUP_DESCRIPTION_MAX_CHARS, MEMBER_LINE_MAX_CHARS, MEMBERS_MAX, NEWS_HEADLINES_MAX, PROMPT_MAX_CHARS,
+  GROUP_DESCRIPTION_MAX_CHARS, GROUP_FACT_MAX_CHARS, GROUP_FACTS_MAX, MEMBER_LINE_MAX_CHARS, MEMBERS_MAX, NEWS_HEADLINES_MAX, PROMPT_MAX_CHARS,
   RECENT_BOT_POSTS_MAX, SITUATION_MAX_FACTS, SYSTEM_MAX_CHARS, TREND_FLAT_PCT, TREND_STRONG_PCT, USER_MESSAGE_MAX_CHARS,
 } from '../config/prompt.ts';
 import { PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
@@ -94,12 +94,38 @@ export function buildSituationFacts(input: SituationInput): string[] {
   return facts.slice(0, SITUATION_MAX_FACTS).map((f) => clip(f, FACT_MAX_CHARS));
 }
 
-export type Member = { name: string; role: string; howToCall: string };
+/**
+ * BR-40: hồ sơ 1 thành viên — lấy từ DATABASE (tên thật được phép trong prompt — BR-21), không từ repo.
+ * `telegramUserId` (nếu Khang đã gắn) nhận ra người nói chắc chắn; không có thì dò `aliases` trong tên hiển thị Telegram.
+ */
+export type Member = {
+  name: string; aliases: string[]; howToCall: string; work: string; about: string; telegramUserId: number | null;
+};
 
-/** SYSTEM: mô tả nhóm + thành viên (tên thật từ database — D1) — có trần số người + độ dài từng dòng. */
-export function renderGroupBlock(groupName: string, description: string, members: readonly Member[]): string {
-  const lines = members.slice(0, MEMBERS_MAX).map((m) => `- ${clip(`${m.name}: ${m.role}; gọi là "${m.howToCall}"`, MEMBER_LINE_MAX_CHARS)}`);
-  return [`NHÓM: ${clip(groupName, 60)} — ${clip(description, GROUP_DESCRIPTION_MAX_CHARS)}`, 'THÀNH VIÊN:', ...lines].join('\n');
+const fold = (t: string) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLowerCase();
+
+/** BR-40: người nói trong đoạn chat là ai — theo mã Telegram, rồi theo tên hiển thị khớp tên / tên gọi khác. */
+export function resolveSpeaker(fromId: number, displayName: string, members: readonly Member[]): string {
+  const byId = members.find((m) => m.telegramUserId === fromId);
+  if (byId) return byId.name;
+  const shown = ` ${fold(displayName)} `;
+  const byName = members.find((m) => [m.name, ...m.aliases].some((n) => n && shown.includes(` ${fold(n)} `)));
+  return byName?.name ?? displayName;
+}
+
+/** SYSTEM: nhóm + bối cảnh chung + hồ sơ từng người. Có trần số dòng + độ dài từng dòng (BR-37). */
+export function renderGroupBlock(groupName: string, description: string, groupFacts: readonly string[], members: readonly Member[]): string {
+  const facts = groupFacts.slice(0, GROUP_FACTS_MAX).map((f) => `- ${defuse(clip(f, GROUP_FACT_MAX_CHARS))}`);
+  const lines = members.slice(0, MEMBERS_MAX).map((m) => {
+    const alias = m.aliases.length > 0 ? ` (còn gọi: ${m.aliases.join(', ')})` : '';
+    return `- ${defuse(clip(`${m.name}${alias} — gọi là "${m.howToCall}". Công việc: ${m.work}. ${m.about}`, MEMBER_LINE_MAX_CHARS))}`;
+  });
+  return [
+    `NHÓM: ${clip(groupName, 60)} — ${defuse(clip(description, GROUP_DESCRIPTION_MAX_CHARS))}`,
+    facts.length > 0 ? `BỐI CẢNH CHUNG CỦA NHÓM:\n${facts.join('\n')}` : null,
+    'THÀNH VIÊN (dùng để trả lời đúng người, đúng chuyện; KHÔNG bịa thêm chuyện riêng ngoài hồ sơ này):',
+    ...lines,
+  ].filter((x): x is string => x !== null).join('\n');
 }
 
 export type PromptParts = {

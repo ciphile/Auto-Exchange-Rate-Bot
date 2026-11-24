@@ -17,12 +17,14 @@ export const RECENT_BOT_POSTS_MAX = 3;
 export const NEWS_HEADLINES_MAX = 3;
 
 /** Thành viên + mô tả nhóm (SYSTEM) — lấy từ database, có trần để danh sách không phình. */
-export const MEMBERS_MAX = 30;
-export const MEMBER_LINE_MAX_CHARS = 160;
+export const MEMBERS_MAX = 15;
+export const MEMBER_LINE_MAX_CHARS = 320; // BR-40: tên, cách gọi, công việc, tính tình, gia đình
 export const GROUP_DESCRIPTION_MAX_CHARS = 600;
+export const GROUP_FACTS_MAX = 8; // BR-40: bối cảnh chung của nhóm (nghề, nơi làm, tuổi, gia đình…)
+export const GROUP_FACT_MAX_CHARS = 220;
 
 /** Trần tổng (ký tự). SYSTEM ổn định theo cấu hình; PROMPT gồm mọi phần đổi theo từng lần gọi. */
-export const SYSTEM_MAX_CHARS = 7_000;
+export const SYSTEM_MAX_CHARS = 9_000; // tăng 25/11/2026 cho hồ sơ thành viên (BR-40) — vẫn là trần cố định
 export const PROMPT_MAX_CHARS = 10_000;
 
 /** Xu hướng tỉ giá (BR-36): |thay đổi| < 0,2% = đi ngang · ≥ 0,6% = mạnh. */

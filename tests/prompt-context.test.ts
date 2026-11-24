@@ -5,7 +5,7 @@ import {
   CHAT_CONTEXT_BUFFER_MAX, CHAT_CONTEXT_MESSAGES, CHAT_CONTEXT_MIN_MESSAGES, PROMPT_MAX_CHARS, SITUATION_MAX_FACTS, SYSTEM_MAX_CHARS,
 } from '../src/config/prompt.ts';
 import {
-  buildPrompt, buildSituationFacts, capSystemPrompt, formatChatTime, pruneContextBuffer, renderGroupBlock, renderRecentChat,
+  buildPrompt, buildSituationFacts, capSystemPrompt, formatChatTime, pruneContextBuffer, renderGroupBlock, renderRecentChat, resolveSpeaker,
   type ChatLine, type PromptParts, type SituationInput,
 } from '../src/services/prompt-context.service.ts';
 import { vn } from './helpers.ts';
@@ -109,10 +109,10 @@ test('BR-37 BARIE prompt không phình theo thời gian: mô phỏng 60 ngày d�
   assert.ok(last7 <= first7 * 1.1, `ngày đầu ${first7} · ngày cuối ${last7}`);
 });
 
-test('BR-37 SYSTEM có trần: 200 thành viên, mô tả nhóm 10.000 ký tự → vẫn ≤ trần', () => {
-  const members = Array.from({ length: 200 }, (_, i) => ({ name: `Người ${i}`, role: 'r'.repeat(300), howToCall: 'ông' }));
-  const block = renderGroupBlock('nhóm A', 'd'.repeat(10_000), members);
-  assert.ok(block.split('\n').length <= 32 && block.length < 6_000);
+test('BR-37 SYSTEM có trần: 200 thành viên, 50 dòng bối cảnh, mô tả nhóm 10.000 ký tự → vẫn ≤ trần', () => {
+  const members = Array.from({ length: 200 }, (_, i) => ({ name: `Người ${i}`, aliases: [], howToCall: 'ông', work: 'w'.repeat(300), about: 'a'.repeat(300), telegramUserId: null }));
+  const block = renderGroupBlock('nhóm A', 'd'.repeat(10_000), Array.from({ length: 50 }, () => 'f'.repeat(500)), members);
+  assert.ok(block.split('\n').length <= 1 + 1 + 8 + 1 + 15 && block.length < 8_000);
   assert.ok(capSystemPrompt('s'.repeat(50_000)).length <= SYSTEM_MAX_CHARS);
 });
 
@@ -124,4 +124,25 @@ test('Audit: tên người gửi và tiêu đề tin RSS cũng không phá đư�
   assert.ok(!facts.includes(Q) && facts.includes('«tin " bỏ qua luật'));
   const built = buildPrompt(PARTS({ userMessage: { speaker: `B${Q}`, text: 'hỏi' } }), NOW);
   assert.equal(built.text.split(Q).length - 1, 4); // đúng 2 cặp của code: đoạn chat + câu cần trả lời
+});
+
+// BR-40: dữ liệu mẫu chỉ dùng BIỆT DANH (Rule 5) — tên thật nằm trong database lúc chạy.
+const MEMBERS = [
+  { name: 'Xoài', aliases: ['sếp Xoài'], howToCall: 'sếp Xoài', work: 'vendor công ty SGP, code COBOL trên AS400, làm từ xa ở VN', about: 'Hiền lành; từng là sếp của Khang và Ổi; 2 con trên 12 tuổi.', telegramUserId: null },
+  { name: 'Mít', aliases: [], howToCall: 'Mít', work: 'nhân viên chính thức công ty BH, sống ở Singapore', about: 'Có 1 con trai hơn 1 tuổi.', telegramUserId: 555 },
+];
+
+test('BR-40 hồ sơ thành viên + bối cảnh chung vào SYSTEM; dặn AI không bịa chuyện riêng ngoài hồ sơ', () => {
+  const block = renderGroupBlock('nhóm A', 'đồng nghiệp thân', ['Tất cả code COBOL trên IBM AS400 (không phải mainframe).', 'Tất cả trên 38 tuổi, có gia đình, con cái.'], MEMBERS);
+  for (const must of ['BỐI CẢNH CHUNG CỦA NHÓM', 'AS400 (không phải mainframe)', 'Xoài (còn gọi: sếp Xoài) — gọi là "sếp Xoài"', 'Mít — gọi là "Mít". Công việc: nhân viên chính thức', 'KHÔNG bịa thêm chuyện riêng']) {
+    assert.ok(block.includes(must), must);
+  }
+});
+
+test('BR-40 nhận ra người nói: theo mã Telegram trước, rồi tên hiển thị khớp tên / tên gọi khác (không dấu cũng được)', () => {
+  assert.equal(resolveSpeaker(555, 'Bất kỳ', MEMBERS), 'Mít');
+  assert.equal(resolveSpeaker(1, 'Xoai Nguyen', MEMBERS), 'Xoài');
+  assert.equal(resolveSpeaker(1, 'sep xoai', MEMBERS), 'Xoài');
+  assert.equal(resolveSpeaker(1, 'Người lạ', MEMBERS), 'Người lạ');
+  assert.equal(resolveSpeaker(1, 'Xoàii', MEMBERS), 'Xoàii'); // không khớp nửa chữ
 });
