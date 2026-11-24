@@ -148,3 +148,9 @@
 - **Yêu cầu gốc:** D4 "(b)… chỉ gởi AI khi Khang hỏi, đảm bảo bot không gởi AI API mỗi lần có 1 thành viên trong nhóm nhắn 1 câu linh tinh. Bot chỉ ghi nguyên văn vào file tạm" · D1 "cứ ghi tên thật vào prompt AI cũng được không sao, prompt ghi log lại nhưng xóa sau 1 ngày và log prompt mã hóa là được"
 - **Kết quả:** `CLAUDE.md` Rule 5 viết lại (repo + log kỹ thuật vẫn cấm tên thật; prompt AI là ngoại lệ), Mục tiêu sửa đè; biên bản, history (A1 → A2, đổi nhãn, T04 xong), STATUS (tổng kết bổ sung) cập nhật; push vào PR #1. Đề xuất "che tên bằng mã" (Khang đồng ý 21:48) → hết hiệu lực.
 - **Bài học cho skill:** quyết định riêng tư có **phạm vi**: "không tên thật" ở repo / log khác với ở prompt lúc chạy → ghi rõ phạm vi từng chỗ; tên thật cho prompt lấy từ **cấu hình trong database**, không từ repo.
+
+### 2026-11-24 22:19 (giờ VN) — Khang — Chốt nguyên tắc D2 (luật thuần code quyết định lên tiếng) + tóm tắt chat cho cả 2 bot
+- **Loại:** Quyết định
+- **Yêu cầu gốc:** "quy tắc suy luận khi nào nên lên tiếng nên được giải quyết bằng rule thuần code chứ không thông qua gọi AI cho tốn lượt" · tóm tắt chat "cho cả 2 (vì cả 2 đều có tính năng đọc trộm tin nhắn user mà)"
+- **Kết quả:** `CLAUDE.md`, biên bản, history (A2 + nhãn D2), STATUS cập nhật; push vào PR #1. Bảng mức 1–10 để phiên sau.
+- **Bài học cho skill:** nguyên tắc "**luật trước, AI sau**" (tài liệu gọi AI của Khang) áp cả cho việc **quyết định có nói hay không**, không chỉ cho việc hiểu lệnh → ghi thành nguyên tắc chung.

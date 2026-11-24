@@ -20,7 +20,7 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 - **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T04, FS. **Bối cảnh:** Khang muốn prompt giàu bối cảnh "có tên từng người, tên nhóm"; Rule 5 (Khang chốt 20:43) cấm tên người / tên nhóm vào prompt AI; Gemini free có thể dùng dữ liệu để cải thiện sản phẩm, có thể có người đọc. **Lựa chọn:** (a) gửi tên thật; (b) **thay tên bằng mã / biệt danh trước khi gửi, code đổi lại tên khi nhận** (AI vẫn đủ bối cảnh: ai là ai, vai trò, quan hệ); (c) không gửi thông tin người. **Kat đề xuất:** (b). **Đã chốt:** (a) — Khang: "cứ ghi tên thật vào prompt AI cũng được… prompt ghi log lại nhưng xóa sau 1 ngày và log prompt mã hóa là được".
 <a id="d2"></a>
 ### D2 — Quy tắc cụ thể của "mức hóng chuyện 1–10" ⏳
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026 · **nguyên tắc ✅ ĐÃ CHỐT 24/11/2026 22:19:** quyết định lên tiếng = luật thuần code, chỉ gọi AI khi code đã quyết định nói; còn chờ bảng mức 1–10
 - **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T05, FS. **Lựa chọn:** bảng mức → xác suất chen vào mỗi "đợt" trò chuyện + trần lượt / ngày; ban đêm 20:00–06:00 có chen vào không (Kat đề xuất: không tự chen, vẫn trả lời khi được gọi tên). **Đã chốt:** —
 <a id="d4"></a>
 ### D4 — Cách lưu cho "tóm tắt chat cuối ngày"
@@ -46,6 +46,8 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 | 24/11/2026 22:05 | Lắng nghe = đọc mọi tin, tự quyết khi nào nói; mức hóng chuyện 1–10; nói có quan điểm | Khang, trong chat | D2 (chi tiết chờ) |
 | 24/11/2026 22:15 | D1: prompt AI được chứa tên thật; log prompt mã hóa, giữ ≤ 1 ngày (ngoại lệ Rule 5; thay đề xuất "che tên bằng mã" lúc 21:48 → ⛔) | Khang, trong chat | `CLAUDE.md` Rule 5 |
 | 24/11/2026 22:15 | D4: tóm tắt chat cuối ngày = lưu nguyên văn mã hóa, chỉ gửi AI khi Khang hỏi, xóa 01:00 mỗi ngày | Khang, trong chat | `CLAUDE.md` Mục tiêu |
+| 24/11/2026 22:19 | D2 (nguyên tắc): quyết định có lên tiếng = luật thuần code, không gọi AI để suy luận; chỉ gọi AI khi đã quyết định nói | Khang, trong chat | `CLAUDE.md` Mục tiêu |
+| 24/11/2026 22:19 | Tóm tắt chat cuối ngày áp cho **cả 2 bot** | Khang, trong chat | `CLAUDE.md` Mục tiêu |
 
 <a id="sb"></a>
 # B. Việc dở dang

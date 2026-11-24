@@ -10,8 +10,7 @@ Bước 1 (phỏng vấn) **gần xong** — lượt 1–5 trong `docs/specs/00-
 | 1 | **Lũi — lĩnh vực tin** nhóm B hay bàn | 👤 Khang gửi sau · ⭐ |
 | 2 | **Lũi — tính cách** (Kat mô tả kỹ, ràng buộc bằng rule + tham số) | 👤 Khang gửi sau · ⭐ |
 | 3 | **Lũi — giọng văn** | 👤 Khang gửi sau · ⭐ |
-| 5 | **D2 — quy tắc mức hóng chuyện 1–10** (bảng mức → tần suất, trần lượt / ngày; ban đêm có chen vào không) | 👤 Khang chốt · ⏳ Kat soạn bảng nháp |
-| 5b | Tóm tắt chat cuối ngày (D4 đã chốt): **Rây có cần không**, hay chỉ Lũi? | 👤 Khang |
+| 5 | **D2 — bảng mức hóng chuyện 1–10** (nguyên tắc đã chốt: luật thuần code quyết định lên tiếng, AI chỉ soạn câu) — mức → tần suất, trần lượt / ngày, ban đêm | ⏳ Kat soạn nháp phiên sau · 👤 Khang chốt |
 | 6 | Duyệt kết luận lượt 2–5 → **chốt requirement** | 👤 Khang |
 | 7 | **Việc 3:** kiểm chứng nhịp lịch 10–15 phút (Vercel Hobby cron chỉ 1 lần / ngày → pg_cron của Supabase?), quota Gemini free theo khóa, RSS các báo → ADR | ⏳ Kat (chờ Khang cho phép) |
 | 8 | **Việc 4 — ATR** | ⏳ Kat soạn · 👤 Khang chốt |
