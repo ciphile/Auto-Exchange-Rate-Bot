@@ -109,7 +109,7 @@
 
 ### 2026-11-24 21:50 (giờ VN) — Khang — Tên group không ghi ở đâu cả, chỉ gọi nhóm A / nhóm B
 - **Loại:** Quyết định
-- **Yêu cầu gốc:** "Prime Optimus là tên thật của group nha, đổi tên khác đi ghi nhóm A hay B là đủ"
+- **Yêu cầu gốc:** "[tên thật nhóm A] là tên thật của group nha, đổi tên khác đi ghi nhóm A hay B là đủ"
 - **Kết quả:** bỏ tên thật của cả 2 group khỏi bảng đối chiếu (trước đó chỉ còn ở đây); repo giờ không còn tên group nào. Lịch sử git vẫn còn (repo private, quy ước tạo repo sạch trước khi public). Từ nay Kat cũng chỉ gọi "nhóm A / nhóm B" khi trả lời Khang.
 - **Bài học cho skill:** tên **group / kênh chat** cũng là thông tin định danh như tên người → đưa vào danh sách "không ghi" ngay từ lượt riêng tư; và **Kat không nhắc lại tên thật trong câu trả lời** dù Khang dùng tên thật.
 

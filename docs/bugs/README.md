@@ -5,4 +5,4 @@ Bug nghiêm trọng: tạo NGAY. Bug thường: lúc tổng kết. Bug nhỏ tes
 
 | Mã | Ngày | Tên | Nhãn |
 |---|---|---|---|
-| [BUG-0001](BUG-0001-lo-ten-that-nhom-B.md) | 24/11/2026 | Lỡ ghi tên thật của nhóm B vào biên bản | ✅ ĐÃ XONG (barie phòng ngừa ⏳ T10) |
+| [BUG-0001](BUG-0001-lo-ten-that-nhom-B.md) | 24/11/2026 | Lỡ ghi tên thật của group vào tài liệu (2 lần — tái phát) | ✅ ĐÃ XONG (barie phòng ngừa ⏳ T10) |

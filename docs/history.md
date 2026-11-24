@@ -169,7 +169,7 @@ Case: Vercel Hobby cron chỉ 1 lần / ngày, Gemini free dùng dữ liệu đ�
 - Tài liệu gọi AI của Khang lưu nguyên văn (so `cmp` khớp) + thành chuẩn 6.10a. Khang gửi lại 2 lần: 1 bản giống hệt, 1 bản cũ hơn (443 dòng đầu giống hệt, thiếu phần "cơ chế gọi AI") → không đổi gì.
 - Biên bản phỏng vấn lượt 1–5 + căn cứ mốc; 11 quyết định ở A2.
 **Dang dở:** T01–T12 (Lũi: lĩnh vực, tính cách, giọng văn; D1 tên trong prompt; D2 mức hóng chuyện; việc 3–5; barie; tạo bot).
-**Phát hiện hay:** Vercel Hobby cron chỉ 1 lần / ngày (cần nhịp lịch khác); Gemini free có thể dùng dữ liệu và có người đọc; Wise chỉ cho tải tối đa 30 ngày theo giờ; mốc cách 50 đ gây báo qua lại. BUG-0001 (riêng tư). Bug nhỏ test bắt được (nguyên mẫu, 23/11): bộ kiểm lời AI từ chối nhầm "1 xíu" → đã sửa.
+**Phát hiện hay:** Vercel Hobby cron chỉ 1 lần / ngày (cần nhịp lịch khác); Gemini free có thể dùng dữ liệu và có người đọc; Wise chỉ cho tải tối đa 30 ngày theo giờ; mốc cách 50 đ gây báo qua lại. BUG-0001 (riêng tư, **tái phát 2 lần** — lần 2 bắt được nhờ rà tên trước khi tạo PR). Bug nhỏ test bắt được (nguyên mẫu, 23/11): bộ kiểm lời AI từ chối nhầm "1 xíu" → đã sửa.
 **Trạng thái cuối phiên:** chưa có code chính thức; nhánh `claude/new-session-5jra1l`; môi trường cloud `auto-exchange-rate-bot` (5 host nguồn tỉ giá). Chưa có CI (barie chờ chốt stack).
 **Việc nên làm tiếp:** T04 + T05 (Khang chốt D1, D2) → T06 → T07 (việc 3) → T08 → T09; song song T01–T03 khi Khang gửi.
 **Kích thước CLAUDE.md:** 21,4 KB
@@ -180,4 +180,4 @@ Case: Vercel Hobby cron chỉ 1 lần / ngày, Gemini free dùng dữ liệu đ�
 <a id="si"></a>
 # I. Hồ sơ bug
 Xem `docs/bugs/README.md`.
-- [BUG-0001](bugs/BUG-0001-lo-ten-that-nhom-B.md) — 24/11/2026 — Lỡ ghi tên thật của nhóm B vào biên bản — ✅
+- [BUG-0001](bugs/BUG-0001-lo-ten-that-nhom-B.md) — 24/11/2026 — Lỡ ghi tên thật của group vào tài liệu (2 lần, tái phát) — ✅
