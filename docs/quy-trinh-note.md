@@ -154,3 +154,9 @@
 - **Yêu cầu gốc:** "quy tắc suy luận khi nào nên lên tiếng nên được giải quyết bằng rule thuần code chứ không thông qua gọi AI cho tốn lượt" · tóm tắt chat "cho cả 2 (vì cả 2 đều có tính năng đọc trộm tin nhắn user mà)"
 - **Kết quả:** `CLAUDE.md`, biên bản, history (A2 + nhãn D2), STATUS cập nhật; push vào PR #1. Bảng mức 1–10 để phiên sau.
 - **Bài học cho skill:** nguyên tắc "**luật trước, AI sau**" (tài liệu gọi AI của Khang) áp cả cho việc **quyết định có nói hay không**, không chỉ cho việc hiểu lệnh → ghi thành nguyên tắc chung.
+
+### 2026-11-24 22:24 → 2026-11-24 22:34 (giờ VN) — Khang + Kat — Mode 2: chỉ cần FS; Kat viết FS v0.1 + code đợt 1 + CI; tổng kết
+- **Loại:** Quy trình · Spec · Code
+- **Yêu cầu gốc:** "giờ Kat làm tiếp việc đi mình đi ngủ… mode 2" · "ở dự án này không cần TS, BRD cũng không cần, chỉ cần FS" · "viết FS xong code được gì trước (mà không cần Khang confirm) thì bạn code đi" · "Gemini là free nên luôn có giới hạn… nhưng cũng đừng nên tiết kiệm AI API quá"
+- **Kết quả:** nhánh làm lại từ `main`; KC tra 4 điểm (Supabase Cron, hạn mức Gemini, Vercel 300 giây, `secret_token` Telegram); FS v0.1; code đợt 1 không thư viện ngoài; audit 2 lần; CI; tổng kết + PR #2.
+- **Bài học cho skill:** "chỉ cần FS" → phải nói rõ **chỗ mới** cho ADR / ATR (phụ lục FS), vì skill coi ATR là bắt buộc; ở Mode 2, chỉ code phần **thuần logic** (không cần tài khoản, không cần cài thư viện) để khỏi đụng giới hạn cứng; Node ≥ 22 chạy TypeScript trực tiếp → test không cần cài gói.
