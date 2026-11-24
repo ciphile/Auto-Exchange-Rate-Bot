@@ -1,0 +1,13 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [{ "type": "command", "timeout": 10, "command": "node \"$CLAUDE_PROJECT_DIR/.claude/do-ngu-canh.js\"" }]
+      }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "timeout": 10, "command": "node \"$CLAUDE_PROJECT_DIR/.claude/do-ngu-canh.js\"" }] }
+    ]
+  }
+}
