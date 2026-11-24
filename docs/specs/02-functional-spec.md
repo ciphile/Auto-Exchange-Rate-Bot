@@ -1,6 +1,6 @@
 # FS — Functional Spec — Auto-Exchange-Rate-Bot (Rây + Lũi)
 
-> **Bản 0.3 · 24/11/2026 (0.1, 0.2: 24/11/2026) · Kat viết ở Mode 2 · Khang đã duyệt bản 0.2 (24/11/2026 22:40)** — Khang có quyền sửa bất kỳ mục nào.
+> **Bản 0.4 · 25/11/2026 (0.1–0.3: 24/11/2026) · Kat viết ở Mode 2 · Khang đã duyệt bản 0.2 (24/11/2026 22:40)** — Khang có quyền sửa bất kỳ mục nào.
 > **Dự án này chỉ có FS** (Khang chốt 24/11/2026: không BRD, không TS). Cổng chặn: **FS chốt mới được code**. Kiến trúc (ADR), kiểm chứng (KC), bảng ATR bảo mật nằm ở **phụ lục** của FS.
 > Nguồn yêu cầu: `docs/specs/00-phong-van.md` (lượt 1–5). Tên người dùng **biệt danh** (Rule 5). Mã quy tắc `BR-xx`, mã chức năng `F-xx`, mã lỗi `E-...` — **bỏ qua số 13**.
 > **Phạm vi bản này:** **Rây đầy đủ** (ưu tiên, hạn chót **thứ Năm 03/12/2026** — Khang xác nhận 24/11/2026). **Lũi: khung + phần dùng chung**; tính cách, giọng văn, lĩnh vực tin **chờ Khang gửi** (mục 8).
@@ -31,9 +31,9 @@
 | **BR-05** | **Nguồn chuẩn để so mốc = Wise (mid-market).** Wise lỗi → dùng nguồn dự phòng (cập nhật 1 lần / ngày) và **ghi rõ trong tin** là số dự phòng. | Số mọi người thấy trên app, đo được. | Khang (lượt 3) · 24/11/2026 |
 | **BR-06** | **Mốc cảnh báo** mặc định 19,800 · 19,900 · 20,000 · 20,100 · 20,200 · 20,300 (VND / 1 SGD). Khang thêm / bớt / đổi bằng lệnh. | Giả lập 30 ngày: cách đều 100 báo đúng 3 sự kiện, mốc 50 báo qua lại. | Khang (phương án C) · 24/11/2026 |
 | **BR-07** | Cảnh báo khi giá **cắt qua mốc, cả chiều tăng và giảm**, có **đệm ±10 VND** (phải vượt mốc ≥ 10 mới tính là đã qua; chưa qua hẳn thì không báo lại). | Không báo qua lại khi giá sát mốc. | Khang (2 chiều) · Kat (đệm, đã giả lập) · 24/11/2026 |
-| **BR-08** | Cảnh báo **ngay lần lấy giá phát hiện cắt mốc**; tối đa **4 cảnh báo / ngày**, cách nhau **≥ 3 giờ**; rơi vào giờ nghỉ → **chờ hết giờ nghỉ** (gửi ở nhịp đầu tiên sau 06:00) nếu giá **vẫn còn** bên kia mốc. | Theo lời Khang. | Khang · 24/11/2026 |
+| **BR-08** | Cảnh báo **ngay lần lấy giá phát hiện cắt mốc**; **số lần tối đa theo mức tần suất** (BR-35: mức 5 = 4 lần / 24 giờ như ban đầu), luôn cách nhau **≥ 3 giờ**; rơi vào giờ nghỉ hoặc chưa đủ 3 giờ → **chờ** (gửi ở nhịp đầu tiên được phép) nếu giá **vẫn còn** bên kia mốc; **đã hết lượt của mức → bỏ, không dồn báo sau**. Đếm theo **khoảng trượt** (24 giờ / 2 ngày / 3 ngày), không theo ngày lịch. | Theo lời Khang. | Khang · 24/11/2026 · sửa 25/11/2026 (BR-35) |
 | **BR-09** | **Giờ nghỉ mặc định 20:00 → 06:00**: bot **không tự nhắn** (không báo, không cảnh báo, không chen chuyện). Khang chỉnh bằng lệnh. | Theo lời Khang. | Khang · 24/11/2026 |
-| **BR-10** | **Báo tỉ giá chủ động trong tuần lương**: mỗi ngày **≤ 1 lần**, kiểu "nói rồi nghỉ 1 ngày rồi nói tiếp" — **không bao giờ nghỉ 2 ngày liền**; tổng 4–6 lần / tuần lương. **Ngày lương luôn báo** (cao hay thấp đều báo). Ngoài tuần lương: **im lặng**. | "hầu như mỗi ngày 1 lần hay mỗi ngày rồi nghỉ 1 ngày" + "ngày cuối tháng đảm bảo bot báo". | Khang · Kat (4–6 lần, không nghỉ 2 ngày liền — Mode 2) · 24/11/2026 |
+| **BR-10** | **Báo tỉ giá chủ động**: mỗi ngày **≤ 1 lần**; **ngày lương luôn báo** ở mọi mức (cao hay thấp đều báo). **Lịch cả tháng theo mức tần suất BR-35**; mức 3 (mặc định) giữ luật tuần lương ban đầu: 4–6 lần, **không bao giờ nghỉ 2 ngày liền**. | "hầu như mỗi ngày 1 lần hay mỗi ngày rồi nghỉ 1 ngày" + "ngày cuối tháng đảm bảo bot báo". | Khang · Kat (4–6 lần, không nghỉ 2 ngày liền — Mode 2) · 24/11/2026 |
 | **BR-11** | **Giờ nói ngẫu nhiên**: mỗi ngày cần báo, code bốc 1 thời điểm ngẫu nhiên trong giờ hoạt động (06:00–20:00, lệch biên 30 phút: 06:30–19:30), lưu lại; tới giờ mới nói. Cảnh báo (BR-08) **không** ngẫu nhiên. | Để người đọc cảm giác như người thật. | Khang · 24/11/2026 |
 | **BR-12** | **Chợ đen ước tính = Wise × 1,004**, làm tròn tới 10 đ, luôn ghi chữ **"ước tính"**. | Không có nguồn chợ đen; mức chênh theo lời Mít ("tầm 20–20100"). | Khang (4b) · 24/11/2026 |
 | **BR-14** | **Số liệu do code tính; AI chỉ viết lời.** Mọi con số AI nhắc phải **khớp số code đưa** (code kiểm); sai → dùng câu soạn sẵn (BR-24). | Chuẩn gọi AI của Khang ("app tính số, AI chỉ viết lại"). | Khang · 24/11/2026 |
@@ -50,9 +50,14 @@
 | **BR-25** | **Chính trị trong nước: trung lập**, dẫn nguồn báo chính thống; câu **dự đoán** (tỉ giá tháng sau, chiến tranh…) phải nói rõ là **đoán**; không khuyên tài chính chắc chắn. | Rủi ro pháp lý cho thành viên; không phóng đại. | Khang · 24/11/2026 |
 | **BR-26** | Bot bị hỏi thẳng "mày là bot à" → **không chối**. Ngoài ra nói chuyện như người (không khuôn mẫu), có quan điểm riêng theo tính cách. | Telegram luôn gắn nhãn BOT; trung thực. | Khang (đồng ý đề xuất) · 24/11/2026 |
 | **BR-27** | **Xưng hô**: Khang chọn cách bot xưng và gọi người dùng (vd "tao – mày", "em – anh") bằng lệnh; prompt luôn mang theo lựa chọn hiện hành. | Theo lời Khang. | Khang · 24/11/2026 |
-| **BR-28** | **Tâm trạng / phong cách**: Khang chọn tâm trạng (vui, cáu, thất tình — nói cộc lốc, muốn nói nhiều…) và phong cách; prompt mang theo. Cảnh báo phải **than như người** (học giọng Xoài, Ổi, Mít), báo giá **như Mít báo** — không khuôn máy móc. | Theo lời Khang. | Khang · 24/11/2026 |
+| **BR-28** | **Phong cách**: cảnh báo phải **than như người** (học giọng Xoài, Ổi, Mít), báo giá **như Mít báo** — không khuôn máy móc. Tính cách + tâm trạng: **BR-31 → BR-34**. | Theo lời Khang. | Khang · 24/11/2026 |
 | **BR-29** | Mọi câu nói về giá (báo, cảnh báo, trả lời) **phải nói rõ nguồn + thời điểm lấy** (vd "theo Wise, lấy lúc 11:00 ngày 24/11"). **AI không bao giờ đi tìm tỉ giá** (Gemini không tra được; tra web gói free gần như 0 lượt): số luôn lấy từ **kho bản chụp** (BR-04) hoặc BR-30. | Người dùng phải biết số đó cũ hay mới, của ai. | Khang · 24/11/2026 |
 | **BR-30** | **Lấy giá ngay theo yêu cầu** ("mày lấy tỉ giá thời điểm hiện tại đi"): AI chỉ **chọn action** `lay_ty_gia_ngay`; **code thuần** đọc thẳng nguồn được chọn (Wise / VCB / VPBank — không qua AI, không tìm web) rồi AI viết lời, nói rõ nguồn + giờ (BR-29). **Thiếu nguồn → hỏi lại** người dùng muốn nguồn nào. Mỗi nguồn tối đa **1 lần đọc / 5 phút** (VCB yêu cầu ≤ 1 lần / 5 phút) — trong 5 phút dùng lại kết quả vừa đọc, kèm giờ. Nguồn lỗi → nói thật chưa lấy được + đưa bản gần nhất trong kho kèm giờ. Kết quả lấy ngay **không** dùng để cảnh báo (cảnh báo chỉ theo lịch BR-04). Là action **chỉ xem** → chạy luôn, không cần thẻ xác nhận. **Cách hiểu nguồn** (Khang dặn 24/11/2026 22:40; Kat chốt cách làm, Mode 2): nêu tên ("check VCB", "vietcombank", "VP bank với Wise") → đúng các nguồn đó · **"tùy mày" / "nguồn nào cũng được" / "sao cũng được"** → **Wise** (nguồn chuẩn BR-05; Wise đang tắt → nguồn bật đầu tiên) · **"tất cả nguồn" / "cả 3" / "lấy hết"** → **mọi nguồn Khang đang bật** · không nói nguồn → **hỏi lại**; câu trả lời cho câu hỏi đó trong **10 phút** (reply tin hỏi, hoặc gọi tên) được hiểu là trả lời câu hỏi · nguồn được hỏi đang bị Khang tắt (`/nguon`) → nói nguồn đó đang tắt, kể các nguồn đang bật. **Luật trước, AI sau:** khi đang chờ câu trả lời "nguồn nào?", code đọc từ khóa trước — rõ ràng thì không gọi AI; mơ hồ / có ý loại trừ ("tất cả trừ VCB") → để AI chọn tham số, code kiểm lại. | Khang (đề xuất action thay vì từ chối) · Kat (5 phút, không dùng cho cảnh báo — Mode 2) | Khang · 24/11/2026 |
+| **BR-31** | **Tính cách Rây chỉ BẬT / TẮT** (`/tinhcach on|off`, mặc định **bật**). **Bật = xỏ lá**: hay lý sự, hay phản biện (như đứa con nít hay hỏi lại điều người lớn nói), hay chọt, nói nhiều, hiền hơn Lũi. **Tắt = ngoan**: nữ sinh lớp 10 ngoan, lễ phép, "Dạ" thưa, câu cú rõ ràng, hầu như không phản biện, không chọt; xưng hô luôn lễ phép (em – anh chị) dù `/xungho` đặt gì. **Tính cách quyết định NÓI GÌ và KHI NÀO**: xác suất phản biện (bật ~55%, tắt ~8%), xác suất chọt (bật ~35%, tắt 0), hệ số chen chuyện (bật ×1,3, tắt ×0,8). | "tính cách là để ra quyết định nói gì? khi nào nói? phản biện ra sao? (hiền lành thì ít phản biện)" | Khang (ý) · Kat (con số, mặc định bật — Mode 2) · 25/11/2026 |
+| **BR-32** | **14 tâm trạng** (`/tamtrang <mã>`, mặc định bình thường): bình thường · vui vẻ · thoải mái · hài hước dí dỏm · siêu hài hước · siêu bựa · khìn khìn · nghiêm túc · hơi căng · stress · cộc cằn · trầm tĩnh · tức giận · **không ổn định** (mỗi lần nói code bốc 1 tâm trạng, chọt mạnh ×1,5 — "hay xỏ lá chọt khe"). **Tâm trạng quyết định NÓI THẾ NÀO** (độ dài, số câu, emoji, mức đùa — bảng mục 9) và nắn nhẹ việc nói gì (tức giận phản biện ×1,5; trầm tĩnh ×0,6…). Tính cách tắt → tâm trạng "dịu" lại (cộc cằn = ngắn, hơi lạnh nhưng vẫn "Dạ"; tức giận = giận dỗi dễ thương). | "tâm trạng là để thể hiện cách nói (dài cộc lốc ngắn gọn...)" | Khang (danh sách) · Kat (bảng số — Mode 2) · 25/11/2026 |
+| **BR-33** | **Giọng miền Nam (miền Tây Nam Bộ), kể cả khi ngoan**: dùng nha, nghen, nè, hông, chớ, tui, tụi mình, ba, má, heo, bắp, trái…; **tránh từ miền Bắc** (ạ, nhé, nhỉ, vâng, thế, đấy, bọn mình, tớ, bố, mẹ, lợn, ngô…). Lễ phép = "Dạ" ở đầu câu, **không "ạ" cuối câu**. Code **tự thay** các cặp an toàn (nhé → nha, thế nào → sao, đấy → đó, bỏ "ạ" cuối câu…) và ghi cảnh báo nếu còn sót. | "người miền nam, miền tây nam bộ không phải miền bắc" | Khang · 25/11/2026 |
+| **BR-34** | **Code tính "chỉ thị nói"** cho mỗi lần gọi AI từ tính cách × tâm trạng × mục đích (trả lời số liệu / trò chuyện / chen chuyện / báo giá / cảnh báo / tóm tắt) × xác suất: lập trường (phản biện · chọt · đồng ý góp ý · trung lập · trả lời · bình giá · tóm tắt), độ dài (số chữ, số câu), emoji tối đa, mức đùa, kèm **mã chỉ thị** (vào log AI + khóa cache). Chuyện chính trị trong nước → code **ép trung lập** (BR-25). **Code kiểm lời AI**: có từ tục → bỏ, dùng câu soạn sẵn (BR-24); quá dài → cắt ở cuối câu; dư emoji → bỏ. | "Code có thể tính toán phức tạp kết hợp tham số và tâm trạng để gởi 1 tham số đặc biệt để API AI nói chuyện cho đúng" | Khang (ý) · Kat (cách làm — Mode 2) · 25/11/2026 |
+| **BR-35** | **Mức tần suất 1–5** (`/tansuat <1-5>`, mặc định **3**): Rây tự báo giá và cảnh báo thường xuyên tới đâu — bảng mục 10. Mức 1, 2 theo đúng lời Khang; mức 3–5 tăng dần. Ngày lương luôn báo; mỗi ngày ≤ 1 lần báo, giờ ngẫu nhiên (BR-11). Đổi mức giữa tháng → lập lại lịch các ngày còn lại. Cảnh báo vẫn **chỉ trong 14 ngày cuối tháng** (BR-03). | "có command để Khang điều chỉnh mức độ thường xuyên mà Rẩy thông báo hay cảnh báo tỉ giá" | Khang (mức 1, 2) · Kat (mức 3–5, mặc định — Mode 2) · 25/11/2026 |
 
 ---
 
@@ -105,7 +110,10 @@
 | `/langnghe on|off` | Bật / tắt lắng nghe (BR-16) | đổi |
 | `/hongchuyen 1..10` | Mức hóng chuyện (mục 6) | đổi |
 | `/xungho <bot xưng> - <gọi người dùng>` | Xưng hô (BR-27) | đổi |
-| `/tamtrang <vui|cau|thatinh|noinhieu|binhthuong>` · `/phongcach <mô tả>` | Tâm trạng, phong cách (BR-28) | đổi |
+| `/tinhcach on|off` | Bật / tắt tính cách xỏ lá (BR-31) | đổi |
+| `/tamtrang <mã>` (không gõ mã → hiện danh sách) | Tâm trạng (BR-32): `binhthuong vuive thoaimai haihuoc sieuhaihuoc sieubua khinkhin nghiemtuc hoicang stress coccan tramtinh tucgian baton` — gõ có dấu cũng hiểu ("siêu bựa") | đổi |
+| `/tansuat 1..5` | Mức tần suất báo giá + cảnh báo (BR-35) | đổi |
+| `/phongcach <mô tả>` | Phong cách thêm (BR-28) | đổi |
 | `/gionghi 20:00-06:00` | Giờ nghỉ (BR-09) | đổi |
 | `/nguon wise,vcb,vpbank` | Nguồn tỉ giá được dùng (Rây) | đổi |
 | `/gannhom` | **Gõ trong group** (chỉ Khang): gắn group này làm group của bot (nhóm A cho Rây, nhóm B cho Lũi) → thẻ xác nhận. Group chưa gắn → bot im lặng ở đó (ATR-4). Không cần tra mã group | đổi |
@@ -188,6 +196,41 @@ F-10 Dọn dẹp
 Đã chốt (dùng chung với Rây): F-04 (danh sách action của Lũi chờ lĩnh vực tin), F-05, F-06, F-07, F-08, BR-09, BR-14 → BR-28. **Riêng Lũi đã biết:** cào tin **2 lần / ngày** (06:00, 12:00) qua **RSS** của báo chính thống; chỉ đăng tiêu đề + 1–2 câu tóm tắt + link; xếp hạng tin theo **luật** (mức nóng, mức nghiêm trọng) với ngưỡng Khang chỉnh; nhắn giờ ngẫu nhiên ngoài giờ nghỉ; link trong chat: chỉ đọc chữ đi kèm, **chỉ mở link khi được yêu cầu**; kho tin dùng chung cho Rây (`hoi_vi_mo`). **Chờ:** lĩnh vực tin · tính cách (Kat sẽ mô tả kỹ + ràng buộc bằng rule + tham số) · giọng văn · bảng xếp hạng tin.
 
 ---
+
+## 9. Tính cách × tâm trạng (BR-31 → BR-34) — con số ở `src/config/persona.ts`, câu chữ ở `src/shared/persona.vi.ts`
+**Hai lớp prompt** (tài liệu gọi AI của Khang mục 3.1): **SYSTEM** mang khối STYLE ổn định (tính cách, tâm trạng hiện tại, xưng hô, giọng miền Nam); **PROMPT** mang "CÁCH NÓI LẦN NÀY" do code tính mỗi lần (lập trường bốc ngẫu nhiên, số chữ, số câu, emoji, mức đùa, mã chỉ thị).
+
+| Tâm trạng | Số chữ | Câu tối đa | Emoji | Đùa | Phản biện × | Chọt × | Chen chuyện × |
+|---|---|---|---|---|---|---|---|
+| bình thường | 10–35 | 3 | 1 | 1 | 1 | 1 | 1 |
+| vui vẻ | 12–40 | 3 | 2 | 2 | 0,9 | 1,1 | 1,15 |
+| thoải mái | 10–35 | 3 | 1 | 1 | 0,8 | 0,9 | 1 |
+| hài hước dí dỏm | 12–40 | 3 | 2 | 2 | 1 | 1,2 | 1,15 |
+| siêu hài hước | 15–50 | 4 | 3 | 3 | 1 | 1,3 | 1,25 |
+| siêu bựa | 15–50 | 4 | 3 | 3 | 1,1 | 1,5 | 1,3 |
+| khìn khìn | 8–40 | 4 | 2 | 3 | 1,1 | 1,2 | 1,2 |
+| nghiêm túc | 15–50 | 4 | 0 | 0 | 0,8 | 0,2 | 0,8 |
+| hơi căng | 6–20 | 2 | 0 | 0 | 1,1 | 0,6 | 0,8 |
+| stress | 4–18 | 2 | 0 | 0 | 0,9 | 0,4 | 0,6 |
+| cộc cằn | 2–10 | 1 | 0 | 0 | 1,2 | 0,8 | 0,7 |
+| trầm tĩnh | 10–30 | 3 | 0 | 1 | 0,6 | 0,3 | 0,6 |
+| tức giận | 4–20 | 2 | 1 | 0 | 1,5 | 1 | 0,9 |
+| không ổn định | bốc 1 trong: vui vẻ, khìn khìn, cộc cằn, siêu bựa (trọng số 2) · hơi căng, tức giận (1) | | | | | chọt ×1,5 | ×1,1 |
+
+**Tính cách:** bật (xỏ lá) — phản biện gốc 55%, chọt gốc 35%, chen chuyện ×1,3, nói dài ×1,25 · tắt (ngoan) — phản biện 8%, chọt 0, chen chuyện ×0,8, emoji ≤ 1. Xác suất cuối = gốc × hệ số tâm trạng, trần phản biện 90%, chọt 70%. **Độ dài theo mục đích:** chen chuyện ×0,7 · báo giá / cảnh báo ×0,8 · tóm tắt cho Khang 60–250 chữ. Lời AI dài hơn 1,6 × tối đa → code cắt ở cuối câu.
+
+## 10. Mức tần suất (BR-35) — `src/config/frequency.ts`
+"Đầu tháng" = trước 14 ngày cuối · "14 ngày cuối" = khung cảnh báo (BR-03), gồm tuần áp chót + tuần lương. Lịch 14 ngày cuối nối chuỗi **lùi từ ngày lương** (ngày lương luôn báo).
+
+| Mức | Đầu tháng | 14 ngày cuối | Cảnh báo |
+|---|---|---|---|
+| 1 (Khang) | **1 lần** | cách **2–4 ngày** 1 lần | tối đa **1 lần / 3 ngày** |
+| 2 (Khang) | **3 lần**, cách **4–5 ngày** | cách **3 ngày** 1 lần | tối đa **2 lần / 2 ngày** |
+| **3 (mặc định)** | 4 lần, cách 3–4 ngày | tuần lương: 4–6 lần, không nghỉ 2 ngày liền (BR-10) · tuần áp chót: cách 2 ngày | tối đa 2 lần / 24 giờ |
+| 4 | 6 lần, cách 2–3 ngày | tuần lương: mỗi ngày · tuần áp chót: cách 1–2 ngày | tối đa 3 lần / 24 giờ |
+| 5 | cách 1–2 ngày (kín đầu tháng) | mỗi ngày | tối đa 4 lần / 24 giờ |
+
+Mọi mức: cảnh báo cách nhau ≥ 3 giờ; giờ nghỉ → chờ; hết lượt → bỏ. Tháng ngắn không đủ chỗ → giảm số lần đầu tháng chứ không ép 2 lần sát nhau.
 
 ## Phụ lục A — Kiến trúc (ADR) — Kat chốt ở Mode 2
 | ADR | Quyết định | Lý do | Xem lại khi |

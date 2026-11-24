@@ -1,8 +1,7 @@
 // F-03: cảnh báo cắt mốc. Hàm thuần: nhận trạng thái + giá + thời điểm, trả trạng thái mới + hành động.
-import {
-  ALERT_HYSTERESIS_VND, DEFAULT_QUIET_HOURS, KEY_ALERT_LEVELS_VND, MAX_ALERTS_PER_DAY, MIN_ALERT_GAP_MS,
-} from '../config/defaults.ts';
-import { getVnDateKey, isInQuietHours } from '../shared/vn-time.ts';
+import { ALERT_HYSTERESIS_VND, DEFAULT_QUIET_HOURS, KEY_ALERT_LEVELS_VND } from '../config/defaults.ts';
+import { DEFAULT_FREQUENCY_LEVEL, FREQUENCY_PROFILES, type AlertLimits } from '../config/frequency.ts';
+import { isInQuietHours } from '../shared/vn-time.ts';
 
 export type AlertDirection = 'up' | 'down';
 export type AlertEvent = { levelVnd: number; direction: AlertDirection; rateVnd: number; detectedAt: number };
@@ -11,13 +10,14 @@ export type PendingAlert = AlertEvent & { originBand: number };
 export type AlertState = {
   band: number | null; // số mốc đang nằm dưới giá (đã tính đệm) — null = chưa có lần đo nào
   pending: PendingAlert | null; // cảnh báo đang chờ được phép gửi
-  sentDateKey: string | null; // ngày (giờ VN) của bộ đếm
-  sentCount: number;
-  lastSentAt: number | null;
+  /** Các lần đã gửi gần đây (ms) — chỉ giữ trong khoảng đếm dài nhất của mọi mức (BR-35). */
+  recentSentAts: number[];
 };
 export type AlertAction = 'none' | 'send' | 'defer' | 'drop';
 
-export const EMPTY_ALERT_STATE: AlertState = { band: null, pending: null, sentDateKey: null, sentCount: 0, lastSentAt: null };
+export const EMPTY_ALERT_STATE: AlertState = { band: null, pending: null, recentSentAts: [] };
+const DEFAULT_LIMITS = FREQUENCY_PROFILES[DEFAULT_FREQUENCY_LEVEL].alerts;
+const KEEP_SENT_MS = Math.max(...Object.values(FREQUENCY_PROFILES).map((p) => p.alerts.perMs));
 
 /** BR-07: band mới với đệm ±h; lần đầu (prev = null) thì đặt band, không báo. */
 export function updateBand(prev: number | null, rateVnd: number, levels: readonly number[], h = ALERT_HYSTERESIS_VND): number {
@@ -38,12 +38,18 @@ export function pickCrossedLevel(prev: number, next: number, levels: readonly nu
   return chosen === undefined ? null : { levelVnd: chosen, direction };
 }
 
-/** BR-08 + BR-09: có được gửi cảnh báo ngay lúc này không. */
-export function canSendAlert(state: AlertState, now: Date, quiet = DEFAULT_QUIET_HOURS): boolean {
-  if (isInQuietHours(now, quiet)) return false;
-  const countToday = state.sentDateKey === getVnDateKey(now) ? state.sentCount : 0;
-  if (countToday >= MAX_ALERTS_PER_DAY) return false;
-  return state.lastSentAt === null || now.getTime() - state.lastSentAt >= MIN_ALERT_GAP_MS;
+export type AlertGate = 'ok' | 'quiet' | 'gap' | 'quota';
+
+/**
+ * BR-08 + BR-09 + BR-35: được gửi cảnh báo lúc này không.
+ * 'quiet' giờ nghỉ và 'gap' chưa đủ khoảng cách → CHỜ; 'quota' đã đủ số lần trong khoảng đếm của mức → BỎ.
+ */
+export function checkAlertGate(state: AlertState, now: Date, limits: AlertLimits = DEFAULT_LIMITS, quiet = DEFAULT_QUIET_HOURS): AlertGate {
+  if (isInQuietHours(now, quiet)) return 'quiet';
+  const t = now.getTime();
+  const last = state.recentSentAts.at(-1);
+  if (last !== undefined && t - last < limits.minGapMs) return 'gap';
+  return state.recentSentAts.filter((at) => t - at < limits.perMs).length >= limits.maxCount ? 'quota' : 'ok';
 }
 
 /**
@@ -53,7 +59,7 @@ export function canSendAlert(state: AlertState, now: Date, quiet = DEFAULT_QUIET
  */
 export function evaluateAlert(
   state: AlertState, rateVnd: number, now: Date, levels: readonly number[], windowOpen: boolean,
-  quiet = DEFAULT_QUIET_HOURS,
+  limits: AlertLimits = DEFAULT_LIMITS, quiet = DEFAULT_QUIET_HOURS,
 ): { state: AlertState; action: AlertAction; event: AlertEvent | null } {
   const nextBand = updateBand(state.band, rateVnd, levels);
   let pending = state.pending;
@@ -68,12 +74,14 @@ export function evaluateAlert(
   }
   if (!pending) return { state: { ...state, band: nextBand }, action: 'none', event: null };
   if (!windowOpen) return { state: { ...state, band: nextBand, pending: null }, action: 'drop', event: null };
-  if (!canSendAlert(state, now, quiet)) return { state: { ...state, band: nextBand, pending }, action: 'defer', event: null };
-  const dateKey = getVnDateKey(now);
-  const sentCount = (state.sentDateKey === dateKey ? state.sentCount : 0) + 1;
+  const gate = checkAlertGate(state, now, limits, quiet);
+  // BR-35: hết lượt của mức → bỏ (Khang: "chỉ 1 lần trong 3 ngày"), không dồn lại báo sau.
+  if (gate === 'quota') return { state: { ...state, band: nextBand, pending: null }, action: 'drop', event: null };
+  if (gate !== 'ok') return { state: { ...state, band: nextBand, pending }, action: 'defer', event: null };
+  const t = now.getTime();
   const { originBand: _origin, ...event } = { ...pending, rateVnd };
   return {
-    state: { band: nextBand, pending: null, sentDateKey: dateKey, sentCount, lastSentAt: now.getTime() },
+    state: { band: nextBand, pending: null, recentSentAts: [...state.recentSentAts.filter((at) => t - at < KEEP_SENT_MS), t] },
     action: 'send', event,
   };
 }
