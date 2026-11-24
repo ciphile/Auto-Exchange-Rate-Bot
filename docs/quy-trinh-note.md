@@ -130,3 +130,9 @@
 - **Yêu cầu gốc:** "phải soạn prompt thật dài gồm bối cảnh tên từng người tên nhóm nhóm hay bàn về việc gì nhóm đang nói về gì, các thông số, các quy tắc, cách xưng hô, tính cách… xem file đính kèm" · "bot đọc tất cả tin nhắn mọi người soạn và trả lời khi thấy cần, thêm mức độ hóng chuyện nhiều chuyện từ 1 tới 10… khi nói thì hay thêm quan điểm của bot vào"
 - **Kết quả:** biên bản + `CLAUDE.md` cập nhật. Kat phát hiện **mâu thuẫn với Rule 5** (tên người / tên nhóm không vào prompt AI; Gemini free có thể dùng dữ liệu) → đề xuất "thay tên bằng mã trước khi gửi, đổi lại tên khi nhận", chờ Khang chốt.
 - **Bài học cho skill:** yêu cầu mới phải được **đối chiếu với quy tắc đã chốt** (riêng tư, bảo mật) trước khi ghi là "chốt"; chỗ mâu thuẫn → nêu rõ + đưa phương án, không tự chọn.
+
+### 2026-11-24 22:07 (giờ VN) — Khang + Kat — Gửi bản cũ của tài liệu gọi AI; TỔNG KẾT phiên 24/11/2026
+- **Loại:** Quy trình
+- **Yêu cầu gốc:** "file đính kèm đây, mình quên gởi, xong thì tổng kết nha"
+- **Kết quả:** file mới = bản cũ hơn của tài liệu đã lưu (443 dòng đầu giống hệt, thiếu phần "cơ chế gọi AI") → giữ bản 1.1, không đổi. Tổng kết theo Rule 3: `history.md` (A1 D1–D3, A2 11 quyết định, B T01–T12, C, D, E, F SC01–SC06, G, I), hồ sơ **BUG-0001**, STATUS đối chiếu + cập nhật, commit + push, tạo PR vào `main`.
+- **Bài học cho skill:** phiên dài nhiều quyết định → lấy **giờ từ sổ quy trình + git log** để ghi history cho đúng; mã việc / mục bỏ số 13 (T12 → T14).
