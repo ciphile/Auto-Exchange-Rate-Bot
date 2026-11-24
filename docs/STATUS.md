@@ -1,5 +1,5 @@
 # STATUS — Auto-Exchange-Rate-Bot
-> **Chế độ làm việc: Mode 2 (Tự động)** · Cập nhật: 25/11/2026 08:10 · Mục đích: để KHANG nhớ việc.
+> **Chế độ làm việc: Mode 2 (Tự động)** · Cập nhật: 25/11/2026 06:48 · Mục đích: để KHANG nhớ việc.
 
 ## Giai đoạn hiện tại
 **FS bản 0.7** (`docs/specs/02-functional-spec.md` — Khang đã duyệt bản 0.2; 0.3–0.6 Kat viết Mode 2: tính cách / tâm trạng / tần suất / ngữ cảnh prompt / nói tục / lệnh cài đặt / hồ sơ thành viên). Hạn chót Rây: **thứ Năm 03/12/2026** (Khang xác nhận). Code: logic thuần + kiểm biến môi trường + barie; typecheck chạy được. 120 / 120 test đạt. Chưa nối dịch vụ thật.
