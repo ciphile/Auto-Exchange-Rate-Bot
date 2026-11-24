@@ -1,24 +1,26 @@
-// BR-31 → BR-34: tính cách + tâm trạng → "chỉ thị nói" gửi AI, và kiểm lời AI trả về. Hàm thuần.
+// BR-31 → BR-34: tính cách + tâm trạng → "chỉ thị nói" gửi AI, và kiểm lời AI trả về. Hàm thuần. Dùng cho cả Rây và Lũi.
 // Theo tài liệu gọi AI của Khang mục 3.1: khối STYLE (ổn định theo cấu hình) nằm ở SYSTEM; phần đổi theo
 // từng lần nói (lập trường bốc ngẫu nhiên, độ dài, emoji, tâm trạng bốc khi "không ổn định") nằm ở PROMPT.
 import {
   DEFAULT_ADDRESS, MAX_POKE_PROBABILITY, MAX_REBUTTAL_PROBABILITY, MOOD_CODES, MOOD_PROFILES, PERSONA_PROFILES,
   POLITE_EMOJI_MAX, PURPOSE_LENGTH_FACTOR, STYLE_HARD_LENGTH_FACTOR, SUMMARY_WORDS, UNSTABLE_CHIME_FACTOR,
   UNSTABLE_MOOD_POOL, UNSTABLE_POKE_BOOST,
-  type MoodCode, type PersonaKey, type StableMood,
+  PERSONA_PENDING, type MoodCode, type PersonaMode, type StableMood,
 } from '../config/persona.ts';
+import type { BotKey } from '../domain/telegram.ts';
 import {
-  MOOD_TEXT, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_WORDS, SENSITIVE_TOPIC_WORDS,
+  BOT_DISPLAY_NAMES, MOOD_TEXT, MOOD_TEXT_OVERRIDES, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_WORDS, SENSITIVE_TOPIC_WORDS,
   SOUTHERN_SPEECH_TEXT, STANCE_TEXT, type Stance,
 } from '../shared/persona.vi.ts';
 
-export type StyleSettings = { personaOn: boolean; mood: MoodCode };
+export type StyleSettings = { bot: BotKey; personaOn: boolean; mood: MoodCode };
 export type Address = { self: string; others: string };
 /** Mục đích lời nói: trả lời số liệu · trả lời trò chuyện / vĩ mô · tự chen · báo giá · cảnh báo · tóm tắt cho Khang. */
 export type SpeechPurpose = 'answer_data' | 'answer_chat' | 'chime_in' | 'rate_report' | 'rate_alert' | 'daily_summary';
 
 export type StyleDirective = {
-  persona: PersonaKey;
+  bot: BotKey;
+  mode: PersonaMode;
   mood: MoodCode;
   effectiveMood: StableMood; // tâm trạng thật dùng lần này (baton → bốc ngẫu nhiên)
   stance: Stance;
@@ -28,7 +30,9 @@ export type StyleDirective = {
   signature: string; // mã ngắn của chỉ thị — đưa vào log AI + khóa cache
 };
 
-const personaOf = (s: StyleSettings): PersonaKey => (s.personaOn ? 'xola' : 'ngoan');
+const modeOf = (s: StyleSettings): PersonaMode => (s.personaOn ? 'on' : 'off');
+const withName = (text: string, bot: BotKey) => text.replaceAll('{ten}', BOT_DISPLAY_NAMES[bot]);
+const moodTextOf = (bot: BotKey, mood: MoodCode) => MOOD_TEXT_OVERRIDES[bot]?.[mood] ?? MOOD_TEXT[mood];
 const plain = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
 const wordRe = (body: string, flags = 'iu') => new RegExp(`(?<![\\p{L}\\p{N}])(?:${body})(?![\\p{L}\\p{N}])`, flags);
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -46,7 +50,7 @@ export function parseMood(input: string): MoodCode | null {
 
 /** BR-27 + BR-31: tắt tính cách → luôn xưng hô lễ phép (em – anh chị); bật → theo /xungho (mặc định tui – mấy ông mấy bà). */
 export function resolveAddress(settings: StyleSettings, configured: Address | null): Address {
-  return settings.personaOn ? configured ?? DEFAULT_ADDRESS.xola : DEFAULT_ADDRESS.ngoan;
+  return settings.personaOn ? configured ?? DEFAULT_ADDRESS[settings.bot].on : DEFAULT_ADDRESS[settings.bot].off;
 }
 
 /** BR-25: chuyện chính trị trong nước → code ép lập trường trung lập. */
@@ -64,15 +68,15 @@ function pickUnstableMood(random: () => number): StableMood {
 /** BR-18 + BR-32: hệ số nhân xác suất tự chen chuyện theo tính cách × tâm trạng. */
 export function getChimeFactor(settings: StyleSettings): number {
   const moodFactor = settings.mood === 'baton' ? UNSTABLE_CHIME_FACTOR : MOOD_PROFILES[settings.mood].chime;
-  return PERSONA_PROFILES[personaOf(settings)].chime * moodFactor;
+  return PERSONA_PROFILES[settings.bot][modeOf(settings)].chime * moodFactor;
 }
 
 /** BR-33: tính cách quyết định NÓI GÌ — bốc lập trường theo xác suất (tính cách × tâm trạng). */
-function pickStance(persona: PersonaKey, mood: StableMood, unstable: boolean, purpose: SpeechPurpose, sensitive: boolean, random: () => number): Stance {
+function pickStance(bot: BotKey, mode: PersonaMode, mood: StableMood, unstable: boolean, purpose: SpeechPurpose, sensitive: boolean, random: () => number): Stance {
   if (purpose === 'daily_summary') return 'tom_tat';
   if (sensitive) return 'trung_lap';
   if (purpose === 'rate_report' || purpose === 'rate_alert') return 'binh_luan_gia';
-  const p = PERSONA_PROFILES[persona];
+  const p = PERSONA_PROFILES[bot][mode];
   const pPoke = Math.min(MAX_POKE_PROBABILITY, p.pokeBase * MOOD_PROFILES[mood].poke * (unstable ? UNSTABLE_POKE_BOOST : 1));
   if (purpose === 'answer_data') return random() < pPoke ? 'tra_loi_kem_choc' : 'tra_loi';
   const pRebut = Math.min(MAX_REBUTTAL_PROBABILITY, p.rebuttalBase * MOOD_PROFILES[mood].rebuttal);
@@ -86,49 +90,54 @@ function pickStance(persona: PersonaKey, mood: StableMood, unstable: boolean, pu
 export function computeStyleDirective(
   settings: StyleSettings, ctx: { purpose: SpeechPurpose; userText?: string }, random: () => number,
 ): StyleDirective {
-  const persona = personaOf(settings);
+  const { bot } = settings;
+  const mode = modeOf(settings);
+  const persona = PERSONA_PROFILES[bot][mode];
   const unstable = settings.mood === 'baton';
   const effectiveMood = unstable ? pickUnstableMood(random) : (settings.mood as StableMood);
   const profile = MOOD_PROFILES[effectiveMood];
-  const stance = pickStance(persona, effectiveMood, unstable, ctx.purpose, isSensitiveTopic(ctx.userText ?? ''), random);
+  const stance = pickStance(bot, mode, effectiveMood, unstable, ctx.purpose, isSensitiveTopic(ctx.userText ?? ''), random);
   let words: readonly [number, number];
   let maxSentences = profile.maxSentences;
   if (ctx.purpose === 'daily_summary') {
     words = SUMMARY_WORDS; maxSentences = 12;
   } else {
-    const f = PURPOSE_LENGTH_FACTOR[ctx.purpose] * PERSONA_PROFILES[persona].wordsFactor;
+    const f = PURPOSE_LENGTH_FACTOR[ctx.purpose] * persona.wordsFactor;
     const min = Math.max(1, Math.round(profile.words[0] * f));
     words = [min, Math.max(min + 2, Math.round(profile.words[1] * f))];
   }
-  const emojiMax = persona === 'ngoan' ? Math.min(POLITE_EMOJI_MAX, profile.emojiMax || POLITE_EMOJI_MAX) : profile.emojiMax;
-  const signature = [persona, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`].join('|');
-  return { persona, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, signature };
+  const emojiMax = persona.politeEmojiCap ? Math.min(POLITE_EMOJI_MAX, profile.emojiMax || POLITE_EMOJI_MAX) : profile.emojiMax;
+  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`].join('|');
+  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, signature };
 }
 
 /** Khối STYLE cho SYSTEM (ổn định theo cấu hình — đổi tính cách / tâm trạng / xưng hô mới đổi). */
 export function renderStyleSystemBlock(settings: StyleSettings, address: Address): string {
-  const persona = personaOf(settings);
-  const mood = MOOD_TEXT[settings.mood];
-  return [
-    PERSONA_TEXT[persona],
-    `TÂM TRẠNG HIỆN TẠI: ${mood.label} — ${mood[persona]}`,
-    `XƯNG HÔ: Rây tự xưng "${address.self}", gọi mọi người là "${address.others}".`,
+  const { bot } = settings;
+  const mode = modeOf(settings);
+  const mood = moodTextOf(bot, settings.mood);
+  return withName([
+    PERSONA_TEXT[bot][mode],
+    PERSONA_PENDING[bot] ? '(Tính cách / tâm trạng riêng của {ten} đang chờ chủ bot gửi — tạm nói tự nhiên, vừa phải.)' : null,
+    `TÂM TRẠNG HIỆN TẠI: ${mood.label} — ${mood[mode]}`,
+    `XƯNG HÔ: {ten} tự xưng "${address.self}", gọi mọi người là "${address.others}".`,
     SOUTHERN_SPEECH_TEXT,
     'VIẾT: văn bản thường gửi Telegram, không markdown, không tiêu đề, không bảng.',
-  ].join('\n\n');
+  ].filter((x): x is string => x !== null).join('\n\n'), bot);
 }
 
 /** Khối "CÁCH NÓI LẦN NÀY" cho PROMPT — chỉ thị cụ thể bằng con số, đặt ngay trước khuôn đầu ra. */
 export function renderStyleTurnBlock(d: StyleDirective): string {
-  const moodLine = d.mood === 'baton' ? `Lần này tâm trạng bốc ra là: ${MOOD_TEXT[d.effectiveMood].label} — ${MOOD_TEXT[d.effectiveMood][d.persona]}` : null;
-  return [
+  const eff = moodTextOf(d.bot, d.effectiveMood);
+  const moodLine = d.mood === 'baton' ? `Lần này tâm trạng bốc ra là: ${eff.label} — ${eff[d.mode]}` : null;
+  return withName([
     `CÁCH NÓI LẦN NÀY (mã ${d.signature}) — làm đúng, không giải thích:`,
     moodLine,
-    `- Lập trường: ${STANCE_TEXT[d.stance][d.persona]}`,
+    `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
-  ].filter((x): x is string => x !== null).join('\n');
+  ].filter((x): x is string => x !== null).join('\n'), d.bot);
 }
 
 const PROFANITY_RE = wordRe(PROFANITY_WORDS.map(escapeRe).join('|'));

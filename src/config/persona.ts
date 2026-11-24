@@ -1,6 +1,8 @@
-// BR-31 → BR-34: tham số tính cách + tâm trạng (con số; câu chữ mô tả giọng ở src/shared/persona.vi.ts).
+// BR-31 → BR-34: tham số tính cách + tâm trạng — dùng cho CẢ 2 BOT (Rây, Lũi); mỗi bot bộ số riêng (con số; câu chữ mô tả giọng ở src/shared/persona.vi.ts).
 // TÍNH CÁCH quyết định NÓI GÌ / KHI NÀO (phản biện, chọt, hay chen chuyện). TÂM TRẠNG quyết định NÓI THẾ NÀO
 // (dài / cộc, emoji, độ hài) và nắn nhẹ việc nói gì. Code nhân 2 bộ hệ số → "chỉ thị nói" gửi AI (style.service.ts).
+
+import type { BotKey } from '../domain/telegram.ts';
 
 /** Mã tâm trạng (lệnh `/tamtrang <mã>`, không dấu). `baton` = không ổn định / hay xỏ lá chọt khe: mỗi lần nói code bốc 1 tâm trạng. */
 export const MOOD_CODES = [
@@ -45,15 +47,22 @@ export const UNSTABLE_MOOD_POOL: readonly { mood: StableMood; weight: number }[]
 export const UNSTABLE_POKE_BOOST = 1.5;
 export const UNSTABLE_CHIME_FACTOR = 1.1;
 
-export type PersonaKey = 'xola' | 'ngoan';
-/** Tính cách bật (`xola`: xỏ lá, lý sự, hay phản biện, nói nhiều) / tắt (`ngoan`: nữ sinh lớp 10 ngoan, dạ thưa). */
-export const PERSONA_PROFILES: Record<PersonaKey, { rebuttalBase: number; pokeBase: number; chime: number; wordsFactor: number }> = {
-  xola: { rebuttalBase: 0.55, pokeBase: 0.35, chime: 1.3, wordsFactor: 1.25 },
-  ngoan: { rebuttalBase: 0.08, pokeBase: 0, chime: 0.8, wordsFactor: 1 },
+/** Tính cách chỉ BẬT / TẮT (BR-31). Rây: bật = xỏ lá, tắt = ngoan. Lũi: chờ Khang (tạm dùng số của Rây). */
+export type PersonaMode = 'on' | 'off';
+export type PersonaProfile = { rebuttalBase: number; pokeBase: number; chime: number; wordsFactor: number; politeEmojiCap: boolean };
+const RAY_PERSONA: Record<PersonaMode, PersonaProfile> = {
+  on: { rebuttalBase: 0.55, pokeBase: 0.35, chime: 1.3, wordsFactor: 1.25, politeEmojiCap: false },
+  off: { rebuttalBase: 0.08, pokeBase: 0, chime: 0.8, wordsFactor: 1, politeEmojiCap: true },
 };
+export const PERSONA_PROFILES: Record<BotKey, Record<PersonaMode, PersonaProfile>> = {
+  ray: RAY_PERSONA,
+  lui: RAY_PERSONA, // TẠM — Khang gửi tính cách Lũi sau (STATUS)
+};
+/** Bot nào chưa có tính cách riêng (khối STYLE ghi rõ "tạm"). */
+export const PERSONA_PENDING: Record<BotKey, boolean> = { ray: false, lui: true };
 export const MAX_REBUTTAL_PROBABILITY = 0.9;
 export const MAX_POKE_PROBABILITY = 0.7;
-/** Ngoan: emoji tối đa (dễ thương, không spam), bất kể tâm trạng. */
+/** Tính cách tắt (politeEmojiCap): emoji tối đa (dễ thương, không spam), bất kể tâm trạng. */
 export const POLITE_EMOJI_MAX = 1;
 
 /** Độ dài theo mục đích lời nói (nhân vào khoảng chữ của tâm trạng). Tóm tắt cho Khang có độ dài riêng. */
@@ -62,10 +71,10 @@ export const SUMMARY_WORDS: readonly [number, number] = [60, 250];
 /** Đầu ra AI dài quá (số chữ > tối đa × hệ số này) → code cắt ở cuối câu gần nhất. */
 export const STYLE_HARD_LENGTH_FACTOR = 1.6;
 
-export const DEFAULT_PERSONA_ON = true; // BR-31: Rây mặc định bật tính cách xỏ lá (Kat chốt Mode 2)
+export const DEFAULT_PERSONA_ON: Record<BotKey, boolean> = { ray: true, lui: true }; // BR-31: mặc định bật (Kat chốt Mode 2)
 export const DEFAULT_MOOD: MoodCode = 'binhthuong';
 /** BR-27 + BR-31: xưng hô mặc định. Bật tính cách → theo lệnh /xungho (mặc định dưới); tắt → luôn lễ phép. */
-export const DEFAULT_ADDRESS = {
-  xola: { self: 'tui', others: 'mấy ông mấy bà' },
-  ngoan: { self: 'em', others: 'anh chị' },
-} as const;
+export const DEFAULT_ADDRESS: Record<BotKey, Record<PersonaMode, { self: string; others: string }>> = {
+  ray: { on: { self: 'tui', others: 'mấy ông mấy bà' }, off: { self: 'em', others: 'anh chị' } },
+  lui: { on: { self: 'tui', others: 'mấy ông mấy bà' }, off: { self: 'em', others: 'anh chị' } }, // TẠM — chờ Khang
+};
