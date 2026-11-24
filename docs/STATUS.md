@@ -12,6 +12,7 @@ Bước 1 (phỏng vấn) **gần xong** — lượt 1–5 trong `docs/specs/00-
 | 3 | **Lũi — giọng văn** | 👤 Khang gửi sau · ⭐ |
 | 4 | **D1 — tên người / tên nhóm trong prompt AI** (đụng Rule 5): Kat đề xuất thay tên bằng mã trước khi gửi, đổi lại khi nhận | 👤 Khang chốt · ⭐ |
 | 5 | **D2 — quy tắc mức hóng chuyện 1–10** (bảng mức → tần suất, trần lượt / ngày; ban đêm có chen vào không) | 👤 Khang chốt · ⏳ Kat soạn bảng nháp |
+| 5b | **D4 — tóm tắt chat cuối ngày:** tóm từng câu (1 lượt AI / tin) hay lưu câu gốc mã hóa rồi tóm 1 lần khi Khang hỏi (Kat đề xuất); áp cho Lũi, Rây có cần không | 👤 Khang chốt |
 | 6 | Duyệt kết luận lượt 2–5 → **chốt requirement** | 👤 Khang |
 | 7 | **Việc 3:** kiểm chứng nhịp lịch 10–15 phút (Vercel Hobby cron chỉ 1 lần / ngày → pg_cron của Supabase?), quota Gemini free theo khóa, RSS các báo → ADR | ⏳ Kat (chờ Khang cho phép) |
 | 8 | **Việc 4 — ATR** | ⏳ Kat soạn · 👤 Khang chốt |

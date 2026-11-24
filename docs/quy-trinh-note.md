@@ -136,3 +136,9 @@
 - **Yêu cầu gốc:** "file đính kèm đây, mình quên gởi, xong thì tổng kết nha"
 - **Kết quả:** file mới = bản cũ hơn của tài liệu đã lưu (443 dòng đầu giống hệt, thiếu phần "cơ chế gọi AI") → giữ bản 1.1, không đổi. Tổng kết theo Rule 3: `history.md` (A1 D1–D3, A2 11 quyết định, B T01–T12, C, D, E, F SC01–SC06, G, I), hồ sơ **BUG-0001**, STATUS đối chiếu + cập nhật, commit + push, tạo PR vào `main`.
 - **Bài học cho skill:** phiên dài nhiều quyết định → lấy **giờ từ sổ quy trình + git log** để ghi history cho đúng; mã việc / mục bỏ số 13 (T12 → T14).
+
+### 2026-11-24 22:09 (giờ VN) — Khang — Bổ sung "tóm tắt chat cuối ngày" (cache mã hóa, xóa 01:00); Kat tạo PR #1
+- **Loại:** Spec
+- **Yêu cầu gốc:** "bot sẽ tóm tắt mỗi câu người dùng vào thành 1 câu ngắn ghi vào cache… cuối ngày khi Khang hỏi tóm tắt họ đang bàn về việc gì trong group B thì app gọi API AI đọc lại toàn bộ cache json ngày đó… cache json này định kỳ xóa lúc 1am mỗi ngày vì dữ liệu riêng tư và phải có mã hóa"
+- **Kết quả:** ghi biên bản, `CLAUDE.md`, history (D4), STATUS. PR #1 (nhánh → `main`) đã tạo trước khi tin này tới; commit này tự vào PR.
+- **Bài học cho skill:** yêu cầu tới **giữa lúc tổng kết** → vẫn ghi đủ các sổ rồi push vào cùng PR (PR tự cập nhật), không cần PR mới.
