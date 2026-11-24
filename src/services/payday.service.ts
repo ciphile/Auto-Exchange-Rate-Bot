@@ -53,3 +53,8 @@ export function pickRandomTalkMinute(random: () => number): number {
   const span = RANDOM_TALK_TO_MINUTE - RANDOM_TALK_FROM_MINUTE;
   return RANDOM_TALK_FROM_MINUTE + Math.floor(random() * (span + 1));
 }
+
+/** BR-03 + BR-39: cảnh báo có chạy lúc này không — bật "cả tháng" thì luôn chạy, tắt thì chỉ 14 ngày cuối. */
+export function isAlertWindowOpen(at: Date, alertFullMonth: boolean): boolean {
+  return alertFullMonth || isInAlertWindow(at);
+}

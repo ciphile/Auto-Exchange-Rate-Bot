@@ -21,7 +21,8 @@ export type AccessInput = {
   botUsername: string; // không có "@"
 };
 
-export type AccessDecision = { route: MessageRoute; reason: string; storeInChatLog: boolean };
+/** storeInChatLog = kho tóm tắt cuối ngày (chỉ khi lắng nghe, BR-16) · storeInContext = kho ngữ cảnh ngắn 20 tin (mọi tin của nhóm đã gắn, BR-36). */
+export type AccessDecision = { route: MessageRoute; reason: string; storeInChatLog: boolean; storeInContext: boolean };
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const boundary = (body: string) => new RegExp(`(?<![\\p{L}\\p{N}_@])(?:${body})(?![\\p{L}\\p{N}_])`, 'iu');
@@ -44,7 +45,7 @@ export function isMentioned(text: string, botUsername: string): boolean {
   return new RegExp(`@${escapeRe(botUsername)}(?![A-Za-z0-9_])`, 'i').test(text);
 }
 
-const decide = (route: MessageRoute, reason: string, storeInChatLog = false): AccessDecision => ({ route, reason, storeInChatLog });
+const decide = (route: MessageRoute, reason: string, storeInChatLog = false, storeInContext = false): AccessDecision => ({ route, reason, storeInChatLog, storeInContext });
 
 export function routeMessage(input: AccessInput): AccessDecision {
   const { message: m, ownerId, boundGroupId, listenOn, callNames, botUsername } = input;
@@ -64,10 +65,11 @@ export function routeMessage(input: AccessInput): AccessDecision {
   }
   if (boundGroupId === null || m.chatId !== boundGroupId) return decide('ignore', 'nhóm chưa gắn — im lặng (ATR-4)');
 
-  const store = listenOn; // BR-16: chỉ lưu khi đang lắng nghe
-  if (command) return decide('group_command', 'lệnh trong nhóm', store);
-  if (m.isReplyToBot || isMentioned(m.text, botUsername)) return decide('group_addressed', 'reply / @tên bot', store);
-  if (listenOn && isCalledByName(m.text, callNames)) return decide('group_addressed', 'gọi tên bot', store);
-  if (listenOn) return decide('group_listen', 'lắng nghe — chỉ lưu', true);
-  return decide('ignore', 'tắt lắng nghe — bỏ ngay, không lưu (BR-16)');
+  const store = listenOn; // BR-16: kho tóm tắt cuối ngày chỉ khi đang lắng nghe
+  // BR-36 (Khang đồng ý 25/11/2026): mọi tin của nhóm đã gắn vào kho ngữ cảnh ngắn 20 tin, cả khi tắt lắng nghe.
+  if (command) return decide('group_command', 'lệnh trong nhóm', store, true);
+  if (m.isReplyToBot || isMentioned(m.text, botUsername)) return decide('group_addressed', 'reply / @tên bot', store, true);
+  if (listenOn && isCalledByName(m.text, callNames)) return decide('group_addressed', 'gọi tên bot', store, true);
+  if (listenOn) return decide('group_listen', 'lắng nghe — chỉ lưu', true, true);
+  return decide('ignore', 'tắt lắng nghe — không trả lời, không lưu tóm tắt; chỉ vào kho ngữ cảnh ngắn (BR-16, BR-36)', false, true);
 }

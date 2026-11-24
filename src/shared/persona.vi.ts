@@ -87,8 +87,12 @@ export const NORTHERN_REPLACEMENTS: readonly (readonly [string, string])[] = [
 ];
 /** Còn sót sau khi thay → ghi cảnh báo (không chặn). */
 export const NORTHERN_WATCH_WORDS: readonly string[] = ['ạ', 'tớ', 'bố', 'mẹ', 'lợn', 'ngô', 'ô tô', 'dứa', 'vừng', 'giời'];
-/** Từ tục — có trong lời AI → bỏ câu AI, dùng câu soạn sẵn (BR-34). */
-export const PROFANITY_WORDS: readonly string[] = ['đm', 'đmm', 'dm', 'đcm', 'dcm', 'vcl', 'vkl', 'đéo', 'địt', 'lồn', 'cặc', 'buồi', 'đĩ', 'óc chó', 'đồ ngu', 'mẹ mày', 'má mày'];
+/** BR-38: từ tục chia bậc. `nhe` / `vua` được dùng theo `/noituc`; `cam` KHÔNG BAO GIỜ (có → bỏ câu AI, dùng câu soạn sẵn). */
+export const PROFANITY_TIERS = {
+  nhe: ['vãi', 'vl', 'vờ lờ', 'đù', 'đù má', 'mẹ nó', 'má nó', 'cha nó', 'bà nội nó', 'chết mẹ', 'chết cha', 'khốn nạn'],
+  vua: ['đm', 'dm', 'đmm', 'đcm', 'dcm', 'vcl', 'vkl', 'đéo'],
+  cam: ['địt', 'lồn', 'cặc', 'buồi', 'đĩ', 'óc chó', 'đồ ngu', 'mẹ mày', 'má mày', 'thằng chó', 'đồ chó'],
+} as const;
 /** BR-25: dấu hiệu chuyện chính trị trong nước → lập trường trung lập (code ép, không để AI tự chọn). */
 export const SENSITIVE_TOPIC_WORDS: readonly string[] = [
   'chính trị', 'đảng cộng sản', 'bộ chính trị', 'tổng bí thư', 'chủ tịch nước', 'nhà nước', 'chính quyền', 'biểu tình', 'phản động', 'đa đảng',

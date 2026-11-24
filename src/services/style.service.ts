@@ -5,15 +5,16 @@ import {
   DEFAULT_ADDRESS, MAX_POKE_PROBABILITY, MAX_REBUTTAL_PROBABILITY, MOOD_CODES, MOOD_PROFILES, PERSONA_PROFILES,
   POLITE_EMOJI_MAX, PURPOSE_LENGTH_FACTOR, STYLE_HARD_LENGTH_FACTOR, SUMMARY_WORDS, UNSTABLE_CHIME_FACTOR,
   UNSTABLE_MOOD_POOL, UNSTABLE_POKE_BOOST,
-  PERSONA_PENDING, type MoodCode, type PersonaMode, type StableMood,
+  PERSONA_PENDING, PROFANITY_LEVELS, type MoodCode, type ProfanityLevel, type PersonaMode, type StableMood,
 } from '../config/persona.ts';
 import type { BotKey } from '../domain/telegram.ts';
 import {
-  BOT_DISPLAY_NAMES, MOOD_TEXT, MOOD_TEXT_OVERRIDES, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_WORDS, SENSITIVE_TOPIC_WORDS,
+  BOT_DISPLAY_NAMES, MOOD_TEXT, MOOD_TEXT_OVERRIDES, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_TIERS, SENSITIVE_TOPIC_WORDS,
   SOUTHERN_SPEECH_TEXT, STANCE_TEXT, type Stance,
 } from '../shared/persona.vi.ts';
 
-export type StyleSettings = { bot: BotKey; personaOn: boolean; mood: MoodCode };
+/** `profanityLevel` (BR-38, `/noituc`) không truyền = 0 (cấm). */
+export type StyleSettings = { bot: BotKey; personaOn: boolean; mood: MoodCode; profanityLevel?: ProfanityLevel };
 export type Address = { self: string; others: string };
 /** Mục đích lời nói: trả lời số liệu · trả lời trò chuyện / vĩ mô · tự chen · báo giá · cảnh báo · tóm tắt cho Khang. */
 export type SpeechPurpose = 'answer_data' | 'answer_chat' | 'chime_in' | 'rate_report' | 'rate_alert' | 'daily_summary';
@@ -27,6 +28,9 @@ export type StyleDirective = {
   words: readonly [number, number];
   maxSentences: number;
   emojiMax: number;
+  /** BR-38: số từ tục tối đa lần này (0 = cấm) + bậc được dùng. */
+  profanityMax: number;
+  profanityTiers: readonly ('nhe' | 'vua')[];
   signature: string; // mã ngắn của chỉ thị — đưa vào log AI + khóa cache
 };
 
@@ -88,7 +92,7 @@ function pickStance(bot: BotKey, mode: PersonaMode, mood: StableMood, unstable: 
 
 /** BR-34: tính "chỉ thị nói" cho 1 lần gọi AI (code tính, AI làm theo). `random` truyền vào để test lặp lại được. */
 export function computeStyleDirective(
-  settings: StyleSettings, ctx: { purpose: SpeechPurpose; userText?: string }, random: () => number,
+  settings: StyleSettings, ctx: { purpose: SpeechPurpose; userText?: string; profanityUsedToday?: number }, random: () => number,
 ): StyleDirective {
   const { bot } = settings;
   const mode = modeOf(settings);
@@ -107,8 +111,13 @@ export function computeStyleDirective(
     words = [min, Math.max(min + 2, Math.round(profile.words[1] * f))];
   }
   const emojiMax = persona.politeEmojiCap ? Math.min(POLITE_EMOJI_MAX, profile.emojiMax || POLITE_EMOJI_MAX) : profile.emojiMax;
-  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`].join('|');
-  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, signature };
+  // BR-38: tục chỉ khi bật tính cách + tâm trạng cho phép + không phải tóm tắt / chuyện nhạy cảm; trần / tin và trần / ngày.
+  const rule = PROFANITY_LEVELS[settings.personaOn ? settings.profanityLevel ?? 0 : 0];
+  const profanityAllowed = profile.profanityOk && ctx.purpose !== 'daily_summary' && stance !== 'trung_lap';
+  const profanityMax = profanityAllowed ? Math.max(0, Math.min(rule.perMessage, rule.perDay - (ctx.profanityUsedToday ?? 0))) : 0;
+  const profanityTiers = profanityMax > 0 ? rule.tiers : [];
+  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`, `${profanityMax}t`].join('|');
+  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, profanityMax, profanityTiers, signature };
 }
 
 /** Khối STYLE cho SYSTEM (ổn định theo cấu hình — đổi tính cách / tâm trạng / xưng hô mới đổi). */
@@ -137,10 +146,20 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
+    d.profanityMax > 0
+      ? `- Từ tục: ĐƯỢC dùng tối đa ${d.profanityMax} từ cảm thán (không bắt buộc), chỉ trong: ${d.profanityTiers.flatMap((t) => PROFANITY_TIERS[t]).join(', ')}. Không chửi thẳng vào ai.`
+      : '- Từ tục: KHÔNG dùng.',
+    `- TUYỆT ĐỐI KHÔNG: ${PROFANITY_TIERS.cam.join(', ')}.`,
   ].filter((x): x is string => x !== null).join('\n'), d.bot);
 }
 
-const PROFANITY_RE = wordRe(PROFANITY_WORDS.map(escapeRe).join('|'));
+const BANNED_RE = wordRe(PROFANITY_TIERS.cam.map(escapeRe).join('|'));
+// Cụm dài trước ("đù má" trước "đù") để đếm 1 lần.
+const SOFT_WORDS = [...PROFANITY_TIERS.nhe.map((w) => ({ w, tier: 'nhe' as const })), ...PROFANITY_TIERS.vua.map((w) => ({ w, tier: 'vua' as const }))]
+  .sort((a, b) => b.w.length - a.w.length);
+const SOFT_RE = wordRe(SOFT_WORDS.map((x) => escapeRe(x.w)).join('|'), 'giu');
+const tierOf = (word: string) => SOFT_WORDS.find((x) => x.w === word.toLowerCase())?.tier ?? 'vua';
+const mask = (word: string) => `${word[0] ?? ''}${'*'.repeat(Math.max(1, word.length - 1))}`;
 const EMOJI_RE = /\p{Extended_Pictographic}/gu;
 const countWords = (t: string) => t.split(/\s+/).filter(Boolean).length;
 
@@ -168,10 +187,16 @@ function trimToLength(text: string, maxWords: number, maxSentences: number): str
  * BR-34: code kiểm lời AI (Bẫy 29 — điều bắt buộc không chỉ dặn trong prompt).
  * Tục → ok=false (dùng câu soạn sẵn) · từ miền Bắc → thay · quá dài → cắt cuối câu · emoji dư → bỏ.
  */
-export function checkStyledOutput(text: string, d: StyleDirective): { ok: boolean; text: string; warnings: string[] } {
+export function checkStyledOutput(text: string, d: StyleDirective): { ok: boolean; text: string; warnings: string[]; profanityUsed: number } {
   const warnings: string[] = [];
-  if (PROFANITY_RE.test(text.normalize('NFC'))) return { ok: false, text: '', warnings: ['có từ tục'] };
-  let out = normalizeSouthern(text.trim());
+  if (BANNED_RE.test(text.normalize('NFC'))) return { ok: false, text: '', warnings: ['có từ cấm tuyệt đối'], profanityUsed: 0 };
+  // BR-38: từ tục trong giới hạn được giữ; vượt số lượng / sai bậc → che (đ*) thay vì bỏ cả câu.
+  let profanityUsed = 0;
+  let out = normalizeSouthern(text.trim()).replace(SOFT_RE, (m) => {
+    if (profanityUsed < d.profanityMax && d.profanityTiers.includes(tierOf(m))) { profanityUsed++; return m; }
+    warnings.push(`che từ tục "${mask(m)}"`);
+    return mask(m);
+  });
   const hardMax = Math.ceil(d.words[1] * STYLE_HARD_LENGTH_FACTOR);
   if (countWords(out) > hardMax) { out = trimToLength(out, hardMax, d.maxSentences + 1); warnings.push('quá dài — đã cắt'); }
   let seen = 0;
@@ -179,5 +204,5 @@ export function checkStyledOutput(text: string, d: StyleDirective): { ok: boolea
   if (seen > d.emojiMax) warnings.push('dư emoji — đã bỏ');
   const leftover = NORTHERN_WATCH_WORDS.filter((w) => wordRe(escapeRe(w)).test(out));
   if (leftover.length > 0) warnings.push(`còn từ miền Bắc: ${leftover.join(', ')}`);
-  return { ok: out.length > 0, text: out, warnings };
+  return { ok: out.length > 0, text: out, warnings, profanityUsed };
 }

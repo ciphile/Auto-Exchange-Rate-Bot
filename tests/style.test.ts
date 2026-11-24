@@ -114,9 +114,11 @@ test('BR-33 giọng miền Nam: code thay từ miền Bắc an toàn, giữ ch�
   assert.ok(!isSensitiveTopic('chế độ ăn kiêng') && !isSensitiveTopic('bật chế độ ngoan')); // audit: không bắt nhầm
 });
 
-test('BR-34 kiểm lời AI: tục → bỏ (dùng câu soạn sẵn); dài quá → cắt cuối câu; emoji dư → bỏ', () => {
+test('BR-34 kiểm lời AI: từ cấm tuyệt đối → bỏ (câu soạn sẵn); /noituc 0 → che từ tục; dài quá → cắt; emoji dư → bỏ', () => {
   const d = computeStyleDirective({ bot: 'ray', personaOn: true, mood: 'coccan' }, { purpose: 'answer_chat' }, seededRandom(6));
-  assert.equal(checkStyledOutput('đm giá thấp quá', d).ok, false);
+  assert.equal(checkStyledOutput('đồ ngu, giá thấp quá', d).ok, false);
+  const masked = checkStyledOutput('đm giá thấp quá', d);
+  assert.ok(masked.ok && masked.text.startsWith('đ* giá') && masked.profanityUsed === 0);
   const long = Array.from({ length: 8 }, (_, i) => `Câu số ${i} nói dài dòng lắm nha.`).join(' ');
   const cut = checkStyledOutput(long, d);
   assert.ok(cut.ok && cut.text.split(/(?<=\.)\s+/).length <= d.maxSentences + 1 && cut.warnings.length > 0);
@@ -154,4 +156,36 @@ test('BR-31 cơ chế dùng chung cho Lũi: tên Lũi trong khối STYLE, ghi r�
   assert.ok(d.signature.startsWith('lui|on|') && !renderStyleTurnBlock(d).includes('{ten}'));
   const ray = renderStyleSystemBlock(XOLA, resolveAddress(XOLA, null));
   assert.ok(ray.includes('Rây xỏ lá') && !ray.includes('{ten}')); // "hiền hơn Lũi" là lời Khang — được nhắc Lũi
+});
+
+test('BR-38 nói tục có giới hạn: /noituc 1 chỉ tục nhẹ ≤ 1 / tin; 3 = nhẹ + vừa ≤ 2 / tin; dư → che', () => {
+  const mk = (level: 0 | 1 | 2 | 3, used = 0) => computeStyleDirective({ bot: 'ray', personaOn: true, mood: 'tucgian', profanityLevel: level }, { purpose: 'answer_chat', profanityUsedToday: used }, seededRandom(40));
+  const l1 = mk(1);
+  assert.deepEqual([l1.profanityMax, l1.profanityTiers], [1, ['nhe']]);
+  const r1 = checkStyledOutput('Vãi, đm giá xuống nữa rồi', l1);
+  assert.equal(r1.profanityUsed, 1);
+  assert.ok(r1.text.startsWith('Vãi, đ* giá'));
+  const l3 = mk(3);
+  const r3 = checkStyledOutput('đm vãi vcl giá', l3);
+  assert.equal(r3.profanityUsed, 2);
+  assert.ok(r3.text.includes('đm vãi v**'));
+  assert.match(renderStyleTurnBlock(l3), /ĐƯỢC dùng tối đa 2 từ/);
+  assert.match(renderStyleTurnBlock(mk(0)), /Từ tục: KHÔNG dùng/);
+});
+
+test('BR-38 giới hạn: trần / ngày; ngoan luôn 0; nghiêm túc / trầm tĩnh / tóm tắt / chuyện nhạy cảm → 0; từ cấm luôn bị bỏ', () => {
+  const base = { bot: 'ray', personaOn: true, mood: 'coccan', profanityLevel: 2 } as const;
+  assert.equal(computeStyleDirective(base, { purpose: 'answer_chat', profanityUsedToday: 5 }, seededRandom(41)).profanityMax, 0);
+  assert.equal(computeStyleDirective({ ...base, personaOn: false }, { purpose: 'answer_chat' }, seededRandom(41)).profanityMax, 0);
+  assert.equal(computeStyleDirective({ ...base, mood: 'nghiemtuc' }, { purpose: 'answer_chat' }, seededRandom(41)).profanityMax, 0);
+  assert.equal(computeStyleDirective(base, { purpose: 'daily_summary' }, seededRandom(41)).profanityMax, 0);
+  assert.equal(computeStyleDirective(base, { purpose: 'answer_chat', userText: 'chuyện chính trị' }, seededRandom(41)).profanityMax, 0);
+  const d3 = computeStyleDirective({ ...base, profanityLevel: 3 }, { purpose: 'answer_chat' }, seededRandom(41));
+  assert.equal(checkStyledOutput('mẹ mày', d3).ok, false);
+  assert.match(renderStyleTurnBlock(d3), /TUYỆT ĐỐI KHÔNG: địt/);
+});
+
+test('BR-31 mặc định chế độ NGOAN (Khang 25/11/2026)', async () => {
+  const { DEFAULT_PERSONA_ON } = await import('../src/config/persona.ts');
+  assert.deepEqual(DEFAULT_PERSONA_ON, { ray: false, lui: false });
 });

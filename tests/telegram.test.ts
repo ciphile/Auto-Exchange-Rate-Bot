@@ -171,3 +171,12 @@ test('Audit: đứt mạng khi gửi tin → KHÔNG tự gửi lại (tránh tin
   await client.deleteMessage(GROUP_A, 5);
   assert.equal(count, 2);
 });
+
+test('BR-16 + BR-36: tắt lắng nghe → không trả lời, không lưu tóm tắt, NHƯNG vẫn vào kho ngữ cảnh ngắn; nhóm lạ / người lạ → không vào đâu cả', () => {
+  const off = routeMessage(input(msg({ text: 'nay ăn gì' }), { listenOn: false }));
+  assert.deepEqual([off.route, off.storeInChatLog, off.storeInContext], ['ignore', false, true]);
+  const stranger = routeMessage(input(msg({ chatId: -100999 })));
+  assert.equal(stranger.storeInContext, false);
+  const priv = routeMessage(input(msg({ chatKind: 'private', chatId: 999, fromId: 999 })));
+  assert.equal(priv.storeInContext, false);
+});

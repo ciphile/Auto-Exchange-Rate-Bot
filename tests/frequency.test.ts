@@ -32,12 +32,12 @@ test('BR-35 + BR-10 mọi mức, mọi tháng: ngày lương luôn báo; ≤ 1 l
   }
 });
 
-test('BR-35 mức 1 (Khang): đầu tháng đúng 1 lần; 14 ngày cuối cách 2–4 ngày', () => {
+test('BR-35 mức 1 (Khang): đầu tháng đúng 1 lần; 14 ngày cuối cách 4–5 ngày (thưa hơn mức 2)', () => {
   const rnd = seededRandom(12);
   for (let i = 0; i < 500; i++) {
     const { early, window } = split(planMonthPosts(2026, 11, 1, rnd), 30);
     assert.equal(early.length, 1);
-    assert.ok(gaps(window).every((g) => g >= 2 && g <= 4), `${window}`);
+    assert.ok(gaps(window).every((g) => g >= 4 && g <= 5), `${window}`);
   }
 });
 
