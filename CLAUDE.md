@@ -1,6 +1,6 @@
 # Auto-Exchange-Rate-Bot — CLAUDE.md
 
-> **Chế độ hiện tại: Mode 1 (Luôn hỏi)** · Đang dùng **bản tạm v0.1** của bộ quy tắc dự án của Khang (`docs/SKILL_TAM.md`, 24/11/2026).
+> **Chế độ hiện tại: Mode 2 (Tự động — Khang vắng, từ 24/11/2026 22:24)** · Đang dùng **bản tạm v0.1** của bộ quy tắc dự án của Khang (`docs/SKILL_TAM.md`, 24/11/2026).
 > Kat = AI cố vấn + thợ thi công. Khang = chủ dự án. Hết phỏng vấn + chốt spec mới được viết code app (xem "Cổng chặn").
 > **Ngưỡng cảnh báo kích thước `CLAUDE.md`: 70 KB** (Khang đặt 24/11/2026; dưới mức này không cần chuyển bớt).
 
@@ -82,6 +82,8 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 4. **Specs — bước đệm sống còn:** BRD/PRD · Functional Spec (chức năng, quy tắc nghiệp vụ `BR-xx` **kèm LÝ DO + ai chốt + ngày**, user flow, tiêu chí "Khi… thì…", phụ lục "Đường đi") · Technical Spec (schema, API, logic + pseudo flow từng module / chương trình, flow gọi nhau, flow database, mã lỗi, biến môi trường, ADR, ATR) — **đủ chi tiết để Kat quên hết vẫn code lại y chang**.
 5. **Vibe code 4 nhịp:** hiểu ý định từ Spec → kế hoạch (task list) → thực thi → review, bắt bug, sửa.
 
+**Riêng dự án này (Khang chốt 24/11/2026): chỉ cần FS** (`docs/specs/02-functional-spec.md`) — không BRD, không TS; kiến trúc (ADR), kiểm chứng (KC), bảng ATR nằm ở **phụ lục FS**. Cổng chặn = **FS chốt mới được code**.
+
 **CỔNG CHẶN:** **CẤM viết code app khi chưa có BRD + FS + TS đã chốt** (Mode 1, 3: Khang chốt; Mode 2: Kat viết đầy đủ là chốt). Định dạng ở 4A: BRD, FS = Markdown; TS = Markdown nguồn + Word `.docx` (dự án nhỏ: Khang có thể cho TS chỉ Markdown). Muốn thử khả thi bất cứ gì → hỏi Khang trước.
 
 **TS trước hay code trước:** dựng hệ thống → **TS trước, code sau**. Thêm tính năng / sửa bug về sau → được code trước, nhưng **TS phải khớp code chậm nhất lúc tổng kết** (trước khi tạo PR).
@@ -112,18 +114,20 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 
 **Dữ liệu nguồn (Khang chốt 24/11/2026, lượt 3 — chờ duyệt kết luận):** mốc so với **giá Wise** · không DBS · chợ đen = Wise +0,4% (ước tính, không hiệu chỉnh bằng giá thật) · Wise hỏng → nguồn dự phòng 1 lần / ngày + **ghi rõ trong tin** · độ trễ cảnh báo không quan trọng.
 
-## Kiến trúc (CHƯA CHỐT — chưa có TS / ADR; stack bàn **sau khi chốt requirement**)
-**Hướng Khang đã đồng ý (24/11/2026), chốt bằng ADR ở việc 3 sau kiểm chứng:** 2 bot (2 token) chung 1 bộ code · **Vercel (Hobby) + Supabase (Postgres)** · Telegram webhook · **TypeScript** · Gemini free theo tài liệu của Khang · Lũi lấy tin qua **RSS** · prompt AI được chứa tên thật (log prompt mã hóa, giữ ≤ 1 ngày), tin chat **mã hóa, xóa lúc 01:00 mỗi ngày** · Rây / Lũi không chối là bot khi bị hỏi thẳng. Cần kiểm chứng: nhịp lịch 10–15 phút (Vercel Hobby cron chỉ 1 lần / ngày), quota Gemini free theo khóa, RSS từng báo.
-Chưa có code chính thức. Code nháp đã **đóng băng** làm nguyên mẫu ở `prototype-v0/` (Khang quyết 24/11/2026; Python 3.12 + SDK `anthropic` + GitHub Actions; workflow đã dời vào `prototype-v0/workflows/`, không tự chạy; lấy lại cấu trúc cũ từ commit `41c0108`). Không sửa nguyên mẫu, không coi là nguồn đúng nghiệp vụ. Môi trường cloud `auto-exchange-rate-bot` (allow-list: open.er-api.com, wise.com, www.vietcombank.com.vn, portal.vietcombank.com.vn, www.vpbank.com.vn). Nguồn Wise là endpoint **không chính thức** của wise.com.
+## Kiến trúc (chốt ở FS phụ lục A — ADR-01…07, Kat chốt Mode 2 24/11/2026)
+2 bot (2 token) chung 1 bộ code · **Vercel Hobby + TypeScript + Telegram webhook** · **Supabase Free** · nhịp lịch **Supabase Cron → `/api/tick` mỗi 10 phút** (dự phòng GitHub Actions 30 phút) · **Gemini free** theo tài liệu của Khang · **AES-256-GCM** cho kho tin nhắn + log prompt · nguồn Wise (không chính thức) / VCB / VPBank / dự phòng open.er-api.
+**Code hiện có (đợt 1, chỉ logic thuần + barie, chưa nối dịch vụ):** `src/config/defaults.ts` (mọi tham số mặc định) · `src/domain/app-error.ts` + `src/shared/messages.vi.ts` (mã lỗi 2 câu) · `src/shared/` (result, vn-time, crypto) · `src/services/` (payday, alert, rate, chattiness — hàm thuần) · `src/adapters/rate-sources.adapter.ts` (nơi duy nhất gọi mạng nguồn tỉ giá) · `tests/` (35 test, gồm barie) · CI `.github/workflows/ci.yml` (`npm run check`). **Không thư viện ngoài** (Node ≥ 22.18 chạy TypeScript trực tiếp); chưa có typecheck (chờ Khang duyệt cài `typescript`).
+Nguyên mẫu cũ đóng băng ở `prototype-v0/` (không sửa, không coi là nguồn đúng).
 
 ## Quy tắc nghiệp vụ
-Chưa có `BR-xx` (chờ FS). **Mốc cảnh báo (CHỐT 24/11/2026, phương án C, căn cứ giả lập 30 ngày trong biên bản):** 19800 · 19900 · 20000 · 20100 · 20200 · 20300 (VND / 1 SGD, so với giá Wise); đệm ±10 VND; **Khang chỉnh mốc bằng lệnh**; chênh chợ đen +0,4% so với Wise (đã chốt ở lượt 3). Lịch nhắn của nguyên mẫu (mỗi sáng, 4 tin / ngày, im lặng 22:00–07:00) **đã lỗi thời** — lịch mới: 7 ngày cuối tháng, xem Mục tiêu.
+Định nghĩa đầy đủ (lý do + ai chốt + ngày) ở **FS `docs/specs/02-functional-spec.md` mục 2: BR-01 → BR-28** (bỏ số 13). Hay dùng: ngày lương = ngày cuối tháng (BR-01) · tuần lương 7 ngày / khung cảnh báo 14 ngày (BR-02, BR-03) · lấy giá 01:00 · 06:00 · 11:00 · 16:00 · 21:00 (BR-04) · mốc 19800…20300, đệm ±10, 2 chiều (BR-06, BR-07) · ≤ 4 cảnh báo / ngày, cách ≥ 3 giờ (BR-08) · giờ nghỉ 20:00–06:00 (BR-09) · báo 4–6 lần / tuần lương, không nghỉ 2 ngày liền, ngày lương luôn báo (BR-10) · chợ đen = Wise × 1,004 (BR-12) · quyết định chen chuyện = luật thuần code, bảng mức 1–10 ở FS mục 6 (BR-18). · **AI không bao giờ đi tìm tỉ giá; mọi câu về giá ghi nguồn + thời điểm** (BR-29) · "lấy giá ngay" = action gọi **hàm code** đọc nguồn, thiếu nguồn thì hỏi lại, ≤ 1 lần / 5 phút mỗi nguồn (BR-30).
 
 ## Coding standards — chi tiết `docs/CODING_STANDARDS.md` (đọc TOÀN BỘ 1 lần / phiên khi bắt đầu code)
 - Mức **production-ready**; module / chức năng lớn xong → **audit ≥ 2 lần** + báo cáo bảng cho Khang.
 - Phân tầng Controller → Service → Repository / Adapter; không nhảy tầng; thư mục phẳng; file ≲ 300 dòng, hàm ≲ 50 dòng.
 - **Không hard-code**: bí mật ở biến môi trường, nghiệp vụ ở `settings`, câu chữ ở `messages`, mã lỗi `E-<NHÓM>-<số>` có 2 câu (báo lỗi + cách xử lý).
 - **Gọi AI: làm theo 100% tài liệu của Khang** (`CODING_STANDARDS` mục 6.10a): 1 hàm duy nhất, REST + key ở header, che key, model `-latest` + dự phòng, xử lý từng mã lỗi, đường lui khi AI lỗi, log prompt, cache, dọn dẹp; không tự bỏ mục nào (mục không áp dụng → bảng trong TS, Khang duyệt).
+- **Lượt AI (Khang dặn 24/11/2026):** Gemini free **luôn có giới hạn** (vài trăm lượt / ngày) → không gọi AI vô ích (luật trước, AI sau); nhưng **cũng đừng tiết kiệm quá** — các group nhắn ít, nên chỗ nào AI làm lời văn tự nhiên hơn thì cứ dùng.
 - **AI không bao giờ quyết con số**: chỉ viết lời; code kiểm đầu ra, hỏng → dùng mẫu soạn sẵn; gọi AI qua 1 adapter, log mọi lần gọi.
 - Dữ liệu ngoài (tỉ giá…) lấy sẵn bằng việc định kỳ; dịch vụ lỗi → dùng bản gần nhất + ghi rõ ngày.
 - Tiền là số nguyên đơn vị nhỏ nhất; ngày giờ ISO có múi giờ, hiển thị giờ VN.

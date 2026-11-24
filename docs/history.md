@@ -19,8 +19,8 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 > **Nhãn:** ✅ ĐÃ CHỐT 24/11/2026 22:15 — (a) gửi tên thật, log prompt mã hóa giữ ≤ 1 ngày · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T04, FS. **Bối cảnh:** Khang muốn prompt giàu bối cảnh "có tên từng người, tên nhóm"; Rule 5 (Khang chốt 20:43) cấm tên người / tên nhóm vào prompt AI; Gemini free có thể dùng dữ liệu để cải thiện sản phẩm, có thể có người đọc. **Lựa chọn:** (a) gửi tên thật; (b) **thay tên bằng mã / biệt danh trước khi gửi, code đổi lại tên khi nhận** (AI vẫn đủ bối cảnh: ai là ai, vai trò, quan hệ); (c) không gửi thông tin người. **Kat đề xuất:** (b). **Đã chốt:** (a) — Khang: "cứ ghi tên thật vào prompt AI cũng được… prompt ghi log lại nhưng xóa sau 1 ngày và log prompt mã hóa là được".
 <a id="d2"></a>
-### D2 — Quy tắc cụ thể của "mức hóng chuyện 1–10" ⏳
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026 · **nguyên tắc ✅ ĐÃ CHỐT 24/11/2026 22:19:** quyết định lên tiếng = luật thuần code, chỉ gọi AI khi code đã quyết định nói; còn chờ bảng mức 1–10
+### D2 — Quy tắc cụ thể của "mức hóng chuyện 1–10"
+> **Nhãn:** ✅ ĐÃ CHỐT 24/11/2026 22:34 (Kat, Mode 2 — FS mục 6) · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026 · **nguyên tắc ✅ ĐÃ CHỐT 24/11/2026 22:19:** quyết định lên tiếng = luật thuần code, chỉ gọi AI khi code đã quyết định nói; còn chờ bảng mức 1–10
 - **Ghi nhận:** 2026-11-24 22:05. **Chặn:** T05, FS. **Lựa chọn:** bảng mức → xác suất chen vào mỗi "đợt" trò chuyện + trần lượt / ngày; ban đêm 20:00–06:00 có chen vào không (Kat đề xuất: không tự chen, vẫn trả lời khi được gọi tên). **Đã chốt:** —
 <a id="d4"></a>
 ### D4 — Cách lưu cho "tóm tắt chat cuối ngày"
@@ -48,6 +48,12 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 | 24/11/2026 22:15 | D4: tóm tắt chat cuối ngày = lưu nguyên văn mã hóa, chỉ gửi AI khi Khang hỏi, xóa 01:00 mỗi ngày | Khang, trong chat | `CLAUDE.md` Mục tiêu |
 | 24/11/2026 22:19 | D2 (nguyên tắc): quyết định có lên tiếng = luật thuần code, không gọi AI để suy luận; chỉ gọi AI khi đã quyết định nói | Khang, trong chat | `CLAUDE.md` Mục tiêu |
 | 24/11/2026 22:19 | Tóm tắt chat cuối ngày áp cho **cả 2 bot** | Khang, trong chat | `CLAUDE.md` Mục tiêu |
+| 24/11/2026 22:24 | **Mode 2** (Khang đi ngủ: "Kat làm tiếp việc đi… cái gì quan trọng nhớ hỏi mình sau") | Khang | `CLAUDE.md` |
+| 24/11/2026 22:30 | **Dự án chỉ cần FS** (không BRD, không TS); ADR / KC / ATR vào phụ lục FS | Khang | `CLAUDE.md` Cổng chặn |
+| 24/11/2026 22:31 | Viết FS xong thì **code luôn phần không cần Khang xác nhận** | Khang | quy-trinh-note |
+| 24/11/2026 22:32 | Lượt AI: Gemini free có giới hạn (vài trăm / ngày) nhưng **đừng tiết kiệm quá** (group nhắn ít) | Khang | `CLAUDE.md`, `CODING_STANDARDS` 6.10a |
+| 24/11/2026 22:34 | **FS v0.1** (Rây đầy đủ, Lũi khung): BR-01…28, F-01…10, bảng mức hóng chuyện (chốt D2 ở Mode 2), ADR-01…07, KC-01…05, bảng ATR | Kat (Mode 2 = chốt thật; Khang sửa được) | `docs/specs/02-functional-spec.md` |
+| 24/11/2026 22:36 | **BR-29 / BR-30**: hỏi giá không dùng AI tìm; luôn ghi nguồn + thời điểm; "lấy giá ngay" = action gọi hàm code đọc nguồn (hỏi lại nếu thiếu nguồn, ≤ 1 lần / 5 phút) — FS bản 0.2 | Khang (yêu cầu) · Kat (chọn làm action, Mode 2) | FS mục 2, F-04 |
 
 <a id="sb"></a>
 # B. Việc dở dang
@@ -70,28 +76,33 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 - **Ai / điều kiện:** chờ D1
 - ✅ 2026-11-24 22:15: Khang chốt D1 (a) — xem A1 D1
 <a id="t05"></a>
-### [ ] T05 — Quy tắc mức hóng chuyện 1–10 · [tổng kết 24/11/2026] · `QĐ`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T05 — Quy tắc mức hóng chuyện 1–10 · [tổng kết 24/11/2026] · `QĐ`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- ✅ 2026-11-24 22:34: FS mục 6 (Mode 2)
 - **Ai / điều kiện:** chờ D2
 <a id="t06"></a>
-### [ ] T06 — Duyệt kết luận lượt 2–5 → chốt requirement · [tổng kết 24/11/2026] · `QĐ`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T06 — Duyệt kết luận lượt 2–5 → chốt requirement · [tổng kết 24/11/2026] · `QĐ`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- ✅ 2026-11-24 22:34: FS v0.1 chốt ở Mode 2 (Khang xem lại: T17)
 - **Ai / điều kiện:** Khang
 <a id="t07"></a>
 ### [ ] T07 — Việc 3 — kiến trúc / khả thi: kiểm chứng nhịp lịch 10–15 phút (Vercel Hobby cron chỉ 1 lần / ngày → pg_cron của Supabase?), Supabase tạm ngưng sau 1 tuần không hoạt động, quota Gemini free theo khóa, RSS các báo · [tổng kết 24/11/2026] · `VERIFY`
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Kat, sau khi Khang cho phép
 <a id="t08"></a>
-### [ ] T08 — Việc 4 — bảng ATR · [tổng kết 24/11/2026] · `DOC`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T08 — Việc 4 — bảng ATR · [tổng kết 24/11/2026] · `DOC`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- ✅ 2026-11-24 22:34: FS phụ lục C (các dòng "Thiếu" xong dần khi code)
 - **Ai / điều kiện:** Kat soạn, Khang chốt
 <a id="t09"></a>
-### [ ] T09 — Việc 5 — BRD + FS + TS (cổng chặn) · [tổng kết 24/11/2026] · `DOC`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T09 — Việc 5 — BRD + FS + TS (cổng chặn) · [tổng kết 24/11/2026] · `DOC`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- ✅ 2026-11-24 22:34: Khang chốt chỉ cần FS → FS v0.1
 - **Ai / điều kiện:** Kat
 <a id="t10"></a>
-### [ ] T10 — Barie tối thiểu + CI, **gồm barie quét tên thật** (BUG-0001) · [tổng kết 24/11/2026] · `CODE`
-> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+### [x] T10 — Barie tối thiểu + CI, **gồm barie quét tên thật** (BUG-0001) · [tổng kết 24/11/2026] · `CODE`
+> **Nhãn:** ✅ ĐÃ XONG 24/11/2026 · trước đó: ⏳ ĐANG CHỜ từ 24/11/2026
+- ✅ 2026-11-24 22:34: barie: tên thật, mã lỗi 2 câu, chỉ adapter gọi mạng, không bí mật gõ cứng, không thinkingConfig + CI; còn thiếu typecheck (T15), webhook / tick 401, RLS (khi code phần đó)
 - **Ai / điều kiện:** Kat, sau khi chốt stack
 <a id="t11"></a>
 ### [ ] T11 — Khang tạo 2 bot với @BotFather, tắt Group Privacy (`/setprivacy` → Disable), không dán token vào chat · [tổng kết 24/11/2026] · `VERIFY`
@@ -101,6 +112,23 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 ### [ ] T12 — Nguồn Wise không chính thức → ADR + nguồn dự phòng · [tổng kết 24/11/2026] · `DOC`
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Kat
+
+<a id="t14"></a>
+### [ ] T14 — Khang tạo dịch vụ: project Supabase, project Vercel, khóa Gemini (Google AI Studio), 2 bot @BotFather — cần trước khi nối dịch vụ thật · [tổng kết 24/11/2026] · `VERIFY`
+> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ai / điều kiện:** Khang (Kat soạn hướng dẫn cài đặt)
+<a id="t15"></a>
+### [ ] T15 — Duyệt cài gói `typescript` (chỉ dùng lúc phát triển) cho barie typecheck — checklist 5 ý · [tổng kết 24/11/2026] · `QĐ`
+> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ai / điều kiện:** Khang
+<a id="t16"></a>
+### [ ] T16 — Code đợt 2: AI adapter (100% tài liệu của Khang), Telegram adapter + webhook, repository Supabase + migration (RLS), `/api/tick`, dọn dẹp 01:00, lệnh của Khang — làm với adapter giả trước · [tổng kết 24/11/2026] · `CODE`
+> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ai / điều kiện:** Kat
+<a id="t17"></a>
+### [ ] T17 — Khang xem lại FS v0.1 (Mode 2 đã chốt; sửa chỗ nào thì Kat cập nhật) · [tổng kết 24/11/2026] · `QĐ`
+> **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
+- **Ai / điều kiện:** Khang
 
 <a id="sc"></a>
 # C. Mục tiêu, triết lý, kiến trúc
@@ -142,6 +170,11 @@ Hai bot Telegram riêng, chung 1 bộ code, trực 24/24, miễn phí 100%: **R�
 > **Nhãn:** 🟢 HIỆU LỰC từ 24/11/2026
 #### 🔄 Thay đổi — 2026-11-24 20:43 → 21:50 (giờ VN) — Biệt danh thay tên thật
 - Tên người, tên công ty, tên group → biệt danh (Mít, Ổi, Xoài, Mận, công ty SGP, nhóm A, nhóm B); bảng đối chiếu chỉ ở `docs/rieng-tu/`; tài liệu gọi AI của Khang cũng ở đó (có thông tin riêng). Sự cố: [BUG-0001](bugs/BUG-0001-lo-ten-that-nhom-B.md).
+<a id="e-code-dot-1"></a>
+## E4. Code đợt 1 (Mode 2)
+> **Nhãn:** 🟢 HIỆU LỰC từ 24/11/2026
+#### 🔄 Thay đổi — 2026-11-24 22:34 (giờ VN) — Logic thuần của Rây + barie + CI
+- **Trước:** chưa có code chính thức. **Sau:** config, mã lỗi, vn-time, crypto (AES-256-GCM), services payday / alert / rate / chattiness, adapter nguồn tỉ giá, 35 test (BR trong tên test), barie, CI. Không thư viện ngoài. **Lý do / ai:** Khang ("code được gì trước mà không cần Khang confirm thì code"). **Audit:** lần 1 — 1 lỗi (nguồn dự phòng nhận giá ≤ 0 → chia 0 khi quy đổi) đã sửa + test; lần 2 — 0 lỗi. **Bug nhỏ test bắt được:** cảnh báo chờ qua giờ nghỉ mà giá quay về chỗ cũ lại bị báo thành "cắt mốc chiều ngược" → sửa bằng vị trí gốc (originBand).
 <a id="e-gia-lap-moc"></a>
 ## E3. Giả lập mốc cảnh báo
 > **Nhãn:** ✅ ĐÃ CHỐT 24/11/2026 (phương án C)
@@ -190,3 +223,15 @@ Case: Vercel Hobby cron chỉ 1 lần / ngày, Gemini free dùng dữ liệu đ�
 # I. Hồ sơ bug
 Xem `docs/bugs/README.md`.
 - [BUG-0001](bugs/BUG-0001-lo-ten-that-nhom-B.md) — 24/11/2026 — Lỡ ghi tên thật của group vào tài liệu (2 lần, tái phát) — ✅
+
+### 2026-11-24 (tổng kết lúc 22:34) — Mode 2, Khang vắng
+**Làm gì:** Khang chốt "chỉ cần FS", Mode 2, quy tắc lượt AI; Kat viết FS v0.1, kiểm chứng (KC), code đợt 1.
+**Hoàn thành:**
+- FS v0.1: Rây đầy đủ (BR-01…28, F-01…10, mã lỗi, khối prompt, bảng mức hóng chuyện, đường đi), Lũi khung; phụ lục ADR-01…07, KC-01…05, ATR.
+- Code đợt 1 + barie + CI: `npm run check` → 35 / 35 đạt.
+**Dang dở:** T01–T03 (Lũi), T07 (KC-01 thử trên project thật), T11, T12, T14–T17.
+**Phát hiện hay:** Vercel Hobby cron 1 lần / ngày → dùng Supabase Cron; hạn mức Gemini free tính **theo dự án**, không theo khóa; Node 22 chạy TypeScript trực tiếp → không cần thư viện cho test. Bug nhỏ test bắt được: cảnh báo chờ bị đảo chiều (đã sửa).
+**Trạng thái cuối phiên:** nhánh `claude/new-session-5jra1l` (làm lại từ `main` sau khi mợt PR #1); PR #2 mở; chưa nối dịch vụ thật.
+**Việc nên làm tiếp:** T17 (Khang xem FS) → T14 (Khang tạo dịch vụ) → T16 (code đợt 2) ; T15 ; Lũi khi có T01–T03.
+**Kích thước CLAUDE.md:** 23,2 KB
+**Bổ sung sau tổng kết (22:36):** Khang thêm lưu ý hỏi giá → FS 0.2 (BR-29, BR-30) + hàm `describeRateSource` + test; push vào PR #2.

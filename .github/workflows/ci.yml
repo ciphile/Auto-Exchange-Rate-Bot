@@ -1,0 +1,18 @@
+# Cổng chặn tự động (CODING_STANDARDS 6.18): mọi push / PR chạy toàn bộ test + barie. Đỏ → không mợt.
+name: CI
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --version
+      - run: npm run check
