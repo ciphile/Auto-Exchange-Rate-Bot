@@ -250,3 +250,6 @@
 - Làm: 1 module `spoken-time.ts` (giờ → chữ, ngày → hôm nay / hôm qua / ngày N, `humanizeDateTimes` đổi mọi giờ / ngày dạng số trong lời AI). `describeRateSource` nhận thêm "bây giờ" để biết hôm nay / hôm qua → typecheck chỉ ra đủ 15 chỗ gọi (không sót).
 - Phần kiểm "giờ + ngày bắt buộc" (BR-54) phải viết lại theo cách viết mới: so giờ bằng CHỮ, nhận "ngày 25" = "hôm nay" khi cùng ngày.
 - Test bắt 1 lỗi: AI viết tự nhiên "lúc 10:00 ngày 25/11" → thành "lúc mười giờ sáng ngày hôm nay" (vụng) → gọn thành "hôm nay".
+
+## 25/11/2026 — Ghi pending quan trọng: lịch dọn nhật ký cron (chưa làm)
+- Khang hỏi lịch gọi bot mỗi phút có tốn dung lượng không → Kat phát hiện `cron.job_run_details` (Supabase) phình ~20 MB / tháng, không tự xóa. Khang: "ghi pending task quan trọng cái này phải làm" → ghi STATUS dòng 1b (⭐⭐), **chưa sửa hướng dẫn** (theo lệnh "ghi pending"). Việc phải làm TRƯỚC khi Khang chạy phần 7.

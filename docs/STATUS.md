@@ -7,7 +7,8 @@
 ## Việc dở / chờ
 | # | Việc | Ai / trạng thái |
 |---|---|---|
-| 1 | PR #5 **đã mợt** (25/11). Còn 1 commit chưa vào `main`: công tắc giá chợ đen `/chotden` (BR-53) — nằm trên nhánh `claude/new-session-5jra1l`, chờ Khang cho phép Kat tạo PR mới | 👤 Khang |
+| 1 | **Mợt PR #7** (BR-54 → BR-56: hỏi nguồn 2 phút tự trả lời, giờ + ngày lấy giá, nói giờ + ngày kiểu người). PR #5, #6 đã mợt (25/11). CI xanh ở lần kiểm gần nhất | 👤 Khang · ⭐ |
+| 1b | **⭐ PENDING QUAN TRỌNG — PHẢI LÀM TRƯỚC KHI KHANG CÀI LỊCH GỌI BOT (phần 7):** thêm vào `docs/huong-dan-cai-dat.md` phần 7 một **lịch dọn nhật ký chạy mỗi đêm** xóa dòng cũ hơn 1 ngày trong `cron.job_run_details`. Lý do: lịch gọi bot **mỗi phút** (BR-55) làm Supabase ghi ~1.440 dòng nhật ký / ngày, **không tự xóa** → ~20 MB / tháng, ~250 MB / năm = hơn nửa ổ 500 MB của gói Free (Khang dặn 25/11/2026: "ghi pending task quan trọng cái này phải làm"). Kèm bước kiểm đã chạy + cách xem dung lượng (Supabase → Reports / Usage). **Khang đừng chạy phần 7 cho tới khi Kat xong việc này** (Kat chưa sửa code / hướng dẫn — chỉ ghi sổ theo lệnh "ghi pending") | ⏳ Kat · ⭐⭐ |
 | 2 | **Cài Rây theo `docs/huong-dan-cai-dat.md` phần 1–8** + chạy `thanh-vien.sql` (file riêng Kat gửi, không trong repo) + `/chodencontact them …` cho nơi đổi chợ đen. Không dán khóa vào chat. Xong báo Kat tên bot + địa chỉ Vercel | 👤 Khang · ⭐ |
 | 3 | **Kiểm sau deploy**: `/robots.txt` · `/docs/...` phải 404 · `/api/ray` GET → 405 · `curl -X POST /api/tick` → 401 · Build Logs (KC-06) · `/trangthai` trong Telegram | 👤 Khang + ⏳ Kat sửa theo lỗi thật |
 | 4 | **Tải lịch lễ MOM tự động** trong tick (lịch 2027 cần trước 15/12; tạm: `/ngayle them`) — KC-08 | ⏳ Kat |
