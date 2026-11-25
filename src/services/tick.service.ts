@@ -18,6 +18,9 @@ import { pickReminderMinute, planHolidayReminders, planTimesheetReminder, getTim
 import type { Runtime } from './runtime.types.ts';
 import { mergeStoredSettings, type BotSettings } from './settings.service.ts';
 import { rateSpellings, readContextLines, saveContextLine, speak, type SpeakRequest } from './speech.service.ts';
+import { CHEER_TEXT } from '../shared/cheer.vi.ts';
+import { buildWorkCheer, formatHolidayLineVi } from './cheer.service.ts';
+import { estimateBlackMarketVnd } from './rate.service.ts';
 import { getChimeFactor } from './style.service.ts';
 
 const TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô|vàng|coin|bitcoin|lương|thuế|kinh tế|lãi suất)/iu;
@@ -96,9 +99,10 @@ async function runAlert(ctx: Ctx): Promise<void> {
   if (r.action === 'send' && r.event) {
     const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
     const up = r.event.direction === 'up';
+    const cheer = buildWorkCheer(now, getDaysUntilPayday(now));
     const sent = await postToGroup(ctx, {
       purpose: 'rate_alert', mustContainAny: rateSpellings(mid.row.rate_vnd),
-      task: `Báo nhanh cho nhóm: tỉ giá vừa ${up ? 'TĂNG qua' : 'GIẢM xuống dưới'} mốc ${r.event.levelVnd.toLocaleString('vi-VN')} đ; giá hiện tại ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}). Nhắc đúng con số này.`,
+      task: `Báo nhanh cho nhóm: tỉ giá vừa ${up ? 'TĂNG qua' : 'GIẢM xuống dưới'} mốc ${r.event.levelVnd.toLocaleString('vi-VN')} đ; giá hiện tại ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}). Nhắc đúng con số này.${cheer ? `\n${CHEER_TEXT.toneRule} Ý động viên: ${cheer}` : ''}`,
       fallback: BOT_TEXT.rateAlert(mid.row.rate_vnd, r.event.levelVnd, up, src),
     });
     if (!sent) return; // chưa gửi được (giờ nghỉ / chưa gắn nhóm) → giữ trạng thái cũ, lần sau xét lại
@@ -126,10 +130,17 @@ async function runScheduledReport(ctx: Ctx): Promise<void> {
   if (!mid) return;
   const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
   const days = getDaysUntilPayday(now);
+  // BR-46: thứ Tư → thứ Sáu / gần lương → giọng động viên; BR-47: Wise trước, kèm chợ đen ước tính.
+  const cheer = buildWorkCheer(now, days);
+  const black = estimateBlackMarketVnd(mid.row.rate_vnd);
   const sent = await postToGroup(ctx, {
     purpose: 'rate_report', mustContainAny: rateSpellings(mid.row.rate_vnd),
-    task: `Tự báo tỉ giá cho nhóm như một thành viên: 1 SGD = ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}); còn ${days} ngày tới ngày lương. Nhắc đúng con số + nguồn + giờ, có thể bình luận xu hướng theo bối cảnh.`,
-    fallback: BOT_TEXT.rateReport(mid.row.rate_vnd, src, days),
+    task: [
+      `Tự báo tỉ giá cho nhóm như một thành viên: 1 SGD = ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}); chợ đen ước tính khoảng ${black.toLocaleString('vi-VN')} đ; còn ${days} ngày tới ngày lương.`,
+      'Nhắc đúng con số Wise + nguồn + giờ TRƯỚC, có thể kèm chợ đen và bình luận xu hướng theo bối cảnh.',
+      cheer ? `${CHEER_TEXT.toneRule} Ý động viên phải có: ${cheer} ${CHEER_TEXT.reportExample}` : null,
+    ].filter(Boolean).join('\n'),
+    fallback: BOT_TEXT.rateReport(mid.row.rate_vnd, src, cheer, black),
   });
   if (sent) await rt.store.setState(rt.bot, doneKey, true);
 }
@@ -143,9 +154,11 @@ async function runReminders(ctx: Ctx): Promise<void> {
     let minute = await rt.store.getState<number>(rt.bot, minKey);
     if (minute === null) { minute = pickReminderMinute(rem.minuteRange, rt.random); await rt.store.setState(rt.bot, minKey, minute); }
     if (minuteOfDay < minute) continue;
-    const lines = rem.holidays.map((h) => `- ${h.date.split('-').reverse().join('/')}: ${h.name}`).join('\n');
+    const lines = rem.holidays.map((h) => `- ${formatHolidayLineVi(h)}`).join('\n');
     const when = rem.kind === 'day_of' ? 'HÔM NAY là ngày nghỉ lễ ở Singapore' : rem.kind === 'week_ahead' ? 'TUẦN SAU có ngày nghỉ lễ ở Singapore' : 'THÁNG SAU có ngày nghỉ lễ ở Singapore';
-    const ok = await postToGroup(ctx, { purpose: 'reminder', task: `Nhắc nhóm một cách tự nhiên: ${when}:\n${lines}\nNói đúng ngày, đúng tên lễ.`, fallback: BOT_TEXT.holidayReminder(lines) });
+    // BR-46: nhắc lễ giọng động viên ("cố lên mọi người ơi, tuần sau được nghỉ lễ thứ Sáu (lễ Hồi giáo) rồi").
+    const task = [`Nhắc nhóm: ${when}:`, lines, 'Nói đúng thứ, đúng ngày, đúng tên lễ (kèm phần giải thích trong ngoặc).', CHEER_TEXT.toneRule, CHEER_TEXT.holidayExample].join('\n');
+    const ok = await postToGroup(ctx, { purpose: 'reminder', task, fallback: BOT_TEXT.holidayReminder(CHEER_TEXT.holidayLead[rem.kind], lines) });
     if (ok) await rt.store.setState(rt.bot, 'reminders_sent', [...sent, rem.key].slice(-SENT_KEYS_MAX));
   }
   const tsKey = `timesheet:${today}`;

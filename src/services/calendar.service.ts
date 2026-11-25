@@ -3,6 +3,7 @@
 import type { YearHolidays } from '../adapters/holidays.adapter.ts';
 import type { Store } from '../repositories/store.repository.ts';
 import { addDays, resolveYearHolidays, withObservedDays, type HolidaySource } from './holiday.service.ts';
+import { describeHolidayVi } from './cheer.service.ts';
 
 export type HolidayCalendar = { dates: YearHolidays; sources: Record<number, HolidaySource> };
 
@@ -48,7 +49,7 @@ export function endOfNextMonth(todayKey: string): string {
 export function buildHolidayFacts(cal: HolidayCalendar, todayKey: string): { facts: string[]; plain: string } {
   const end = endOfNextMonth(todayKey);
   const items = Object.keys(cal.dates).filter((d) => d >= todayKey && d <= end).sort()
-    .map((d) => `${d.slice(8, 10)}/${d.slice(5, 7)} (${WEEKDAYS_VI[new Date(`${d}T00:00:00Z`).getUTCDay()]}): ${(cal.dates[d] ?? '').replace(/"{3,}/g, "''").slice(0, 60)}`);
+    .map((d) => `${d.slice(8, 10)}/${d.slice(5, 7)} (${WEEKDAYS_VI[new Date(`${d}T00:00:00Z`).getUTCDay()]}): ${describeHolidayVi(cal.dates[d] ?? '')}`);
   const range = `từ hôm nay tới hết ${end.slice(8, 10)}/${end.slice(5, 7)}/${end.slice(0, 4)}`;
   if (items.length === 0) return { facts: [`LỊCH NGHỈ LỄ SINGAPORE ${range}: KHÔNG có ngày lễ nào.`], plain: `Dạ ${range} không có ngày nghỉ lễ Singapore nào hết.` };
   const shown = items.slice(0, HOLIDAY_FACT_MAX_LINES);

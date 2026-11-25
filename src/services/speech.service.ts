@@ -2,6 +2,7 @@
 // → code kiểm lời (BR-29 con số bắt buộc, BR-38 tục, độ dài) → không đạt / AI lỗi thì dùng câu soạn sẵn (đường lui).
 import type { BotKey } from '../domain/telegram.ts';
 import type { Store } from '../repositories/store.repository.ts';
+import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { decryptText, encryptText } from '../shared/crypto.ts';
 import type { Result } from '../shared/result.ts';
 import { getVnDateKey } from '../shared/vn-time.ts';
@@ -73,7 +74,7 @@ export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakR
     renderStyleSystemBlock(styleSettings, resolveAddress(styleSettings, settings.address)),
     settings.styleNote ? `PHONG CÁCH THÊM (chủ bot dặn): ${settings.styleNote}` : null,
     renderGroupBlock(group.name, group.description, group.facts, members),
-    DATA_RULES,
+    isRay ? `${DATA_RULES}\n${CHEER_TEXT.wiseRule}` : DATA_RULES,
   ].filter((x): x is string => x !== null).join('\n\n'));
   const prompt = buildPrompt({
     facts, chat, userMessage: req.userMessage ?? null, asker: req.asker ?? null,
