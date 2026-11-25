@@ -8,6 +8,7 @@ import { BOT_DISPLAY_NAMES } from '../shared/persona.vi.ts';
 import { unwrap } from '../shared/result.ts';
 import { applySettingsChange, mergeStoredSettings, type SettingsChange } from './settings.service.ts';
 import { saveContextLine, speak } from './speech.service.ts';
+import { EXCHANGE_MAX, EXCHANGE_STATE_KEY, type ExchangeContact } from './exchange.service.ts';
 import { INTRO_FALLBACK, INTRO_FEATURES } from '../shared/intro.vi.ts';
 
 export const CONFIRM_TTL_MS = 10 * 60_000;
@@ -18,7 +19,9 @@ export type ConfirmCard =
   | { type: 'bind'; chatId: number; title: string; createdAt: number }
   | { type: 'relay'; text: string; createdAt: number }
   | { type: 'intro'; createdAt: number }
-  | { type: 'holiday'; action: 'add' | 'remove'; date: string; name: string; createdAt: number };
+  | { type: 'holiday'; action: 'add' | 'remove'; date: string; name: string; createdAt: number }
+  | { type: 'exchange'; action: 'add'; contact: ExchangeContact; createdAt: number }
+  | { type: 'exchange'; action: 'remove'; index: number; createdAt: number };
 type CardBody = ConfirmCard extends infer C ? (C extends ConfirmCard ? Omit<C, 'createdAt'> : never) : never;
 
 /** Gửi thẻ vào chat riêng của Khang (kể cả khi lệnh gõ trong nhóm — không lộ thẻ ra nhóm). */
@@ -74,6 +77,19 @@ async function applyCard(rt: Runtime, card: ConfirmCard): Promise<string> {
       unwrap(await rt.tg.sendMessage(groupChatId, r.text));
       await saveContextLine(store, bot, rt.key, { at: rt.now().getTime(), speaker: BOT_DISPLAY_NAMES[bot], isBot: true, text: r.text });
       await store.audit(bot, 'owner', 'intro', { usedAi: r.usedAi });
+      return `✅ ${BOT_TEXT.confirmDone}`;
+    }
+    case 'exchange': {
+      const list = [...((await store.getState<ExchangeContact[]>(bot, EXCHANGE_STATE_KEY)) ?? [])];
+      if (card.action === 'add') {
+        if (list.length >= EXCHANGE_MAX) return `Danh sách đã đủ ${EXCHANGE_MAX} nơi, xóa bớt trước nha.`;
+        list.push(card.contact);
+      } else {
+        if (card.index < 1 || card.index > list.length) return 'Số thứ tự không có trong danh sách (gõ /chodencontact để xem).';
+        list.splice(card.index - 1, 1);
+      }
+      await store.setState(bot, EXCHANGE_STATE_KEY, list);
+      await store.audit(bot, 'owner', `exchange_${card.action}`, { count: list.length }); // không ghi tên / số điện thoại vào log
       return `✅ ${BOT_TEXT.confirmDone}`;
     }
     case 'holiday': {

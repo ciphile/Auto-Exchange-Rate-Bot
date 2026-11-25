@@ -11,7 +11,7 @@
 
 ## 1b. Menu lệnh Telegram (nút "Menu" / gõ "/")
 - **Chat riêng của Khang:** menu có mọi lệnh của Khang + `/help` (trừ `/gannhom` — lệnh này gõ trong nhóm).
-- **Trong nhóm:** menu chỉ có lệnh chung (`/help`, `/tygia`, `/ngayle`).
+- **Trong nhóm:** menu chỉ có lệnh chung (`/help`, `/tygia`, `/chodencontact`, `/ngayle`).
 - Người khác chat riêng với bot: không có menu (bot im lặng với người lạ).
 - Bot **tự cài menu** ở nhịp lịch 10 phút; danh sách lệnh đổi (deploy bản mới) thì tự cập nhật. Menu lấy từ `src/shared/command-guide.vi.ts`.
 
@@ -20,6 +20,7 @@
 |---|---|---|---|---|
 | `/help` | Rây, Lũi | xem hướng dẫn dùng bot | mới vào nhóm, quên cách dùng | bot gửi bản hướng dẫn này vào nhóm |
 | `/tygia (hoặc /gia)` | Rây | hỏi tỉ giá SGD → VND đang có | muốn biết giá để đổi tiền | Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính |
+| `/chodencontact` | Rây | xem nơi đổi chợ đen uy tín nhóm giới thiệu | sắp đổi lương ra tiền mặt VND | danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay |
 | `/ngayle` | Rây | xem ngày nghỉ lễ Singapore sắp tới | tính chuyện nghỉ, về quê, đi chơi | danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù) |
 
 ## 3. Nói tự nhiên với Rây (không cần lệnh) — hiện trong `/help`
@@ -37,6 +38,7 @@
 | "Rây ơi còn mấy ngày nữa có lương?" | số ngày tới ngày lương (ngày cuối tháng) |
 | "Rây ơi tháng sau có ngày lễ nào không?" | lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau |
 | "Rây ơi khi nào được nghỉ lễ?" | như trên |
+| "Rây ơi nên đổi chợ đen ở đâu uy tín?" | các nơi đổi nhóm giới thiệu (tên + số điện thoại), kèm giá chợ đen ước tính |
 
 ## 4. Lệnh của Khang (gõ trong CHAT RIÊNG với bot)
 > Gõ trong nhóm thì bot **im lặng** nhưng cả nhóm vẫn thấy dòng Khang gõ. Lệnh đổi dữ liệu luôn có **thẻ ✅ / ❌** (hết hạn 10 phút, dùng 1 lần). Ngoại lệ: `/gannhom` phải gõ **trong nhóm** (thẻ vẫn gửi vào chat riêng).
@@ -53,6 +55,7 @@
 | `/thuhoi` | Rây, Lũi | xóa tin vừa nhắn thay | lỡ tay, gửi nhầm (trong 48 giờ) | tin /noi gần nhất bị xóa khỏi nhóm |
 | `/gioithieu` | Rây, Lũi | bot tự giới thiệu ngắn trong nhóm | mới đưa bot vào nhóm | thẻ ✅ → bot giới thiệu tên + việc chính (≈ 4 câu) |
 | `/ngayle · /ngayle them 2027-01-01 Tên lễ · /ngayle xoa 2027-01-01` | Rây | xem / thêm / xóa ngày lễ Singapore | thiếu lịch năm sau (trang MOM không vào được) | xem: danh sách lễ · thêm / xóa: thẻ ✅ rồi mới lưu |
+| `/chodencontact · /chodencontact them Tên \| số điện thoại \| ghi chú · /chodencontact xoa 1` | Rây | xem / thêm / xóa nơi đổi chợ đen bot được giới thiệu | có chỗ đổi mới uy tín, hoặc chỗ cũ không còn tốt | thẻ ✅ rồi mới lưu; bot CHỈ giới thiệu đúng danh sách này (tối đa 10 nơi). Tên + số điện thoại chỉ lưu trong database, không vào repo |
 | `/gannhom (gõ TRONG NHÓM)` | Rây, Lũi | gắn nhóm làm nhóm của bot | lần đầu đưa bot vào nhóm | thẻ ✅ gửi vào chat riêng của Khang → bấm ✅ là gắn xong |
 | `/moc 19800 19900 20000` | Rây | đặt mốc cảnh báo tỉ giá | muốn được báo khi giá qua mốc khác | thẻ ✅ ghi mốc cũ → mới |
 | `/langnghe on \| off` | Rây, Lũi | bật / tắt bot đọc tin trong nhóm | muốn gọi "Rây ơi" là trả lời, muốn bot tự chen chuyện, muốn /tomtat | thẻ ✅ · bật: bot đọc + lưu tin (mã hóa, xóa 01:00) · tắt: chỉ trả lời khi reply / @tên bot |

@@ -169,3 +169,30 @@ test('F-06 / BR-20 / D4: bật lắng nghe → tin nhóm vào kho cả ngày (m�
   await rt.store.cleanup(new Date(Date.now() + 1000));
   assert.equal(mem.tables.get('chat_log')?.length, 0, 'dọn 01:00 xóa sạch kho cả ngày');
 });
+
+test('BR-49 nơi đổi chợ đen: Khang thêm (thẻ ✅) → /chodencontact trong nhóm hiện đúng danh sách; hỏi "đổi chợ đen ở đâu" → prompt chỉ có đúng danh sách; AI bịa số điện thoại khác → câu soạn sẵn', async () => {
+  const phone = ['09', '12', '345', '678'].join(''); // số giả ghép lúc chạy
+  let reply = 'Dạ đổi ở chỗ ' + ['08', '88', '888', '888'].join('') + ' nha';
+  const { rt, fake, prompts } = createTestRuntime({ aiReply: () => reply });
+  await rt.store.saveGroup('ray', GROUP);
+  await handleUpdate(rt, msg(`/chodencontact them Chỗ Đổi A | ${phone} | đổi nhanh`));
+  await handleUpdate(rt, press(cardData(fake.sent.at(-1)?.buttons, 0)));
+  await handleUpdate(rt, groupMsg('/chodencontact', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', new RegExp(`1\\. Chỗ Đổi A — ${phone} \\(đổi nhanh\\)`));
+  await rt.store.saveSettings('ray', { listenOn: true });
+  await handleUpdate(rt, groupMsg('Rây ơi nên đổi chợ đen ở đâu uy tín?', 5));
+  assert.match(prompts.at(-1) ?? '', /NƠI ĐỔI CHỢ ĐEN UY TÍN[\s\S]*Chỗ Đổi A/);
+  assert.match(fake.sent.at(-1)?.text ?? '', /Chỗ Đổi A/, 'số AI bịa → câu soạn sẵn đúng danh sách');
+  reply = `Dạ anh chị gọi Chỗ Đổi A số ${phone} nha`;
+  await handleUpdate(rt, groupMsg('ray oi doi cho den o dau', 5));
+  assert.equal(fake.sent.at(-1)?.text, reply, 'không dấu vẫn hiểu; AI nói đúng số trong danh sách thì giữ lời AI');
+  await handleUpdate(rt, msg('/chodencontact xoa 1'));
+  await handleUpdate(rt, press(cardData(fake.sent.at(-1)?.buttons, 0)));
+  await handleUpdate(rt, groupMsg('/chodencontact', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /chưa có nơi đổi nào/);
+  const lui = { ...rt, bot: 'lui' as const };
+  await lui.store.saveGroup('lui', -77);
+  const before = fake.sent.length;
+  await handleUpdate(lui, { ...groupMsg('/chodencontact', 5), chatId: -77 });
+  assert.equal(fake.sent.length, before, 'BR-45: Lũi không có lệnh này');
+});

@@ -7,7 +7,7 @@ import { BOT_CALL_NAMES } from '../src/config/defaults.ts';
 import { isCalledByName } from '../src/services/access.service.ts';
 import { renderGroupHelp, renderOwnerGuide } from '../src/services/help.service.ts';
 import { matchSourceKeywords } from '../src/services/live-rate.service.ts';
-import { HOLIDAY_Q_RE, LIVE_RE, RATE_TOPIC_RE, handleUpdate } from '../src/services/webhook.service.ts';
+import { HOLIDAY_Q_RE, LIVE_RE, handleUpdate, matchesIntent } from '../src/services/webhook.service.ts';
 import { COMMAND_GUIDE, GROUP_EXAMPLES } from '../src/shared/command-guide.vi.ts';
 import { OTHER_COMMAND_HELP, OWNER_COMMAND_HELP } from '../src/shared/commands.vi.ts';
 import { createTestRuntime, OWNER_ID } from './fakes.ts';
@@ -32,7 +32,7 @@ test('Barie: MỌI lệnh + câu mẫu trong hướng dẫn đều có trong doc
 test('Barie: câu mẫu nói tự nhiên chạy đúng luật code (gọi tên + hiểu đúng ý)', () => {
   for (const e of GROUP_EXAMPLES.ray) {
     assert.ok(isCalledByName(e.say, BOT_CALL_NAMES.ray), `không nhận ra gọi tên: ${e.say}`);
-    assert.ok(LIVE_RE.test(e.say) || HOLIDAY_Q_RE.test(e.say) || RATE_TOPIC_RE.test(e.say), `không khớp ý nào: ${e.say}`);
+    assert.ok((['live', 'holiday', 'rate', 'exchange'] as const).some((i) => matchesIntent(e.say, i)), `không khớp ý nào: ${e.say}`);
   }
   const say = (i: number) => GROUP_EXAMPLES.ray[i]?.say ?? '';
   assert.deepEqual(matchSourceKeywords(say(1)), { kind: 'named', sources: ['wise'] });

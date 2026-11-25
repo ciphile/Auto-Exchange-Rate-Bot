@@ -12,6 +12,7 @@ import { parseHolidayCommand } from './holiday.service.ts';
 import { describeRateSource, type RateSource } from './rate.service.ts';
 import type { Runtime } from './runtime.types.ts';
 import { summarizeToday } from './summary.service.ts';
+import { EXCHANGE_STATE_KEY, EXCHANGE_USAGE, parseExchangeCommand, renderExchangeList, type ExchangeContact } from './exchange.service.ts';
 import { renderOwnerGuide } from './help.service.ts';
 import { handleOwnerSettingsCommand, renderOwnerHelp, type BotSettings } from './settings.service.ts';
 
@@ -40,6 +41,16 @@ export async function handleOwnerCommand(rt: Runtime, msg: IncomingMessage, sett
     case 'gioithieu': {
       if ((await rt.store.loadConfig(rt.bot)).groupChatId === null) return reply(rt, BOT_TEXT.relayNoGroup);
       return sendConfirmCard(rt, { type: 'intro' }, 'Cho bot tự giới thiệu ngắn trong nhóm?');
+    }
+    case 'chodencontact': {
+      const e = parseExchangeCommand(msg.text);
+      if (!e || e.kind === 'error') return reply(rt, e?.message ?? EXCHANGE_USAGE);
+      const list = (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [];
+      if (e.kind === 'list') return reply(rt, renderExchangeList(list, null));
+      if (e.kind === 'add') return sendConfirmCard(rt, { type: 'exchange', action: 'add', contact: e.contact }, `Thêm nơi đổi chợ đen: ${e.contact.name} — ${e.contact.phone}${e.contact.note ? ` (${e.contact.note})` : ''}?`);
+      const target = list[e.index - 1];
+      if (!target) return reply(rt, 'Số thứ tự không có trong danh sách (gõ /chodencontact để xem).');
+      return sendConfirmCard(rt, { type: 'exchange', action: 'remove', index: e.index }, `Xóa nơi đổi số ${e.index}: ${target.name}?`);
     }
     case 'thuhoi': {
       const last = await rt.store.getState<{ chatId: number; messageId: number; at: number }>(rt.bot, 'last_relay');

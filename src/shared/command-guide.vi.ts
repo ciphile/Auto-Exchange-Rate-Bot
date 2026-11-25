@@ -21,6 +21,7 @@ export const COMMAND_GUIDE: readonly CommandGuide[] = [
   // ——— Mọi người trong nhóm ———
   { cmd: 'help', syntax: '/help', scope: 'group', bots: BOTH, what: 'xem hướng dẫn dùng bot', when: 'mới vào nhóm, quên cách dùng', result: 'bot gửi bản hướng dẫn này vào nhóm' },
   { cmd: 'tygia', syntax: '/tygia (hoặc /gia)', scope: 'group', bots: RAY, what: 'hỏi tỉ giá SGD → VND đang có', when: 'muốn biết giá để đổi tiền', result: 'Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính' },
+  { cmd: 'chodencontact', syntax: '/chodencontact', scope: 'group', bots: RAY, what: 'xem nơi đổi chợ đen uy tín nhóm giới thiệu', when: 'sắp đổi lương ra tiền mặt VND', result: 'danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay' },
   { cmd: 'ngayle', syntax: '/ngayle', scope: 'group', bots: RAY, what: 'xem ngày nghỉ lễ Singapore sắp tới', when: 'tính chuyện nghỉ, về quê, đi chơi', result: 'danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù)' },
   // ——— Chỉ Khang, chat riêng ———
   { cmd: 'caclenh', syntax: '/caclenh', scope: 'owner', bots: BOTH, what: 'hướng dẫn ĐẦY ĐỦ mọi lệnh', when: 'quên lệnh, muốn xem cách dùng + kết quả', result: 'bot gửi hướng dẫn chi tiết (có thể chia vài tin)' },
@@ -33,6 +34,7 @@ export const COMMAND_GUIDE: readonly CommandGuide[] = [
   { cmd: 'thuhoi', syntax: '/thuhoi', scope: 'owner', bots: BOTH, what: 'xóa tin vừa nhắn thay', when: 'lỡ tay, gửi nhầm (trong 48 giờ)', result: 'tin /noi gần nhất bị xóa khỏi nhóm' },
   { cmd: 'gioithieu', syntax: '/gioithieu', scope: 'owner', bots: BOTH, what: 'bot tự giới thiệu ngắn trong nhóm', when: 'mới đưa bot vào nhóm', result: 'thẻ ✅ → bot giới thiệu tên + việc chính (≈ 4 câu)' },
   { cmd: 'ngayle', syntax: '/ngayle · /ngayle them 2027-01-01 Tên lễ · /ngayle xoa 2027-01-01', scope: 'owner', bots: RAY, what: 'xem / thêm / xóa ngày lễ Singapore', when: 'thiếu lịch năm sau (trang MOM không vào được)', result: 'xem: danh sách lễ · thêm / xóa: thẻ ✅ rồi mới lưu' },
+  { cmd: 'chodencontact', syntax: '/chodencontact · /chodencontact them Tên | số điện thoại | ghi chú · /chodencontact xoa 1', scope: 'owner', bots: RAY, what: 'xem / thêm / xóa nơi đổi chợ đen bot được giới thiệu', when: 'có chỗ đổi mới uy tín, hoặc chỗ cũ không còn tốt', result: 'thẻ ✅ rồi mới lưu; bot CHỈ giới thiệu đúng danh sách này (tối đa 10 nơi)' },
   { cmd: 'gannhom', syntax: '/gannhom (gõ TRONG NHÓM)', scope: 'owner', bots: BOTH, what: 'gắn nhóm làm nhóm của bot', when: 'lần đầu đưa bot vào nhóm', result: 'thẻ ✅ gửi vào chat riêng của Khang → bấm ✅ là gắn xong' },
   { cmd: 'moc', syntax: '/moc 19800 19900 20000', scope: 'owner', bots: RAY, what: 'đặt mốc cảnh báo tỉ giá', when: 'muốn được báo khi giá qua mốc khác', result: 'thẻ ✅ ghi mốc cũ → mới' },
   { cmd: 'langnghe', syntax: '/langnghe on | off', scope: 'owner', bots: BOTH, what: 'bật / tắt bot đọc tin trong nhóm', when: 'muốn gọi "Rây ơi" là trả lời, muốn bot tự chen chuyện, muốn /tomtat', result: 'thẻ ✅ · bật: bot đọc + lưu tin (mã hóa, xóa 01:00) · tắt: chỉ trả lời khi reply / @tên bot' },
@@ -73,6 +75,7 @@ export const GROUP_EXAMPLES: Record<BotKey, readonly { say: string; result: stri
     { say: 'Rây ơi còn mấy ngày nữa có lương?', result: 'số ngày tới ngày lương (ngày cuối tháng)' },
     { say: 'Rây ơi tháng sau có ngày lễ nào không?', result: 'lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau' },
     { say: 'Rây ơi khi nào được nghỉ lễ?', result: 'như trên' },
+    { say: 'Rây ơi nên đổi chợ đen ở đâu uy tín?', result: 'các nơi đổi nhóm giới thiệu (tên + số điện thoại), kèm giá chợ đen ước tính' },
   ],
   lui: [],
 };

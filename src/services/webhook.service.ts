@@ -15,6 +15,7 @@ import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
 import { renderGroupHelp } from './help.service.ts';
 import { buildWorkCheer } from './cheer.service.ts';
 import { buildConversionFact, parseAmountQuestion } from './number-guard.service.ts';
+import { buildExchangeFacts, EXCHANGE_STATE_KEY, renderExchangeList, type ExchangeContact } from './exchange.service.ts';
 import { getDaysUntilPayday } from './payday.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
@@ -35,15 +36,18 @@ export const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate
  * Câu gõ KHÔNG DẤU ("ray oi gia sao roi") — so bằng từ khóa không dấu, CHỈ khi cả câu không có dấu
  * (Bẫy 16: "già sao rồi" có dấu thì không được bỏ dấu rồi hiểu thành "giá").
  */
+/** BR-49: hỏi nên đổi chợ đen ở đâu / của ai. */
+export const EXCHANGE_Q_RE = /(chợ đen|chỗ đổi|nơi đổi|đổi tiền|đổi đô|đổi sgd|bán đô|bán sgd).{0,30}(ở đâu|chỗ nào|của ai|ai|uy tín|đâu)|(ở đâu|chỗ nào|ai).{0,20}(đổi|bán) (tiền|đô|sgd|chợ đen)/iu;
 const FOLDED = {
   live: /\b(lay|check|coi|xem|cap nhat|update) (ty )?gia\b|\bgia\b.{0,25}\b(ngay|bay gio|hien tai|moi nhat|luc nay|live)\b/,
   holiday: /\b(ngay le|nghi le|le gi|le nao|co le|duoc nghi|holiday)\b/,
   rate: /\b(ty gia|gia(?! dinh)|sgd|do sing|rate|luong|doi tien|doi ra)\b/,
+  exchange: /\b(cho den|cho doi|noi doi|doi tien|doi do|doi sgd|ban do|ban sgd)\b.{0,30}\b(o dau|cho nao|cua ai|ai|uy tin|dau)\b/,
 };
 const hasVietnameseMarks = (t: string) => /[^\x00-\x7F]/.test(t.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, ''));
 /** Câu này thuộc ý nào (luật trước, AI sau) — có dấu dùng regex có dấu, không dấu dùng bộ không dấu. */
-export function matchesIntent(text: string, intent: 'live' | 'holiday' | 'rate'): boolean {
-  const accented = { live: LIVE_RE, holiday: HOLIDAY_Q_RE, rate: RATE_TOPIC_RE }[intent];
+export function matchesIntent(text: string, intent: 'live' | 'holiday' | 'rate' | 'exchange'): boolean {
+  const accented = { live: LIVE_RE, holiday: HOLIDAY_Q_RE, rate: RATE_TOPIC_RE, exchange: EXCHANGE_Q_RE }[intent];
   return accented.test(text) || (!hasVietnameseMarks(text) && FOLDED[intent].test(text.toLowerCase()));
 }
 const usernameCache = new Map<string, string>();
@@ -86,6 +90,12 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
     case 'group_command': {
       const name = parseCommand(update.text)?.name;
       if (name === 'help') { unwrap(await rt.tg.sendMessage(update.chatId, renderGroupHelp(rt.bot), { replyTo: update.messageId })); return; }
+      if (name === 'chodencontact' && rt.bot === 'ray') {
+        const list = (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [];
+        const mid = await getLatestMid(rt.store);
+        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null), { replyTo: update.messageId }));
+        return;
+      }
       if (name === 'tygia' || name === 'gia') return answer(rt, settings, update, members, update.chatId, true, true);
       if (name === 'ngayle') { unwrap(await rt.tg.sendMessage(update.chatId, await renderHolidayList(rt), { replyTo: update.messageId })); }
       return;
@@ -123,6 +133,9 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const cal = await loadHolidayCalendar(rt.store, today);
   const holiday = rt.bot === 'ray' && matchesIntent(msg.text, 'holiday') ? buildHolidayFacts(cal, today) : null;
   if (holiday) extraFacts.unshift(...holiday.facts);
+  // BR-49: hỏi nên đổi chợ đen ở đâu → đưa ĐÚNG danh sách Khang giới thiệu (database); AI không tự thêm nơi khác.
+  const exchange = rt.bot === 'ray' && matchesIntent(msg.text, 'exchange') ? (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [] : null;
+  if (exchange) extraFacts.unshift(...buildExchangeFacts(exchange));
   const isData = forceData || extraFacts.length > 0 || matchesIntent(msg.text, 'rate') || (rt.bot === 'ray' && parseAmountQuestion(msg.text) !== null);
   const mid = await getLatestMid(rt.store);
   // Hỏi quy đổi ("1000 đô được bao nhiêu") → CODE tính, AI chỉ đọc lại (CODING_STANDARDS 6.10a: app tính số).
@@ -130,7 +143,7 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   if (amount && mid) extraFacts.unshift(buildConversionFact(amount, mid.row.rate_vnd, mid.source, new Date(mid.row.fetched_at)));
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
-  const fallback = holiday ? holiday.plain : isData
+  const fallback = exchange ? renderExchangeList(exchange, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null) : holiday ? holiday.plain : isData
     ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), estimateBlackMarketVnd(mid.row.rate_vnd)) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {
