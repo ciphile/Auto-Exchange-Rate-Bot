@@ -177,13 +177,13 @@ test('BR-38 nói tục có giới hạn: /noituc 1 chỉ tục nhẹ ≤ 1 / tin
   const mk = (level: 0 | 1 | 2 | 3, used = 0) => computeStyleDirective({ bot: 'ray', personaOn: true, mood: 'tucgian', profanityLevel: level }, { purpose: 'answer_chat', profanityUsedToday: used }, seededRandom(40));
   const l1 = mk(1);
   assert.deepEqual([l1.profanityMax, l1.profanityTiers], [1, ['nhe']]);
-  const r1 = checkStyledOutput('Vãi, đm giá xuống nữa rồi', l1);
+  const r1 = checkStyledOutput('Vl, đm giá xuống nữa rồi', l1);
   assert.equal(r1.profanityUsed, 1);
-  assert.ok(r1.text.startsWith('Vãi, đ* giá'));
+  assert.ok(r1.text.startsWith('Vl, đ* giá'));
   const l3 = mk(3);
-  const r3 = checkStyledOutput('đm vãi vcl giá', l3);
+  const r3 = checkStyledOutput('đm vl vcl giá', l3);
   assert.equal(r3.profanityUsed, 2);
-  assert.ok(r3.text.includes('đm vãi v**'));
+  assert.ok(r3.text.includes('đm vl v**'));
   assert.match(renderStyleTurnBlock(l3), /ĐƯỢC dùng tối đa 2 từ/);
   assert.match(renderStyleTurnBlock(mk(0)), /Từ tục: KHÔNG dùng/);
 });
@@ -203,4 +203,16 @@ test('BR-38 giới hạn: trần / ngày; ngoan luôn 0; nghiêm túc / trầm t
 test('BR-31 mặc định chế độ NGOAN (Khang 25/11/2026)', async () => {
   const { DEFAULT_PERSONA_ON } = await import('../src/config/persona.ts');
   assert.deepEqual(DEFAULT_PERSONA_ON, { ray: false, lui: false });
+});
+
+test('Khang 25/11/2026: từ lóng "vãi, éo, móa" — KHÔNG ngoan thì dùng tự do (kể cả /noituc 0, không tính lượt tục); ngoan thì bị che', () => {
+  const on = computeStyleDirective({ bot: 'ray', personaOn: true, mood: 'vuive', profanityLevel: 0 }, { purpose: 'answer_chat' }, seededRandom(3));
+  const r = checkStyledOutput('vãi, éo hiểu sao giảm hoài =)) móa', on);
+  assert.equal(r.text, 'vãi, éo hiểu sao giảm hoài =)) móa');
+  assert.equal(r.profanityUsed, 0);
+  assert.match(renderStyleTurnBlock(on), /"=D"[\s\S]*từ lóng "vãi", "éo", "móa"/);
+  const off = computeStyleDirective({ bot: 'ray', personaOn: false, mood: 'vuive' }, { purpose: 'answer_chat' }, seededRandom(3));
+  const r2 = checkStyledOutput('Dạ vãi giá giảm', off);
+  assert.ok(!r2.text.includes('vãi'));
+  assert.match(renderStyleTurnBlock(off), /KHÔNG dùng từ lóng/);
 });

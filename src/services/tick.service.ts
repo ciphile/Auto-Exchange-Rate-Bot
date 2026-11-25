@@ -23,6 +23,7 @@ import { buildWorkCheer, formatHolidayLineVi } from './cheer.service.ts';
 import { estimateBlackMarketVnd } from './rate.service.ts';
 import { getChimeFactor } from './style.service.ts';
 import { buildCommandMenus } from './help.service.ts';
+import { runConvertDefaults } from './convert-flow.service.ts';
 
 const TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô|vàng|coin|bitcoin|lương|thuế|kinh tế|lãi suất)/iu;
 const SENT_KEYS_MAX = 60;
@@ -47,6 +48,7 @@ export async function runTick(rt: Runtime, webhookUrl: string | null): Promise<{
     { name: 'report', run: () => runScheduledReport(ctx) },
     { name: 'reminders', run: () => runReminders(ctx) },
     { name: 'chime', run: () => runChimeIn(ctx) },
+    { name: 'convert', run: () => runConvertDefaults(rt, ctx.settings) },
     { name: 'cleanup', run: () => (p.hour === 1 && p.minute < 10 ? rt.store.cleanup(now) : Promise.resolve()) },
   ];
   const failed: string[] = [];

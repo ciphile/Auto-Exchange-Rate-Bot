@@ -216,17 +216,22 @@ const AMOUNTS: [string, number | null, number | null][] = [ // [câu, SGD (đơn
   ['Rây ơi 250 s$ nhiêu tiền', 250, null],
 ];
 for (const [q, sgd, vndAmt] of AMOUNTS) {
-  for (const ai of ['fail', 'correct', 'hallucinate'] as const) {
-    test(`AUDIT-E quy đổi · "${q}" · AI ${ai}`, async () => {
-      const c: Case = { text: q, now: vn(11, 25), ai };
+  for (const variant of ['hỏi nguồn', 'chợ đen', 'tất cả'] as const) {
+    test(`AUDIT-E đổi tiền (BR-51) · "${q}" · ${variant}`, async () => {
+      const text = variant === 'hỏi nguồn' ? q : `${q} theo ${variant}`;
+      const c: Case = { text, now: vn(11, 25), ai: 'hallucinate' };
       const o = await run(c);
-      checkInvariants(c, o, q);
-      assert.match(o.prompt, /QUY ĐỔI \(code tính, theo Wise/);
-      if (sgd !== null) {
-        assert.ok(o.prompt.includes(`${fmt(sgd)} SGD ≈ ${fmt(convertSgdToVnd(sgd * 100, RATE))} đ theo Wise`), 'số quy đổi Wise đúng');
-        assert.ok(o.prompt.includes(`≈ ${fmt(convertSgdToVnd(sgd * 100, BLACK))} đ`), 'số quy đổi chợ đen đúng');
-      }
-      if (vndAmt !== null) assert.ok(o.prompt.includes(`${fmt(vndAmt)} đ ≈ ${((Math.round((vndAmt / RATE) * 100)) / 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} SGD`), 'quy đổi VND → SGD đúng');
+      checkInvariants(c, o, text);
+      assert.equal(o.aiCalled, false, 'đổi tiền: CODE tính, không gọi AI');
+      const out = o.sent[0]?.text ?? '';
+      if (variant === 'hỏi nguồn') { assert.match(out, /nguồn nào/); return; }
+      const expect = (rate: number) => (sgd !== null ? `${fmt(convertSgdToVnd(sgd * 100, rate))} đ`
+        : `${(Math.round(((vndAmt ?? 0) / rate) * 100) / 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 })} SGD`);
+      assert.ok(out.includes(`Chợ đen: ≈ ${expect(BLACK)}`), out);
+      if (variant === 'tất cả') {
+        assert.ok(out.includes(`Wise: ≈ ${expect(RATE)}`), out);
+        assert.match(out, /DBS: chưa có giá/);
+      } else assert.ok(!out.includes('Wise: ≈'), 'chỉ nguồn được chọn');
     });
   }
 }
@@ -250,7 +255,7 @@ for (const q of LUI_Q) {
 }
 
 // ——— G. Khang hỏi trong chat riêng ———
-for (const q of ['giá hôm nay nhiêu', 'tháng sau có lễ không', '1000 đô ra nhiêu', 'mày khỏe không', 'giá lên hay xuống']) {
+for (const q of ['giá hôm nay nhiêu', 'tháng sau có lễ không', 'tỉ giá dbs sao rồi', 'mày khỏe không', 'giá lên hay xuống']) {
   for (const ai of ['fail', 'correct', 'hallucinate'] as const) {
     test(`AUDIT-G chat riêng Khang · "${q}" · AI ${ai}`, async () => {
       const c: Case = { text: q, now: vn(11, 26), ai, fromOwnerPrivate: true };

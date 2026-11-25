@@ -21,6 +21,7 @@ export const COMMAND_GUIDE: readonly CommandGuide[] = [
   // ——— Mọi người trong nhóm ———
   { cmd: 'help', syntax: '/help', scope: 'group', bots: BOTH, what: 'xem hướng dẫn dùng bot', when: 'mới vào nhóm, quên cách dùng', result: 'bot gửi bản hướng dẫn này vào nhóm' },
   { cmd: 'tygia', syntax: '/tygia (hoặc /gia)', scope: 'group', bots: RAY, what: 'hỏi tỉ giá SGD → VND đang có', when: 'muốn biết giá để đổi tiền', result: 'Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính' },
+  { cmd: 'doitien', syntax: '/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise', scope: 'group', bots: RAY, what: 'đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn', when: 'muốn biết lương / số tiền đổi ra được bao nhiêu', result: 'chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng ~5–15 phút → tự tính theo chợ đen + Wise' },
   { cmd: 'chodencontact', syntax: '/chodencontact', scope: 'group', bots: RAY, what: 'xem nơi đổi chợ đen uy tín nhóm giới thiệu', when: 'sắp đổi lương ra tiền mặt VND', result: 'danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay' },
   { cmd: 'ngayle', syntax: '/ngayle', scope: 'group', bots: RAY, what: 'xem ngày nghỉ lễ Singapore sắp tới', when: 'tính chuyện nghỉ, về quê, đi chơi', result: 'danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù)' },
   // ——— Chỉ Khang, chat riêng ———
@@ -75,6 +76,9 @@ export const GROUP_EXAMPLES: Record<BotKey, readonly { say: string; result: stri
     { say: 'Rây ơi còn mấy ngày nữa có lương?', result: 'số ngày tới ngày lương (ngày cuối tháng)' },
     { say: 'Rây ơi tháng sau có ngày lễ nào không?', result: 'lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau' },
     { say: 'Rây ơi khi nào được nghỉ lễ?', result: 'như trên' },
+    { say: 'Rây ơi lương 5000 đô đổi ra nhiêu tiền Việt?', result: 'bot hỏi lại đổi theo nguồn nào; trả lời "chợ đen" / "wise" / "tất cả" là tính liền; không trả lời thì lát tự tính chợ đen + Wise' },
+    { say: 'Rây ơi 5000 sgd theo chợ đen ra nhiêu', result: 'tính liền theo chợ đen (số do code tính, không đoán)' },
+    { say: 'Rây ơi 50 triệu là bao nhiêu đô theo wise', result: 'đổi ngược VND → SGD theo Wise' },
     { say: 'Rây ơi nên đổi chợ đen ở đâu uy tín?', result: 'các nơi đổi nhóm giới thiệu (tên + số điện thoại), kèm giá chợ đen ước tính' },
   ],
   lui: [],

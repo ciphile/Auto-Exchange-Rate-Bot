@@ -1,6 +1,5 @@
-// BR-29 + CODING_STANDARDS 6.10 ("AI không bao giờ quyết con số"): code tính quy đổi; code kiểm MỌI con số lớn trong lời AI
+// BR-29 + CODING_STANDARDS 6.10 ("AI không bao giờ quyết con số"): đọc số tiền trong câu (BR-51 đổi tiền dùng); code kiểm MỌI con số lớn trong lời AI
 // phải có sẵn trong dữ liệu code đưa (prompt) hoặc trong câu người hỏi — số lạ = AI bịa → bỏ lời AI, dùng câu soạn sẵn.
-import { describeRateSource, convertSgdToVnd, convertVndToSgdCents, estimateBlackMarketVnd, type RateSource } from './rate.service.ts';
 
 export const GUARD_MIN_NUMBER = 1000; // số nhỏ hơn (ngày, %, giờ) không kiểm
 export const MAX_CONVERT_SGD = 10_000_000;
@@ -43,17 +42,4 @@ export function parseAmountQuestion(text: string): AmountQuestion | null {
     if (v !== null && v <= MAX_CONVERT_VND) return { kind: 'vnd', vnd: v };
   }
   return null;
-}
-
-const vnd = (n: number) => n.toLocaleString('vi-VN');
-const sgdText = (cents: number) => (cents / 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 });
-
-/** Dòng bối cảnh quy đổi do CODE tính (Wise + chợ đen ước tính) — AI chỉ đọc lại. */
-export function buildConversionFact(q: AmountQuestion, rateVnd: number, source: RateSource, fetchedAt: Date): string {
-  const src = describeRateSource(source, fetchedAt);
-  const black = estimateBlackMarketVnd(rateVnd);
-  if (q.kind === 'sgd') {
-    return `QUY ĐỔI (code tính, ${src}): ${sgdText(q.sgdCents)} SGD ≈ ${vnd(convertSgdToVnd(q.sgdCents, rateVnd))} đ theo Wise; theo chợ đen ước tính ≈ ${vnd(convertSgdToVnd(q.sgdCents, black))} đ. Chỉ dùng đúng các số này.`;
-  }
-  return `QUY ĐỔI (code tính, ${src}): ${vnd(q.vnd)} đ ≈ ${sgdText(convertVndToSgdCents(q.vnd, rateVnd))} SGD theo Wise. Chỉ dùng đúng các số này.`;
 }

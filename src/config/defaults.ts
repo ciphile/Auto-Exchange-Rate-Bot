@@ -26,7 +26,8 @@ export const RANDOM_TALK_TO_MINUTE = 19 * 60 + 30;
 export const BLACK_MARKET_PREMIUM = 0.0048;
 /** Mức chênh dạng chữ cho prompt / tin ("+0,48%"). */
 export const BLACK_MARKET_PREMIUM_TEXT = `+${(BLACK_MARKET_PREMIUM * 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}%`;
-export const BLACK_MARKET_ROUND_VND = 10;
+// Khang 25/11/2026: chợ đen hay làm tròn → tròn tới 50 đ (20.096 → 20.100).
+export const BLACK_MARKET_ROUND_VND = 50;
 // BR-18 + FS mục 6: bảng mức hóng chuyện (vị trí 0 = mức 1 … vị trí 9 = mức 10).
 export const CHATTINESS_TABLE: readonly { probability: number; dailyCap: number }[] = [
   { probability: 0, dailyCap: 0 },

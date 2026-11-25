@@ -3,6 +3,7 @@
 import type { BotKey } from '../domain/telegram.ts';
 import type { Store } from '../repositories/store.repository.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
+import { BOT_DISPLAY_NAMES, CAPABILITY_TEXT, OPINION_RULE_TEXT } from '../shared/persona.vi.ts';
 import { decryptText, encryptText } from '../shared/crypto.ts';
 import type { Result } from '../shared/result.ts';
 import { getVnDateKey } from '../shared/vn-time.ts';
@@ -76,6 +77,9 @@ export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakR
     settings.styleNote ? `PHONG CÁCH THÊM (chủ bot dặn): ${settings.styleNote}` : null,
     renderGroupBlock(group.name, group.description, group.facts, members),
     isRay ? `${DATA_RULES}\n${CHEER_TEXT.wiseRule}` : DATA_RULES,
+    // Khang 25/11/2026: mặc định có quan điểm + nối tiếp (đọc cả tin của mình) · không có chức năng tìm kiếm.
+    OPINION_RULE_TEXT.replaceAll('{ten}', BOT_DISPLAY_NAMES[bot]).replaceAll('{xung}', resolveAddress(styleSettings, settings.address).self),
+    CAPABILITY_TEXT[bot].replaceAll('{ten}', BOT_DISPLAY_NAMES[bot]),
   ].filter((x): x is string => x !== null).join('\n\n'));
   const prompt = buildPrompt({
     facts, chat, userMessage: req.userMessage ?? null, asker: req.asker ?? null,

@@ -11,7 +11,7 @@
 
 ## 1b. Menu lệnh Telegram (nút "Menu" / gõ "/")
 - **Chat riêng của Khang:** menu có mọi lệnh của Khang + `/help` (trừ `/gannhom` — lệnh này gõ trong nhóm).
-- **Trong nhóm:** menu chỉ có lệnh chung (`/help`, `/tygia`, `/chodencontact`, `/ngayle`).
+- **Trong nhóm:** menu chỉ có lệnh chung (`/help`, `/tygia`, `/doitien`, `/chodencontact`, `/ngayle`).
 - Người khác chat riêng với bot: không có menu (bot im lặng với người lạ).
 - Bot **tự cài menu** ở nhịp lịch 10 phút; danh sách lệnh đổi (deploy bản mới) thì tự cập nhật. Menu lấy từ `src/shared/command-guide.vi.ts`.
 
@@ -20,6 +20,7 @@
 |---|---|---|---|---|
 | `/help` | Rây, Lũi | xem hướng dẫn dùng bot | mới vào nhóm, quên cách dùng | bot gửi bản hướng dẫn này vào nhóm |
 | `/tygia (hoặc /gia)` | Rây | hỏi tỉ giá SGD → VND đang có | muốn biết giá để đổi tiền | Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính |
+| `/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise` | Rây | đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn | muốn biết lương / số tiền đổi ra được bao nhiêu | chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng ~5–15 phút → tự tính theo chợ đen + Wise |
 | `/chodencontact` | Rây | xem nơi đổi chợ đen uy tín nhóm giới thiệu | sắp đổi lương ra tiền mặt VND | danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay |
 | `/ngayle` | Rây | xem ngày nghỉ lễ Singapore sắp tới | tính chuyện nghỉ, về quê, đi chơi | danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù) |
 
@@ -38,6 +39,9 @@
 | "Rây ơi còn mấy ngày nữa có lương?" | số ngày tới ngày lương (ngày cuối tháng) |
 | "Rây ơi tháng sau có ngày lễ nào không?" | lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau |
 | "Rây ơi khi nào được nghỉ lễ?" | như trên |
+| "Rây ơi lương 5000 đô đổi ra nhiêu tiền Việt?" | bot hỏi lại đổi theo nguồn nào; trả lời "chợ đen" / "wise" / "tất cả" là tính liền; không trả lời thì lát tự tính chợ đen + Wise |
+| "Rây ơi 5000 sgd theo chợ đen ra nhiêu" | tính liền theo chợ đen (số do code tính, không đoán) |
+| "Rây ơi 50 triệu là bao nhiêu đô theo wise" | đổi ngược VND → SGD theo Wise |
 | "Rây ơi nên đổi chợ đen ở đâu uy tín?" | các nơi đổi nhóm giới thiệu (tên + số điện thoại), kèm giá chợ đen ước tính |
 
 ## 4. Lệnh của Khang (gõ trong CHAT RIÊNG với bot)

@@ -223,3 +223,8 @@
 - Mạng máy ảo chặn `www.dbs.com.sg` → Kat xin thêm vào môi trường (Khang duyệt); lệnh tải trang bị bộ lọc quyền của phiên chặn → **dừng, hỏi Khang**, không lách. Khang nhắn "cho Kat đọc trang DBS" → thử lại 1 lần.
 - Dò: dữ liệu nhúng sẵn trong trang là bản **2020** (bẫy!) → đọc `fx-board-rate.js` tìm đường dẫn thật `sg-rates-api/.../getCurrencyConversionRates` → dòng VND/SGD khớp từng số lẻ với ảnh Khang (19.607,8431).
 - Bài học: dữ liệu "có sẵn trong HTML" có thể là bản cũ — luôn xem ngày hiệu lực; viết bộ đọc theo dữ liệu thật, không theo phỏng đoán. Node `fetch` trên máy ảo cần `NODE_USE_ENV_PROXY=1` mới đi qua proxy (chỉ máy ảo, Vercel không cần).
+
+## 25/11/2026 — Đổi tiền cho nhóm (BR-51) + giọng / quan điểm / không tìm kiếm (BR-52)
+- Đổi tiền: số do CODE tính (không AI); hỏi nguồn → nhận trả lời của đúng người (không cần gọi tên) → im lặng thì tick tính mặc định. Test bắt lỗi thật: "/doitien 100 tất cả" ghép thiếu dấu cách thành "sgdtất cả".
+- Khang sửa giữa chừng: viết gọn "1990" là do Khang gõ thiếu số → bot phải viết ĐỦ chữ số (chỉ bỏ dấu chấm) → gỡ phần cho phép viết gọn vừa làm. Bài học: ví dụ người dùng đưa có thể có lỗi gõ — hỏi lại / làm bản an toàn (đủ số) trước.
+- Chợ đen tròn 50 đ (Khang: họ hay làm tròn).

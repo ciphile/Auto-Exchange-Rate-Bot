@@ -3,7 +3,7 @@
 import { BLACK_MARKET_PREMIUM, BLACK_MARKET_ROUND_VND } from '../config/defaults.ts';
 import { getVnParts } from '../shared/vn-time.ts';
 
-/** BR-12: chợ đen ước tính = Wise × (1 + BLACK_MARKET_PREMIUM — hiện 0,48%), làm tròn tới 10 đ. */
+/** BR-12: chợ đen ước tính = Wise × (1 + BLACK_MARKET_PREMIUM — hiện 0,48%), làm tròn tới BLACK_MARKET_ROUND_VND (50 đ). */
 export function estimateBlackMarketVnd(wiseMidVnd: number): number {
   return Math.round((wiseMidVnd * (1 + BLACK_MARKET_PREMIUM)) / BLACK_MARKET_ROUND_VND) * BLACK_MARKET_ROUND_VND;
 }

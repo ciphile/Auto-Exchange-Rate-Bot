@@ -8,7 +8,7 @@ import { TERSE_WORDS,
   PERSONA_PENDING, PROFANITY_LEVELS, type MoodCode, type ProfanityLevel, type PersonaMode, type StableMood,
 } from '../config/persona.ts';
 import type { BotKey } from '../domain/telegram.ts';
-import {
+import { SLANG_WORDS, TEXT_EMOTICONS,
   BOT_DISPLAY_NAMES, MOOD_TEXT, MOOD_TEXT_OVERRIDES, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_TIERS, SENSITIVE_TOPIC_WORDS,
   SOUTHERN_SPEECH_TEXT, STANCE_TEXT, type Stance,
 } from '../shared/persona.vi.ts';
@@ -151,7 +151,7 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
     d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn nếu nói giá (giờ lấy giá không bắt buộc khi nói cụt). Vd "Wise 19950 :))".' : null,
-    d.mode === 'on' ? '- Biểu cảm bằng ký tự (":))", "=))", ":v") được dùng thoải mái, không tính vào emoji.' : null,
+    d.mode === 'on' ? `- Biểu cảm bằng ký tự (${TEXT_EMOTICONS.map((e) => `"${e}"`).join(', ')}) dùng thoải mái, không tính vào emoji; từ lóng ${SLANG_WORDS.map((w) => `"${w}"`).join(', ')} được dùng vừa phải.` : '- KHÔNG dùng từ lóng (vãi, éo, móa).',
     d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi 19900 =)), éo gì cũng giảm".' : null,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
@@ -167,6 +167,7 @@ const BANNED_RE = wordRe(PROFANITY_TIERS.cam.map(escapeRe).join('|'));
 const SOFT_WORDS = [...PROFANITY_TIERS.nhe.map((w) => ({ w, tier: 'nhe' as const })), ...PROFANITY_TIERS.vua.map((w) => ({ w, tier: 'vua' as const }))]
   .sort((a, b) => b.w.length - a.w.length);
 const SOFT_RE = wordRe(SOFT_WORDS.map((x) => escapeRe(x.w)).join('|'), 'giu');
+const SLANG_RE = wordRe(SLANG_WORDS.map(escapeRe).join('|'), 'giu');
 const tierOf = (word: string) => SOFT_WORDS.find((x) => x.w === word.toLowerCase())?.tier ?? 'vua';
 const mask = (word: string) => `${word[0] ?? ''}${'*'.repeat(Math.max(1, word.length - 1))}`;
 const EMOJI_RE = /\p{Extended_Pictographic}/gu;
@@ -201,7 +202,9 @@ export function checkStyledOutput(text: string, d: StyleDirective): { ok: boolea
   if (BANNED_RE.test(text.normalize('NFC'))) return { ok: false, text: '', warnings: ['có từ cấm tuyệt đối'], profanityUsed: 0 };
   // BR-38: từ tục trong giới hạn được giữ; vượt số lượng / sai bậc → che (đ*) thay vì bỏ cả câu.
   let profanityUsed = 0;
-  let out = normalizeSouthern(text.trim()).replace(SOFT_RE, (m) => {
+  // Khang 25/11/2026: từ lóng (vãi, éo, móa) được dùng khi KHÔNG ngoan; ngoan → che.
+  const base = d.mode === 'on' ? normalizeSouthern(text.trim()) : normalizeSouthern(text.trim()).replace(SLANG_RE, (m) => { warnings.push(`che từ lóng "${mask(m)}"`); return mask(m); });
+  let out = base.replace(SOFT_RE, (m) => {
     if (profanityUsed < d.profanityMax && d.profanityTiers.includes(tierOf(m))) { profanityUsed++; return m; }
     warnings.push(`che từ tục "${mask(m)}"`);
     return mask(m);

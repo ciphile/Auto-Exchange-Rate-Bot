@@ -196,3 +196,64 @@ test('BR-49 nơi đổi chợ đen: Khang thêm (thẻ ✅) → /chodencontact t
   await handleUpdate(lui, { ...groupMsg('/chodencontact', 5), chatId: -77 });
   assert.equal(fake.sent.length, before, 'BR-45: Lũi không có lệnh này');
 });
+
+test('BR-51 đổi tiền: hỏi số tiền không nói nguồn → bot hỏi lại; ĐÚNG người trả lời "chợ đen" (không cần gọi tên, tắt lắng nghe) → tính liền; người khác trả lời → bỏ qua', async () => {
+  const now = new Date('2026-11-25T03:00:00Z');
+  const { rt, fake, prompts } = createTestRuntime({ now: () => now, aiReply: () => 'không được gọi' });
+  await rt.store.saveGroup('ray', GROUP);
+  await rt.store.insertRate('wise', 20004);
+  await handleUpdate(rt, groupMsg('@ray_test_bot lương 5000 đô đổi ra nhiêu tiền Việt?', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /5\.000 SGD anh chị muốn đổi theo nguồn nào/);
+  const before = fake.sent.length;
+  await handleUpdate(rt, groupMsg('chợ đen', 9)); // người khác
+  assert.equal(fake.sent.length, before);
+  await handleUpdate(rt, groupMsg('chợ đen', 5));
+  assert.equal(fake.sent.at(-1)?.text, 'Dạ 5.000 SGD đổi ra nè:\n- Chợ đen: ≈ 100.500.000 đ (1 SGD = 20.100 đ, chợ đen ước tính theo Wise)');
+  assert.equal(prompts.length, 0, 'đổi tiền không gọi AI');
+});
+
+test('BR-51 đổi tiền: không ai trả lời → sau 5 phút nhịp lịch tự tính chợ đen + Wise, trả lời ngay dưới tin hỏi', async () => {
+  let now = new Date('2026-11-25T03:00:00Z');
+  const { rt, fake } = createTestRuntime({ now: () => now });
+  await rt.store.saveGroup('ray', GROUP);
+  await rt.store.insertRate('wise', 20004);
+  await handleUpdate(rt, groupMsg('/doitien 1000', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /nguồn nào/);
+  const { runTick } = await import('../src/services/tick.service.ts');
+  now = new Date('2026-11-25T03:03:00Z');
+  await runTick(rt, null);
+  assert.ok(!fake.sent.some((s) => s.text.includes('đổi ra nè')), 'chưa đủ 5 phút');
+  now = new Date('2026-11-25T03:11:00Z');
+  await runTick(rt, null);
+  const out = fake.sent.find((s) => s.text.includes('đổi ra nè'));
+  assert.equal(out?.replyTo, 50);
+  assert.match(out?.text ?? '', /Chợ đen: ≈ 20\.100\.000 đ[\s\S]*Wise: ≈ 20\.004\.000 đ/);
+});
+
+test('BR-51 /doitien: có nguồn → tính liền; "50tr wise" → VND sang SGD; sai cú pháp → hướng dẫn; tính cách bật → giọng xỏ lá ":))"', async () => {
+  const { rt, fake } = createTestRuntime();
+  await rt.store.saveGroup('ray', GROUP);
+  await rt.store.insertRate('wise', 20000);
+  await handleUpdate(rt, groupMsg('/doitien 2000 wise', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /Wise: ≈ 40\.000\.000 đ/);
+  await handleUpdate(rt, groupMsg('/doitien 50tr wise', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /50\.000\.000 đ đổi ra nè:\n- Wise: ≈ 2\.500 SGD/);
+  await handleUpdate(rt, groupMsg('/doitien abc', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /Gõ: \/doitien 5000/);
+  await rt.store.saveSettings('ray', { personaOn: true });
+  await handleUpdate(rt, groupMsg('/doitien 100 tất cả', 5));
+  assert.match(fake.sent.at(-1)?.text ?? '', /^100 SGD nè :\)\)\n- Chợ đen[\s\S]*- VPBank \(mua chuyển khoản\): chưa có giá/);
+});
+
+test('Khang 25/11/2026: SYSTEM có luật mặc định có QUAN ĐIỂM + nối tiếp (đọc cả tin của chính bot) + KHÔNG có chức năng tìm kiếm; câu hỏi tiếp thấy lời bot vừa nói', async () => {
+  const { rt, prompts } = createTestRuntime({ aiReply: () => 'Dạ mọi người đang bàn đóng thuế qua Wise, nhưng theo em thì nên hỏi kế toán cho chắc' });
+  await rt.store.saveGroup('ray', GROUP);
+  await rt.store.saveSettings('ray', { listenOn: true });
+  await handleUpdate(rt, groupMsg('đóng thuế qua wise được không ta', 9));
+  await handleUpdate(rt, groupMsg('Rây, tụi tao đang nói về vấn đề gì vậy?', 5));
+  const first = prompts.at(-1) ?? '';
+  assert.match(first, /MẶC ĐỊNH Rây có quan điểm riêng[\s\S]*"nhưng theo em thì …"/);
+  assert.match(first, /KHÔNG tra cứu internet, KHÔNG tìm kiếm/);
+  await handleUpdate(rt, groupMsg('Rây ơi vậy theo mày tao nên đóng thuế ra sao?', 5));
+  assert.match(prompts.at(-1) ?? '', /Rây \(bot\): Dạ mọi người đang bàn đóng thuế qua Wise, nhưng theo em/);
+});

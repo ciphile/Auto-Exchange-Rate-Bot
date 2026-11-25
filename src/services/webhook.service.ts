@@ -14,7 +14,9 @@ import { canFetchLiveNow, isSourceQuestionOpen, matchSourceKeywords, planLiveFet
 import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
 import { renderGroupHelp } from './help.service.ts';
 import { buildWorkCheer } from './cheer.service.ts';
-import { buildConversionFact, parseAmountQuestion } from './number-guard.service.ts';
+import { parseAmountQuestion } from './number-guard.service.ts';
+import { CONVERT_USAGE, matchConvertSources, parseConvertCommand } from './convert.service.ts';
+import { answerPendingConvert, startConvert } from './convert-flow.service.ts';
 import { buildExchangeFacts, EXCHANGE_STATE_KEY, renderExchangeList, type ExchangeContact } from './exchange.service.ts';
 import { getDaysUntilPayday } from './payday.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
@@ -83,6 +85,9 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
   if (decision.storeInContext) await saveContextLine(rt.store, rt.bot, rt.key, line);
   // D4 / BR-16: kho cả ngày cho /tomtat — chỉ khi đang lắng nghe; nguyên văn, mã hóa, không gọi AI theo từng tin.
   if (decision.storeInChatLog) await rt.store.addChatLog(rt.bot, encryptText(JSON.stringify(line), rt.key));
+  // BR-51: người đang được hỏi "đổi theo nguồn nào?" trả lời (kể cả khi tắt lắng nghe, không cần gọi tên) → tính luôn.
+  const inBoundGroup = update.chatKind === 'group' && update.chatId === config.groupChatId;
+  if (rt.bot === 'ray' && (inBoundGroup || decision.route === 'owner_chat') && !parseCommand(update.text) && await answerPendingConvert(rt, settings, update)) return;
   switch (decision.route) {
     case 'owner_command': return handleOwnerCommand(rt, update, settings);
     case 'owner_chat': return answer(rt, settings, update, members, rt.ownerId, false);
@@ -95,6 +100,11 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
         const mid = await getLatestMid(rt.store);
         unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null), { replyTo: update.messageId }));
         return;
+      }
+      if (name === 'doitien' && rt.bot === 'ray') {
+        const c = parseConvertCommand(update.text);
+        if (!c || 'error' in c) { unwrap(await rt.tg.sendMessage(update.chatId, c?.error ?? CONVERT_USAGE, { replyTo: update.messageId })); return; }
+        return startConvert(rt, settings, update, c.amount, c.sources);
       }
       if (name === 'tygia' || name === 'gia') return answer(rt, settings, update, members, update.chatId, true, true);
       if (name === 'ngayle') { unwrap(await rt.tg.sendMessage(update.chatId, await renderHolidayList(rt), { replyTo: update.messageId })); }
@@ -112,6 +122,9 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
     if (inGroup) await saveContextLine(rt.store, rt.bot, rt.key, { at: rt.now().getTime(), speaker: BOT_DISPLAY_NAMES[rt.bot], isBot: true, text });
   };
   const now = rt.now();
+  // BR-51: câu có số tiền ("lương 5000 đô ra nhiêu", "50 triệu là mấy đô") → luồng đổi tiền (CODE tính, hỏi nguồn nếu chưa nói).
+  const amount = rt.bot === 'ray' ? parseAmountQuestion(msg.text) : null;
+  if (amount) return startConvert(rt, settings, { ...msg, chatId }, amount, matchConvertSources(msg.text));
   const extraFacts: string[] = [];
   const sourceQ = await rt.store.getState<{ askedAt: number }>(rt.bot, 'source_question');
   const choice = matchSourceKeywords(msg.text);
@@ -136,11 +149,8 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   // BR-49: hỏi nên đổi chợ đen ở đâu → đưa ĐÚNG danh sách Khang giới thiệu (database); AI không tự thêm nơi khác.
   const exchange = rt.bot === 'ray' && matchesIntent(msg.text, 'exchange') ? (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [] : null;
   if (exchange) extraFacts.unshift(...buildExchangeFacts(exchange));
-  const isData = forceData || extraFacts.length > 0 || matchesIntent(msg.text, 'rate') || (rt.bot === 'ray' && parseAmountQuestion(msg.text) !== null);
+  const isData = forceData || extraFacts.length > 0 || matchesIntent(msg.text, 'rate');
   const mid = await getLatestMid(rt.store);
-  // Hỏi quy đổi ("1000 đô được bao nhiêu") → CODE tính, AI chỉ đọc lại (CODING_STANDARDS 6.10a: app tính số).
-  const amount = rt.bot === 'ray' ? parseAmountQuestion(msg.text) : null;
-  if (amount && mid) extraFacts.unshift(buildConversionFact(amount, mid.row.rate_vnd, mid.source, new Date(mid.row.fetched_at)));
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
   const fallback = exchange ? renderExchangeList(exchange, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null) : holiday ? holiday.plain : isData
