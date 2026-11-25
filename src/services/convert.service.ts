@@ -4,6 +4,8 @@
 import type { BankQuote } from '../adapters/rate-sources.adapter.ts';
 import type { Store } from '../repositories/store.repository.ts';
 import { parseCommand } from './access.service.ts';
+import type { BotSettings } from './settings.service.ts';
+import { resolveAddress } from './style.service.ts';
 import { parseAmountQuestion, type AmountQuestion } from './number-guard.service.ts';
 import {
   convertSgdToVnd, convertVndToSgdCents, DEFAULT_BLACK_MARKET_CONFIG, describeRateSource, resolveBlackMarket, type BlackMarketConfig, type RateSource,
@@ -15,7 +17,6 @@ export const CONVERT_SOURCES: readonly ConvertSource[] = ['cho_den', 'wise', 'db
 /** Không trả lời / "tùy" → chợ đen + Wise (Khang: "mặc định giá chợ đen hay wise"). */
 export const CONVERT_DEFAULT: readonly ConvertSource[] = ['cho_den', 'wise'];
 export const CONVERT_ANSWER_TTL_MS = 15 * 60_000; // còn nhận câu trả lời "nguồn nào"
-export const CONVERT_DEFAULT_AFTER_MS = 5 * 60_000; // im lặng quá mức này → tick tự tính mặc định
 export const CONVERT_PENDING_KEY = 'convert_pending';
 export const CONVERT_PENDING_MAX = 10;
 const DAY_MS = 86_400_000;
@@ -69,7 +70,7 @@ export async function loadRateTable(store: Store, now: Date, blackMarket: BlackM
     const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
     table.wise = { rate: mid.row.rate_vnd, label: src };
     const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarket);
-    table.cho_den = { rate: bm.vnd, label: bm.manual ? bm.label : 'chợ đen ước tính theo Wise' };
+    table.cho_den = { rate: bm.vnd, label: bm.manual ? bm.label : `chợ đen ước tính ${src}` }; // có giờ lấy giá (BR-54)
   } else if (blackMarket.manual.on && blackMarket.manual.vnd !== null) {
     // Thủ công: giá chợ đen do Khang nhập không cần Wise.
     table.cho_den = { rate: blackMarket.manual.vnd, label: resolveBlackMarket(0, blackMarket).label };
@@ -90,17 +91,29 @@ const sgd = (cents: number) => (cents / 100).toLocaleString('vi-VN', { maximumFr
 const amountText = (a: AmountQuestion) => (a.kind === 'sgd' ? `${sgd(a.sgdCents)} SGD` : `${vnd(a.vnd)} đ`);
 
 /** Kết quả quy đổi — mỗi nguồn 1 dòng, số do CODE tính. polite = chế độ ngoan. */
-export function renderConversion(a: AmountQuestion, sources: readonly ConvertSource[], table: RateTable, polite: boolean): string {
+export function renderConversion(a: AmountQuestion, sources: readonly ConvertSource[], table: RateTable, polite: boolean, lead?: string): string {
   const lines = sources.map((s) => {
     const cell = table[s];
     if (!cell) return `- ${NAMES[s]}: chưa có giá trong 24 giờ qua`;
     const result = a.kind === 'sgd' ? `${vnd(convertSgdToVnd(a.sgdCents, cell.rate))} đ` : `${sgd(convertVndToSgdCents(a.vnd, cell.rate))} SGD`;
     return `- ${NAMES[s]}: ≈ ${result} (1 SGD = ${vnd(cell.rate)} đ, ${cell.label})`;
   });
-  const head = polite ? `Dạ ${amountText(a)} đổi ra nè:` : `${amountText(a)} nè :))`;
+  // lead = câu "do … không nói nguồn nên …" khi bot tự tính vì không ai trả lời (BR-55).
+  const head = lead ? `${lead}\n${amountText(a)}:` : polite ? `Dạ ${amountText(a)} đổi ra nè:` : `${amountText(a)} nè :))`;
   return [head, ...lines].join('\n');
 }
 
 export const askSourceText = (a: AmountQuestion, polite: boolean) => polite
-  ? `Dạ ${amountText(a)} anh chị muốn đổi theo nguồn nào nè: chợ đen, Wise, DBS, VCB hay VPBank? Nói "tất cả" thì em tính hết; không trả lời thì lát em tính theo chợ đen + Wise nha.`
-  : `${amountText(a)} hả, tính theo chợ đen, Wise, DBS, VCB hay VPBank? Nói "tất cả" cũng được; im im thì lát tui tính chợ đen + Wise =))`;
+  ? `Dạ ${amountText(a)} anh chị muốn đổi theo nguồn nào nè: chợ đen, Wise, DBS, VCB hay VPBank? Nói "tất cả" thì em tính hết; sau 2 phút không thấy trả lời thì em tự tính theo chợ đen + Wise nha.`
+  : `${amountText(a)} hả, tính theo chợ đen, Wise, DBS, VCB hay VPBank? Nói "tất cả" cũng được; 2 phút hổng nói gì là tui tự tính chợ đen + Wise đó =))`;
+
+/**
+ * BR-55: câu mở đầu BẮT BUỘC khi bot tự trả lời vì người dùng không nói nguồn (code dựng, không qua AI → 100% có):
+ * ngoan "Dạ do anh chị không nói nguồn nên em tự lấy Wise nè." · bật tính cách "Do mấy ông hổng nói nguồn nên tui tự lấy Wise nha :))".
+ */
+export function noSourceLead(settings: BotSettings, what: string): string {
+  const addr = resolveAddress({ bot: 'ray', personaOn: settings.personaOn, mood: settings.mood }, settings.address);
+  return settings.personaOn
+    ? `Do ${addr.others} hổng nói nguồn nên ${addr.self} ${what} nha :))`
+    : `Dạ do ${addr.others} không nói nguồn nên ${addr.self} ${what} nè.`;
+}

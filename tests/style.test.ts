@@ -216,3 +216,13 @@ test('Khang 25/11/2026: từ lóng "vãi, éo, móa" — KHÔNG ngoan thì dùng
   assert.ok(!r2.text.includes('vãi'));
   assert.match(renderStyleTurnBlock(off), /KHÔNG dùng từ lóng/);
 });
+
+test('Barie chặn số bịa: khối dặn AI (SYSTEM) của tính cách KHÔNG chứa số ≥ 1.000 — số trong SYSTEM được coi là "số hợp lệ", để ví dụ có số sẽ hở lớp chặn', async () => {
+  const { extractBigNumbers } = await import('../src/services/number-guard.service.ts');
+  for (const bot of ['ray', 'lui'] as const) {
+    for (const personaOn of [true, false]) {
+      const block = renderStyleSystemBlock({ bot, personaOn, mood: 'vuive' }, { self: 'em', others: 'anh chị' });
+      assert.deepEqual(extractBigNumbers(block), [], `${bot} ${personaOn ? 'bật' : 'tắt'}`);
+    }
+  }
+});

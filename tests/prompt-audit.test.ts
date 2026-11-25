@@ -9,6 +9,7 @@ import type { BotKey, IncomingMessage } from '../src/domain/telegram.ts';
 import { withObservedDays } from '../src/services/holiday.service.ts';
 import { convertSgdToVnd, estimateBlackMarketVnd } from '../src/services/rate.service.ts';
 import { handleUpdate } from '../src/services/webhook.service.ts';
+import { makeRateStamp } from '../src/services/rate-stamp.service.ts';
 import { getInstantFromVn } from '../src/shared/vn-time.ts';
 import { createTestRuntime, OWNER_ID } from './fakes.ts';
 
@@ -118,7 +119,9 @@ for (const q of RATE_Q) {
         assert.match(o.prompt, /Giá Wise gần nhất: 19\.950 VND \/ 1 SGD \(theo Wise, lấy lúc/, 'bối cảnh có giá + nguồn + giờ');
         assert.match(o.prompt, new RegExp(`chợ đen ước tính ${fmt(BLACK).replace('.', '\\.')}`), 'BR-47 chợ đen');
         assert.equal(/GIỌNG ĐỘNG VIÊN/.test(o.prompt), cheer, 'BR-46 động viên đúng ngày');
-        if (ai === 'correct') assert.equal(text, 'Dạ giá Wise 19.950 đ nha');
+        // BR-54: AI quên giờ + ngày → code tự thêm (giá lấy cách đây 4 giờ).
+        const st = makeRateStamp(now.getTime() - 4 * 3600_000);
+        if (ai === 'correct') assert.equal(text, `Dạ giá Wise 19.950 đ nha (lúc ${st.time} ngày ${st.date})`);
         else assert.match(text, /19\.950 đ \(theo Wise, lấy lúc \d\d:\d\d ngày \d\d\/\d\d\/2026\)/, 'câu soạn sẵn đúng giá + nguồn + giờ');
       });
     }

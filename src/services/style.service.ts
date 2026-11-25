@@ -150,9 +150,9 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     moodLine,
     `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
-    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn nếu nói giá (giờ lấy giá không bắt buộc khi nói cụt). Vd "Wise 19950 :))".' : null,
+    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn + GIỜ + NGÀY lấy giá nếu nói giá (nói cụt cũng KHÔNG được bỏ giờ + ngày). Vd "Wise <giá> lúc <giờ> <ngày> :))".' : null,
     d.mode === 'on' ? `- Biểu cảm bằng ký tự (${TEXT_EMOTICONS.map((e) => `"${e}"`).join(', ')}) dùng thoải mái, không tính vào emoji; từ lóng ${SLANG_WORDS.map((w) => `"${w}"`).join(', ')} được dùng vừa phải.` : '- KHÔNG dùng từ lóng (vãi, éo, móa).',
-    d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi 19900 =)), éo gì cũng giảm".' : null,
+    d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi <giá> =)), éo gì cũng giảm".' : null,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
     d.profanityMax > 0

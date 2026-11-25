@@ -16,6 +16,8 @@ import { renderGroupHelp } from './help.service.ts';
 import { buildWorkCheer } from './cheer.service.ts';
 import { parseAmountQuestion } from './number-guard.service.ts';
 import { CONVERT_USAGE, matchConvertSources, parseConvertCommand } from './convert.service.ts';
+import { SOURCE_QUESTION_KEY, type SourceQuestion } from './followup.service.ts';
+import { buildLiveFallback, exchangeBlackLine } from './live-fallback.service.ts';
 import { answerPendingConvert, startConvert } from './convert-flow.service.ts';
 import { buildExchangeFacts, EXCHANGE_STATE_KEY, renderExchangeList, type ExchangeContact } from './exchange.service.ts';
 import { getDaysUntilPayday } from './payday.service.ts';
@@ -29,6 +31,8 @@ import { blackMarketConfigOf, mergeStoredSettings, type BotSettings } from './se
 import { rateSpellings, saveContextLine, speak } from './speech.service.ts';
 
 /** BR-30: câu đòi lấy giá NGAY (luật trước, AI sau). */
+/** Trả lời "nguồn nào?" không gọi tên bot: chỉ nhận câu ngắn (chống nhầm câu chuyện dài có chữ "wise"). */
+const SHORT_REPLY_MAX_CHARS = 40;
 export const LIVE_RE = /(lấy|check|coi|xem|cập nhật|update)\s.{0,20}(giá|tỉ giá|tỷ giá)|(giá|tỉ giá|tỷ giá).{0,25}(ngay|bây giờ|giờ này|hiện tại|mới nhất|lúc này|live)/iu;
 /** BR-42: câu hỏi về ngày lễ / ngày nghỉ (chỉ Rây — BR-45). */
 export const HOLIDAY_Q_RE = /(ngày lễ|nghỉ lễ|lễ gì|lễ nào|có lễ|được nghỉ|nghỉ ngày nào|holiday)/iu;
@@ -87,7 +91,15 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
   if (decision.storeInChatLog) await rt.store.addChatLog(rt.bot, encryptText(JSON.stringify(line), rt.key));
   // BR-51: người đang được hỏi "đổi theo nguồn nào?" trả lời (kể cả khi tắt lắng nghe, không cần gọi tên) → tính luôn.
   const inBoundGroup = update.chatKind === 'group' && update.chatId === config.groupChatId;
-  if (rt.bot === 'ray' && (inBoundGroup || decision.route === 'owner_chat') && !parseCommand(update.text) && await answerPendingConvert(rt, settings, update)) return;
+  if (rt.bot === 'ray' && (inBoundGroup || decision.route === 'owner_chat') && !parseCommand(update.text)) {
+    if (await answerPendingConvert(rt, settings, update)) return;
+    // BR-55: bot vừa hỏi "lấy giá nguồn nào?" → NGƯỜI ĐÃ HỎI trả lời ngắn ("wise", "vcb", "tùy") là hiểu ngay, không cần gọi tên bot.
+    const sq = await rt.store.getState<SourceQuestion>(rt.bot, SOURCE_QUESTION_KEY);
+    if (sq && sq.fromId === update.fromId && sq.chatId === (inBoundGroup ? update.chatId : rt.ownerId) && isSourceQuestionOpen(sq.askedAt, rt.now())
+      && update.text.length <= SHORT_REPLY_MAX_CHARS && matchSourceKeywords(update.text) !== null) {
+      return answer(rt, settings, update, members, sq.chatId, sq.replyTo !== null);
+    }
+  }
   switch (decision.route) {
     case 'owner_command': return handleOwnerCommand(rt, update, settings);
     case 'owner_chat': return answer(rt, settings, update, members, rt.ownerId, false);
@@ -98,7 +110,7 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
       if (name === 'chodencontact' && rt.bot === 'ray') {
         const list = (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [];
         const mid = await getLatestMid(rt.store);
-        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).todayLine : null), { replyTo: update.messageId }));
+        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? exchangeBlackLine(mid, settings) : null), { replyTo: update.messageId }));
         return;
       }
       if (name === 'doitien' && rt.bot === 'ray') {
@@ -126,19 +138,25 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const amount = rt.bot === 'ray' ? parseAmountQuestion(msg.text) : null;
   if (amount) return startConvert(rt, settings, { ...msg, chatId }, amount, matchConvertSources(msg.text));
   const extraFacts: string[] = [];
-  const sourceQ = await rt.store.getState<{ askedAt: number }>(rt.bot, 'source_question');
+  let liveSources: LiveSource[] = []; // nguồn vừa lấy ngay theo yêu cầu → câu soạn sẵn phải trả đúng các nguồn này
+  const sourceQ = await rt.store.getState<{ askedAt: number }>(rt.bot, SOURCE_QUESTION_KEY);
   const choice = matchSourceKeywords(msg.text);
   const answersQuestion = choice !== null && isSourceQuestionOpen(sourceQ?.askedAt ?? null, now);
   if (matchesIntent(msg.text, 'live') || answersQuestion) {
     const plan = planLiveFetch(choice, settings.sources);
-    if (plan.kind === 'ask') { await rt.store.setState(rt.bot, 'source_question', { askedAt: now.getTime() }); return send(BOT_TEXT.askSource); }
+    if (plan.kind === 'ask') {
+      // BR-55: ghi đủ chỗ trả lời để nhịp lịch (mỗi phút) tự trả lời nếu sau 2 phút không ai nói nguồn.
+      await rt.store.setState(rt.bot, SOURCE_QUESTION_KEY, { askedAt: now.getTime(), chatId, replyTo: inGroup ? msg.messageId : null, fromId: msg.fromId });
+      return send(BOT_TEXT.askSource(!settings.personaOn));
+    }
     if (plan.kind === 'disabled') return send(BOT_TEXT.sourceDisabled(plan.enabled.join(', ')));
-    await rt.store.deleteState(rt.bot, 'source_question');
+    await rt.store.deleteState(rt.bot, SOURCE_QUESTION_KEY);
     const allowed: LiveSource[] = [];
     for (const s of plan.sources) {
       const last = await rt.store.getLatestRate(s);
       if (canFetchLiveNow(last ? Date.parse(last.fetched_at) : null, now)) allowed.push(s);
     }
+    liveSources = plan.sources;
     const report = await fetchAndStoreRates(rt.store, rt.fetchers, allowed);
     extraFacts.push(`Vừa lấy giá NGAY theo yêu cầu: ${report.saved.join(', ') || 'không lấy thêm được (dùng giá gần nhất)'}${report.failed.length ? `; lỗi: ${report.failed.join(', ')}` : ''}.`);
   }
@@ -153,7 +171,8 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const mid = await getLatestMid(rt.store);
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
-  const fallback = exchange ? renderExchangeList(exchange, mid ? resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).todayLine : null) : holiday ? holiday.plain : isData
+  const liveFallback = liveSources.length > 0 ? await buildLiveFallback(rt.store, settings, now, liveSources) : null;
+  const fallback = exchange ? renderExchangeList(exchange, mid ? exchangeBlackLine(mid, settings) : null) : holiday ? holiday.plain : liveFallback ? liveFallback : isData
     ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).phrase) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {

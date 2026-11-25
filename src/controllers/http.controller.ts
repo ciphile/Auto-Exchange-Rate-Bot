@@ -43,7 +43,7 @@ export async function handleWebhookRequest(bot: BotKey, request: Request): Promi
   return text(200, 'ok');
 }
 
-/** POST /api/tick — Supabase Cron gọi mỗi 10 phút với `Authorization: Bearer <TICK_SECRET>` (ATR-3). */
+/** POST /api/tick — Supabase Cron gọi MỖI PHÚT (việc nhẹ chờ 2 phút; việc nặng 1 lần / 10 phút) với `Authorization: Bearer <TICK_SECRET>` (ATR-3). */
 export async function handleTickRequest(request: Request): Promise<Response> {
   const env = readEnv();
   if (!env) return text(500, 'config');

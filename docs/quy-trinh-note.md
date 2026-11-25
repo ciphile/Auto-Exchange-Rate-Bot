@@ -238,3 +238,9 @@
 - Khang mợt PR #5 trước khi Kat trả lời tin tổng kết; Kat vẫn viết "mợt PR #5 khi CI xanh" và còn push thêm commit BR-53 (`cef634c`) vào nhánh đã mợt → commit đó chưa nằm trong `main`.
 - Gốc rễ: Kat **không kiểm trạng thái PR** trước khi nói, chỉ dựa vào trí nhớ của lượt trước.
 - Sửa: kiểm `origin/main` → nhánh theo kịp `main` bằng merge thường (không `--force`) → STATUS ghi đúng. Bài học: trước khi kêu Khang mợt / báo PR còn mở, **gọi tool kiểm trạng thái PR + `git log origin/main..HEAD`**; sau khi PR mợt, việc mới = nhánh theo kịp `main` + PR mới.
+
+## 25/11/2026 — Hỏi nguồn → 2 phút tự trả lời (BR-55) + giờ / ngày lấy giá bắt buộc (BR-54)
+- Khang: chờ 2 phút (không 5), tự trả lời PHẢI có câu "do bạn không nói nguồn nên…" 100%; mọi câu nói tỉ giá hiện tại (kể cả ngắn / cụt) phải có giờ + ngày lấy giá.
+- Vướng kỹ thuật: nhịp lịch 10 phút không canh được mốc 2 phút → đổi Supabase Cron sang MỖI PHÚT; mỗi lần gọi làm việc nhẹ (chờ 2 phút), việc nặng vẫn khóa 1 lần / 10 phút. Khang cần dùng `cron.alter_job` nếu đã tạo lịch `*/10` (hướng dẫn phần 7 đã ghi).
+- Test bắt được 3 lỗi thật khi làm: (1) trả lời "vcb" không gọi tên bot thì Rây không hiểu (chỉ luồng đổi tiền xử lý) → nhận trả lời ngắn của người đã hỏi; (2) hỏi VCB mà khi AI lỗi câu soạn sẵn lại trả giá Wise → câu soạn sẵn theo đúng nguồn đã hỏi; (3) ví dụ có SỐ trong khối dặn AI (SYSTEM) bị coi là "số hợp lệ" → hở lớp chặn số bịa → bỏ số khỏi SYSTEM + barie.
+- Cũng sửa: câu mình đã ghi "giờ lấy giá không bắt buộc khi nói cụt" ở lượt trước trái ý Khang → đảo lại.

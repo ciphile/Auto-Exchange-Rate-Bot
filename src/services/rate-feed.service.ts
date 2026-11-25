@@ -81,9 +81,10 @@ export async function buildRateSnapshot(store: Store, now: Date): Promise<RateSn
 }
 
 /** Dòng bối cảnh giá ngân hàng (VCB / VPBank) — chỉ khi có giá trong 24 giờ. */
-export async function buildBankFacts(store: Store, now: Date): Promise<string[]> {
+export async function buildBankFacts(store: Store, now: Date, only?: readonly LiveSource[]): Promise<string[]> {
   const out: string[] = [];
   for (const source of ['vcb', 'vpbank'] as const) {
+    if (only && !only.includes(source)) continue;
     const r = await store.getLatestRate(source);
     if (!r || now.getTime() - Date.parse(r.fetched_at) > DAY_MS) continue;
     const q = r.extra as BankQuote | null;
@@ -91,7 +92,7 @@ export async function buildBankFacts(store: Store, now: Date): Promise<string[]>
     out.push(`Giá ${source === 'vcb' ? 'Vietcombank' : 'VPBank'}: ${parts.join(', ') || r.rate_vnd.toLocaleString('vi-VN')} đ / 1 SGD (${describeRateSource(source, new Date(Date.parse(r.fetched_at)))}).`);
   }
   // DBS: nguồn tham khảo (Khang 25/11/2026) — mọi người hay xem để biết biến động; giá ngân hàng, đổi theo bậc lớn.
-  const dbs = await store.getLatestRate('dbs');
+  const dbs = !only || only.includes('dbs') ? await store.getLatestRate('dbs') : null;
   if (dbs && now.getTime() - Date.parse(dbs.fetched_at) <= DAY_MS) {
     const eff = (dbs.extra as { effectiveAt?: number | null } | null)?.effectiveAt ?? null;
     const when = describeRateSource('dbs', new Date(eff ?? Date.parse(dbs.fetched_at))).replace('lấy lúc', eff ? 'hiệu lực từ' : 'lấy lúc');

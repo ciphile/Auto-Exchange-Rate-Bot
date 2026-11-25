@@ -59,6 +59,10 @@ export const LIVE_FETCH_COOLDOWN_MS = 5 * 60 * 1000;
 export const LIVE_SOURCE_FOR_ANY = 'wise' as const;
 // BR-30: Rây hỏi "lấy nguồn nào?" — câu trả lời trong 10 phút được hiểu là trả lời câu hỏi đó.
 export const SOURCE_QUESTION_TTL_MS = 10 * 60 * 1000;
+// BR-55 (Khang 25/11/2026): bot hỏi "nguồn nào?" mà sau 2 phút không ai trả lời → bot tự trả lời (kèm câu "do bạn không nói nguồn nên…").
+export const NO_SOURCE_DEFAULT_AFTER_MS = 2 * 60 * 1000;
+// Nhịp lịch bị trễ / hỏng quá lâu → bỏ câu hỏi cũ, không trả lời muộn lạc đề.
+export const NO_SOURCE_GIVE_UP_MS = 30 * 60 * 1000;
 // Kỹ thuật: Telegram.
 export const TELEGRAM_API_BASE = 'https://api.telegram.org';
 export const TELEGRAM_CHUNK_CHARS = 4000; // Telegram cho tối đa 4096 ký tự / tin — chừa chỗ an toàn

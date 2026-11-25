@@ -21,7 +21,7 @@ export const COMMAND_GUIDE: readonly CommandGuide[] = [
   // ——— Mọi người trong nhóm ———
   { cmd: 'help', syntax: '/help', scope: 'group', bots: BOTH, what: 'xem hướng dẫn dùng bot', when: 'mới vào nhóm, quên cách dùng', result: 'bot gửi bản hướng dẫn này vào nhóm' },
   { cmd: 'tygia', syntax: '/tygia (hoặc /gia)', scope: 'group', bots: RAY, what: 'hỏi tỉ giá SGD → VND đang có', when: 'muốn biết giá để đổi tiền', result: 'Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính' },
-  { cmd: 'doitien', syntax: '/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise', scope: 'group', bots: RAY, what: 'đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn', when: 'muốn biết lương / số tiền đổi ra được bao nhiêu', result: 'chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng ~5–15 phút → tự tính theo chợ đen + Wise' },
+  { cmd: 'doitien', syntax: '/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise', scope: 'group', bots: RAY, what: 'đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn', when: 'muốn biết lương / số tiền đổi ra được bao nhiêu', result: 'chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng 2 phút → Rây tự tính theo chợ đen + Wise và nói "do bạn không nói nguồn nên…"' },
   { cmd: 'chodencontact', syntax: '/chodencontact', scope: 'group', bots: RAY, what: 'xem nơi đổi chợ đen uy tín nhóm giới thiệu', when: 'sắp đổi lương ra tiền mặt VND', result: 'danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay' },
   { cmd: 'ngayle', syntax: '/ngayle', scope: 'group', bots: RAY, what: 'xem ngày nghỉ lễ Singapore sắp tới', when: 'tính chuyện nghỉ, về quê, đi chơi', result: 'danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù)' },
   // ——— Chỉ Khang, chat riêng ———
@@ -72,7 +72,7 @@ export const GROUP_EXAMPLES: Record<BotKey, readonly { say: string; result: stri
     { say: 'Rây ơi lấy giá ngay Wise đi', result: 'Rây đi lấy giá Wise LIỀN rồi báo (mỗi nguồn tối đa 1 lần / 5 phút)' },
     { say: 'Rây ơi check giá VCB với VPBank coi', result: 'lấy liền giá 2 ngân hàng (mua chuyển khoản / bán)' },
     { say: 'Rây ơi lấy giá ngay, tùy mày', result: '"tùy" = lấy Wise; nói "tất cả" = lấy mọi nguồn' },
-    { say: 'Rây ơi lấy giá mới nhất đi', result: 'chưa nói nguồn → Rây hỏi lại "nguồn nào?", trả lời "Wise" / "VCB" / "tùy"…' },
+    { say: 'Rây ơi lấy giá mới nhất đi', result: 'chưa nói nguồn → Rây hỏi lại "nguồn nào?"; bạn trả lời "Wise" / "VCB" / "tùy" là lấy liền; 2 phút không trả lời thì Rây tự lấy Wise và nói "do bạn không nói nguồn nên…"; câu nào về giá cũng ghi giờ + ngày lấy giá' },
     { say: 'Rây ơi tỉ giá tuần này lên hay xuống?', result: 'xu hướng 24 giờ / 7 ngày, cao / thấp nhất 7 ngày' },
     { say: 'Rây ơi còn mấy ngày nữa có lương?', result: 'số ngày tới ngày lương (ngày cuối tháng)' },
     { say: 'Rây ơi tháng sau có ngày lễ nào không?', result: 'lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau' },

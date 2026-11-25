@@ -12,7 +12,7 @@
 | 3 | **Kiểm sau deploy**: `/robots.txt` · `/docs/...` phải 404 · `/api/ray` GET → 405 · `curl -X POST /api/tick` → 401 · Build Logs (KC-06) · `/trangthai` trong Telegram | 👤 Khang + ⏳ Kat sửa theo lỗi thật |
 | 4 | **Tải lịch lễ MOM tự động** trong tick (lịch 2027 cần trước 15/12; tạm: `/ngayle them`) — KC-08 | ⏳ Kat |
 | 5 | **Lũi** — tính cách, tâm trạng riêng, giọng văn, lĩnh vực tin, token | 👤 Khang gửi sau |
-| 6 | KC-01 (Supabase Cron 10 phút gói Free) · KC-06 (Vercel chạy `import './x.ts'`) · KC-08 (Vercel vào được MOM) | ⏳ sau việc 2 |
+| 6 | KC-01 (Supabase Cron MỖI PHÚT trên gói Free — nhịp lịch 1 phút cho việc chờ 2 phút) · KC-06 (Vercel chạy `import './x.ts'`) · KC-08 (Vercel vào được MOM) | ⏳ sau việc 2 |
 | 7 | Nhỏ: tách hàm `answer` trong `webhook.service.ts` (~70 dòng > 50) · lệnh xem tình trạng AI chi tiết / xóa cache (tài liệu Khang mục 13) · `/thanhvien` gắn mã Telegram | ⏳ Kat |
 
 ## Câu hỏi chờ Khang
