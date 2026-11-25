@@ -67,7 +67,7 @@ export const MAX_POKE_PROBABILITY = 0.7;
 export const POLITE_EMOJI_MAX = 1;
 
 /** Độ dài theo mục đích lời nói (nhân vào khoảng chữ của tâm trạng). Tóm tắt cho Khang có độ dài riêng. */
-export const PURPOSE_LENGTH_FACTOR = { answer_data: 1, answer_chat: 1, chime_in: 0.7, rate_report: 0.8, rate_alert: 0.8 } as const;
+export const PURPOSE_LENGTH_FACTOR = { answer_data: 1, answer_chat: 1, chime_in: 0.7, rate_report: 0.8, rate_alert: 0.8, reminder: 0.8 } as const;
 export const SUMMARY_WORDS: readonly [number, number] = [60, 250];
 /** Đầu ra AI dài quá (số chữ > tối đa × hệ số này) → code cắt ở cuối câu gần nhất. */
 export const STYLE_HARD_LENGTH_FACTOR = 1.6;

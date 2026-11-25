@@ -54,6 +54,14 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 | 24/11/2026 22:32 | Lượt AI: Gemini free có giới hạn (vài trăm / ngày) nhưng **đừng tiết kiệm quá** (group nhắn ít) | Khang | `CLAUDE.md`, `CODING_STANDARDS` 6.10a |
 | 24/11/2026 22:34 | **FS v0.1** (Rây đầy đủ, Lũi khung): BR-01…28, F-01…10, bảng mức hóng chuyện (chốt D2 ở Mode 2), ADR-01…07, KC-01…05, bảng ATR | Kat (Mode 2 = chốt thật; Khang sửa được) | `docs/specs/02-functional-spec.md` |
 | 24/11/2026 22:36 | **BR-29 / BR-30**: hỏi giá không dùng AI tìm; luôn ghi nguồn + thời điểm; "lấy giá ngay" = action gọi hàm code đọc nguồn (hỏi lại nếu thiếu nguồn, ≤ 1 lần / 5 phút) — FS bản 0.2 | Khang (yêu cầu) · Kat (chọn làm action, Mode 2) | FS mục 2, F-04 |
+| 24/11/2026 22:40 | FS bản 0.2 duyệt · cài `typescript` (dev) · hạn chót Rây thứ Năm 03/12/2026 | Khang, trong chat | FS; `package.json` (bản 6.0.3 — bản 7 không có giao diện JS cho Vercel) |
+| 24/11/2026 22:40 | BR-30: "tùy mày" → Wise · "tất cả" → mọi nguồn bật · thiếu → hỏi lại | Khang (ý) · Kat (cách làm) | `live-rate.service.ts` |
+| 25/11/2026 06:20 | Tính cách bật / tắt + 14 tâm trạng + giọng miền Nam (BR-31 → BR-34) — tính cách = nói gì / khi nào, tâm trạng = nói thế nào | Khang (ý) · Kat (bảng số, Mode 2) | FS mục 9; `style.service.ts` |
+| 25/11/2026 06:25 | Mức tần suất 1–5 (BR-35), mặc định 3 | Khang (mức 1, 2) · Kat (3–5) | FS mục 10; `frequency.service.ts` |
+| 25/11/2026 06:30 | Cơ chế tính cách dùng chung 2 bot; ngữ cảnh 15 tin + bối cảnh tình hình (BR-36); trần prompt không phình (BR-37) | Khang | `prompt-context.service.ts` + barie 60 ngày |
+| 25/11/2026 06:36 | Mặc định NGOAN · giữ tần suất 3 · mức 1 cách 4–5 ngày · cảnh báo cả tháng có công tắc (BR-39) · kho ngữ cảnh 20 tin giữ cả khi tắt lắng nghe (BR-16 sửa) · nói tục có giới hạn (BR-38) · lệnh tự đổi mọi cài đặt | Khang, trả lời 4 câu hỏi | `settings.service.ts` |
+| 25/11/2026 06:44 | Bot biết từng người (BR-40); biệt danh mới công ty BH, hệ thống lõi BH (công ty SGP = vendor) | Khang | `docs/rieng-tu/HO-SO-THANH-VIEN.md` |
+| 25/11/2026 07:00 | Ngày lễ Singapore theo tài liệu MOM của Khang (BR-41), nhắc lễ (BR-42), nhắc timesheet thứ Sáu (BR-43), hiểu ai đang hỏi + giả vờ biết sơ sơ (BR-44) | Khang | `holiday.service.ts`, `reminder.service.ts` |
 
 <a id="sb"></a>
 # B. Việc dở dang
@@ -118,7 +126,7 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Khang (Kat soạn hướng dẫn cài đặt)
 <a id="t15"></a>
-### [ ] T15 — Duyệt cài gói `typescript` (chỉ dùng lúc phát triển) cho barie typecheck — checklist 5 ý · [tổng kết 24/11/2026] · `QĐ`
+### [x] T15 — Duyệt cài gói `typescript` (chỉ dùng lúc phát triển) cho barie typecheck — checklist 5 ý · [tổng kết 24/11/2026] · `QĐ`
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Khang
 <a id="t16"></a>
@@ -126,7 +134,7 @@ Quy tắc ghi chép: `docs/QUY_TAC_GHI_CHEP.md`. Mẫu mục: `docs/SKILL_TAM.md
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Kat
 <a id="t17"></a>
-### [ ] T17 — Khang xem lại FS v0.1 (Mode 2 đã chốt; sửa chỗ nào thì Kat cập nhật) · [tổng kết 24/11/2026] · `QĐ`
+### [x] T17 — Khang xem lại FS v0.1 (Mode 2 đã chốt; sửa chỗ nào thì Kat cập nhật) · [tổng kết 24/11/2026] · `QĐ`
 > **Nhãn:** ⏳ ĐANG CHỜ từ 24/11/2026
 - **Ai / điều kiện:** Khang
 
@@ -235,3 +243,11 @@ Xem `docs/bugs/README.md`.
 **Việc nên làm tiếp:** T17 (Khang xem FS) → T14 (Khang tạo dịch vụ) → T16 (code đợt 2) ; T15 ; Lũi khi có T01–T03.
 **Kích thước CLAUDE.md:** 23,2 KB
 **Bổ sung sau tổng kết (22:36):** Khang thêm lưu ý hỏi giá → FS 0.2 (BR-29, BR-30) + hàm `describeRateSource` + test; push vào PR #2.
+
+### 2026-11-25 (tổng kết lúc 07:05) — Mode 2
+**Làm được:** mợt PR #2, PR #3 (đã kiểm). FS 0.2 → **0.8** (BR-29 → BR-44 + mục 9, 10, phụ lục D). Code: typecheck + `npm audit` vào cổng chặn; biến môi trường (4 nơi); chống lộ `docs/` trên Vercel; hướng dẫn cài đặt phần 0–5; lớp Telegram + đường đi của tin; tính cách × tâm trạng; tần suất; ngữ cảnh + trần prompt; nói tục có giới hạn; lệnh cài đặt; hồ sơ thành viên; ngày lễ MOM + nhắc lễ + timesheet. **137 / 137 test đạt.** Mỗi đợt audit 2 lần — bắt 9 lỗi (tin trùng khi đứt mạng, "vâng lời", "chế độ", 4 đường chèn lệnh vào prompt, …), mỗi lỗi có test.
+**Phát hiện hay:** TypeScript 7 không có giao diện JS → Vercel build hỏng; repo private ≠ trang web private (Vercel có thể phát `docs/`); `secret_token` Telegram chỉ nhận chữ / số / `_-` → mã tự tạo dùng hex; MOM + data.gov.sg bị chặn từ máy ảo → cần dự phòng `/ngayle`.
+**Sai sót của Kat:** quên hỏi tính cách / tâm trạng lúc phỏng vấn; ghi giờ sai vài mục; 1 mục sổ quy trình bị mất do chuỗi lệnh `&&` — đã sửa, ghi bài học.
+**Trạng thái cuối phiên:** nhánh `claude/new-session-5jra1l`; PR #4 mở (gồm mọi việc từ 25/11 06:18); chưa nối dịch vụ thật.
+**Việc nên làm tiếp:** T14 (Khang tạo dịch vụ theo hướng dẫn 1–5) → database Supabase + nạp hồ sơ + `/thanhvien` + hướng dẫn phần 6 → AI adapter → webhook + `/api/tick` (phần 7) → KC-01, 06, 07, 08. Lũi khi có tính cách / lĩnh vực tin.
+**Kích thước CLAUDE.md:** ~29 KB

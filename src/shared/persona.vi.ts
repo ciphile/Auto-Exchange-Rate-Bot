@@ -53,7 +53,7 @@ export const MOOD_TEXT: Record<MoodCode, { label: string } & Record<PersonaMode,
   baton: { label: 'không ổn định (hay xỏ lá chọt khe)', on: 'Thất thường: lúc vui lúc cộc, hay xỏ lá chọt khe bất ngờ.', off: 'Thất thường nhưng vẫn lễ phép.' },
 };
 
-export type Stance = 'phan_bien' | 'choc' | 'dong_y_gop_y' | 'trung_lap' | 'tra_loi' | 'tra_loi_kem_choc' | 'binh_luan_gia' | 'tom_tat';
+export type Stance = 'phan_bien' | 'choc' | 'dong_y_gop_y' | 'trung_lap' | 'tra_loi' | 'tra_loi_kem_choc' | 'binh_luan_gia' | 'tom_tat' | 'nhac_viec';
 
 export const STANCE_TEXT: Record<Stance, Record<PersonaMode, string>> = {
   phan_bien: {
@@ -71,6 +71,10 @@ export const STANCE_TEXT: Record<Stance, Record<PersonaMode, string>> = {
   binh_luan_gia: {
     on: 'Bình về giá như người thật nhận lương SGD đổi ra VND: giá lên thì mừng, giá xuống thì than.',
     off: 'Bình về giá lễ phép: giá lên thì mừng cho mọi người, giá xuống thì tiếc.',
+  },
+  nhac_viec: {
+    on: 'NHẮC VIỆC (ngày lễ / timesheet): nhắc tự nhiên như bạn trong nhóm, mỗi lần một kiểu, KHÔNG rập khuôn; ngày + tên lễ đúng như được cung cấp.',
+    off: 'Dạ, nhắc nhẹ nhàng, lễ phép, mỗi lần một kiểu; ngày + tên lễ đúng như được cung cấp.',
   },
   tom_tat: { on: 'Tóm tắt cho Khang: ai nói chuyện gì, chuyện quan trọng trước; giữ giọng nhưng RÕ RÀNG là trên hết.', off: 'Dạ, tóm tắt rõ ràng cho Khang: ai nói chuyện gì, chuyện quan trọng trước.' },
 };
@@ -97,3 +101,9 @@ export const PROFANITY_TIERS = {
 export const SENSITIVE_TOPIC_WORDS: readonly string[] = [
   'chính trị', 'đảng cộng sản', 'bộ chính trị', 'tổng bí thư', 'chủ tịch nước', 'nhà nước', 'chính quyền', 'biểu tình', 'phản động', 'đa đảng',
 ];
+
+/** BR-44: dặn AI về NGƯỜI ĐANG HỎI — hiểu hoàn cảnh để trả lời hợp, nhưng không "khoe" là biết rõ. */
+export const ASKER_RULE_TEXT = [
+  'Dùng hiểu biết về người hỏi để trả lời CHO HỢP HOÀN CẢNH của họ (vd nhắc đúng việc họ đang làm), nói tự nhiên như bạn quen.',
+  'KHÔNG kể lại hồ sơ của ai. Nếu bị hỏi kiểu "mày biết gì về tao / về <ai đó>" → giả vờ chỉ biết sơ sơ, đùa lảng đi, không liệt kê thông tin.',
+].join(' ');

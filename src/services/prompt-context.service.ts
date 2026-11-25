@@ -8,6 +8,7 @@ import {
 } from '../config/prompt.ts';
 import { PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
 import { getVnDateKey, getVnParts } from '../shared/vn-time.ts';
+import { ASKER_RULE_TEXT } from '../shared/persona.vi.ts';
 
 export type ChatLine = { at: number; speaker: string; isBot: boolean; text: string };
 export type BotPost = { at: number; botName: string; kind: string; summary: string };
@@ -19,6 +20,10 @@ export type RateSnapshotFacts = {
 export type SituationInput = {
   now: Date; daysUntilPayday: number; rate: RateSnapshotFacts | null;
   recentBotPosts: BotPost[]; news: NewsHeadline[];
+  /** BR-43: hôm nay là ngày điền timesheet (thứ Sáu, hoặc ngày làm việc trước nếu thứ Sáu là lễ). */
+  isTimesheetDay?: boolean;
+  /** BR-42: lễ Singapore gần nhất trong 30 ngày tới (đã gồm nghỉ bù). */
+  nextHoliday?: { date: string; name: string; daysAway: number } | null;
 };
 
 const clip = (text: string, max: number) => {
@@ -69,6 +74,11 @@ function describeTrend(pct: number, span: string): string {
 export function buildSituationFacts(input: SituationInput): string[] {
   const facts: string[] = [];
   const d = input.daysUntilPayday;
+  if (input.isTimesheetDay) facts.push('Hôm nay là ngày điền TIMESHEET (mọi người hay quên).');
+  const h = input.nextHoliday;
+  // Tên lễ lấy từ trang MOM (chữ từ ngoài) → gỡ dấu đóng khối + cắt ngắn (audit 25/11/2026).
+  const hName = h ? defuse(clip(h.name, 60)) : '';
+  if (h) facts.push(h.daysAway === 0 ? `Hôm nay là ngày lễ Singapore: ${hName} (được nghỉ).` : `Còn ${h.daysAway} ngày nữa là lễ Singapore ${hName} (${h.date.slice(8, 10)}/${h.date.slice(5, 7)}).`);
   facts.push(d === 0 ? 'Hôm nay là NGÀY LƯƠNG.' : d === 1 ? 'Mai có lương.'
     : d < PAYDAY_WEEK_DAYS ? `Còn ${d} ngày nữa là có lương (đang trong tuần lương).` : `Còn ${d} ngày nữa mới có lương.`);
   const r = input.rate;
@@ -131,6 +141,8 @@ export function renderGroupBlock(groupName: string, description: string, groupFa
 export type PromptParts = {
   facts: string[]; chat: readonly ChatLine[];
   userMessage: { speaker: string; text: string } | null; // câu cần trả lời (null = tự chen / tự báo)
+  /** BR-44: hồ sơ người đang hỏi (nhận ra bằng resolveSpeaker) — null = người lạ / bot tự nói. */
+  asker?: Member | null;
   task: string; styleTurn: string; outputFormat: string; // do code soạn, độ dài cố định
 };
 export type BuiltPrompt = { text: string; chars: number; chatLines: number; factLines: number; trimmed: string[] };
@@ -150,6 +162,7 @@ export function buildPrompt(parts: PromptParts, now: Date, maxChars = PROMPT_MAX
     head,
     `BỐI CẢNH TÌNH HÌNH (code tính, đúng sự thật):\n${facts.map((f) => `- ${f}`).join('\n')}`,
     renderRecentChat(parts.chat, now, chatLimit),
+    parts.asker ? `NGƯỜI ĐANG HỎI: ${defuse(clip(`${parts.asker.name} — ${parts.asker.work}. ${parts.asker.about}`, MEMBER_LINE_MAX_CHARS))}\n${ASKER_RULE_TEXT}` : null,
     parts.userMessage && userText !== null ? `CÂU CẦN TRẢ LỜI — ${defuse(clip(parts.userMessage.speaker, 40))} nói:\n"""\n${defuse(userText)}\n"""` : null,
     parts.task, parts.styleTurn, parts.outputFormat,
   ].filter((x): x is string => x !== null).join('\n\n');

@@ -13,6 +13,7 @@ export const SETTING_LABELS = {
   frequencyLevel: 'Mức tần suất báo giá + cảnh báo',
   alertFullMonth: 'Cảnh báo cả tháng',
   profanityLevel: 'Mức nói tục',
+  timesheetReminderOn: 'Nhắc điền timesheet thứ Sáu',
 } as const;
 
 /** Bẫy 35: hướng dẫn phải khớp đúng cú pháp code nhận (test đối chiếu từng lệnh). */
@@ -30,6 +31,12 @@ export const OWNER_COMMAND_HELP: readonly (readonly [string, string])[] = [
   ['/gionghi 20-6', 'giờ nghỉ, bot không tự nhắn (giờ VN)'],
   ['/nguon wise,vcb,vpbank', 'nguồn tỉ giá được dùng'],
   ['/phongcach <mô tả>', 'ghi thêm phong cách (gõ /phongcach xoa để xóa)'],
+  ['/nhactimesheet on | off', 'thỉnh thoảng nhắc điền timesheet ngày thứ Sáu'],
+];
+
+/** Lệnh không phải cài đặt (xử lý ở service riêng) — vẫn hiện trong /lenh. */
+export const OTHER_COMMAND_HELP: readonly (readonly [string, string])[] = [
+  ['/ngayle', 'xem ngày lễ Singapore sắp tới (thêm: /ngayle them 2027-01-01 Tên lễ · xóa: /ngayle xoa 2027-01-01)'],
 ];
 
 export const COMMAND_ERRORS = {

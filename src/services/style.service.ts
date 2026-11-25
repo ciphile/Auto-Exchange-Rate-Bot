@@ -17,7 +17,7 @@ import {
 export type StyleSettings = { bot: BotKey; personaOn: boolean; mood: MoodCode; profanityLevel?: ProfanityLevel };
 export type Address = { self: string; others: string };
 /** Mục đích lời nói: trả lời số liệu · trả lời trò chuyện / vĩ mô · tự chen · báo giá · cảnh báo · tóm tắt cho Khang. */
-export type SpeechPurpose = 'answer_data' | 'answer_chat' | 'chime_in' | 'rate_report' | 'rate_alert' | 'daily_summary';
+export type SpeechPurpose = 'answer_data' | 'answer_chat' | 'chime_in' | 'rate_report' | 'rate_alert' | 'reminder' | 'daily_summary';
 
 export type StyleDirective = {
   bot: BotKey;
@@ -80,6 +80,7 @@ function pickStance(bot: BotKey, mode: PersonaMode, mood: StableMood, unstable: 
   if (purpose === 'daily_summary') return 'tom_tat';
   if (sensitive) return 'trung_lap';
   if (purpose === 'rate_report' || purpose === 'rate_alert') return 'binh_luan_gia';
+  if (purpose === 'reminder') return 'nhac_viec';
   const p = PERSONA_PROFILES[bot][mode];
   const pPoke = Math.min(MAX_POKE_PROBABILITY, p.pokeBase * MOOD_PROFILES[mood].poke * (unstable ? UNSTABLE_POKE_BOOST : 1));
   if (purpose === 'answer_data') return random() < pPoke ? 'tra_loi_kem_choc' : 'tra_loi';

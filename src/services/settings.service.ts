@@ -5,7 +5,8 @@ import { DEFAULT_ALERT_LEVELS_VND, DEFAULT_CHATTINESS_LEVEL, DEFAULT_QUIET_HOURS
 import { DEFAULT_ALERT_FULL_MONTH, DEFAULT_FREQUENCY_LEVEL, type FrequencyLevel } from '../config/frequency.ts';
 import { DEFAULT_MOOD, DEFAULT_PERSONA_ON, DEFAULT_PROFANITY_LEVEL, MOOD_CODES, type MoodCode, type ProfanityLevel } from '../config/persona.ts';
 import type { BotKey } from '../domain/telegram.ts';
-import { COMMAND_ERRORS, OWNER_COMMAND_HELP, SETTING_LABELS } from '../shared/commands.vi.ts';
+import { DEFAULT_TIMESHEET_REMINDER_ON } from '../config/holidays.ts';
+import { COMMAND_ERRORS, OTHER_COMMAND_HELP, OWNER_COMMAND_HELP, SETTING_LABELS } from '../shared/commands.vi.ts';
 import { MOOD_TEXT } from '../shared/persona.vi.ts';
 import { parseCommand } from './access.service.ts';
 import { parseFrequencyLevel } from './frequency.service.ts';
@@ -25,6 +26,7 @@ export type BotSettings = {
   frequencyLevel: FrequencyLevel;
   alertFullMonth: boolean;
   profanityLevel: ProfanityLevel;
+  timesheetReminderOn: boolean; // BR-43
 };
 export type SettingKey = keyof BotSettings;
 
@@ -34,7 +36,7 @@ export function getDefaultSettings(bot: BotKey): BotSettings {
     alertLevelsVnd: [...DEFAULT_ALERT_LEVELS_VND], listenOn: false, chattinessLevel: DEFAULT_CHATTINESS_LEVEL, address: null,
     personaOn: DEFAULT_PERSONA_ON[bot], mood: DEFAULT_MOOD, styleNote: '', quietHours: { ...DEFAULT_QUIET_HOURS },
     sources: [...LIVE_SOURCES], frequencyLevel: DEFAULT_FREQUENCY_LEVEL, alertFullMonth: DEFAULT_ALERT_FULL_MONTH,
-    profanityLevel: DEFAULT_PROFANITY_LEVEL,
+    profanityLevel: DEFAULT_PROFANITY_LEVEL, timesheetReminderOn: DEFAULT_TIMESHEET_REMINDER_ON,
   };
 }
 
@@ -56,7 +58,7 @@ const MAX_ADDRESS_CHARS = 30;
 export function formatSetting(key: SettingKey, s: BotSettings): string {
   switch (key) {
     case 'alertLevelsVnd': return s.alertLevelsVnd.map((v) => v.toLocaleString('en-US')).join(' · ');
-    case 'listenOn': case 'personaOn': case 'alertFullMonth': return s[key] ? 'bật' : 'tắt';
+    case 'listenOn': case 'personaOn': case 'alertFullMonth': case 'timesheetReminderOn': return s[key] ? 'bật' : 'tắt';
     case 'chattinessLevel': return `mức ${s.chattinessLevel} / 10`;
     case 'address': return s.address ? `${s.address.self} - ${s.address.others}` : 'mặc định theo tính cách';
     case 'mood': return `${MOOD_TEXT[s.mood].label} (${s.mood})`;
@@ -73,7 +75,7 @@ export function renderAllSettings(s: BotSettings): string {
 }
 
 export function renderOwnerHelp(): string {
-  return OWNER_COMMAND_HELP.map(([cmd, what]) => `${cmd} — ${what}`).join('\n');
+  return [...OWNER_COMMAND_HELP, ...OTHER_COMMAND_HELP].map(([cmd, what]) => `${cmd} — ${what}`).join('\n');
 }
 
 const parseOnOff = (arg: string): boolean | null => (ON.has(arg.toLowerCase()) ? true : OFF.has(arg.toLowerCase()) ? false : null);
@@ -91,6 +93,7 @@ const PARSERS: Record<string, { key: SettingKey; parse: (arg: string) => Partial
   } },
   langnghe: { key: 'listenOn', parse: (a) => { const v = parseOnOff(a); return v === null ? COMMAND_ERRORS.onOff : { listenOn: v }; } },
   tinhcach: { key: 'personaOn', parse: (a) => { const v = parseOnOff(a); return v === null ? COMMAND_ERRORS.onOff : { personaOn: v }; } },
+  nhactimesheet: { key: 'timesheetReminderOn', parse: (a) => { const v = parseOnOff(a); return v === null ? COMMAND_ERRORS.onOff : { timesheetReminderOn: v }; } },
   canhbaocathang: { key: 'alertFullMonth', parse: (a) => { const v = parseOnOff(a); return v === null ? COMMAND_ERRORS.onOff : { alertFullMonth: v }; } },
   hongchuyen: { key: 'chattinessLevel', parse: (a) => { const v = intIn(a, 1, 10); return v === null ? COMMAND_ERRORS.chattiness : { chattinessLevel: v }; } },
   tansuat: { key: 'frequencyLevel', parse: (a) => { const v = parseFrequencyLevel(a); return v === null ? COMMAND_ERRORS.frequency : { frequencyLevel: v }; } },

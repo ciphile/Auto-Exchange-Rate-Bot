@@ -29,7 +29,7 @@ test('Bẫy 35: MỌI ví dụ trong bảng hướng dẫn đều chạy đượ
     '/caidat': '/caidat', '/moc 19800 19900 20000': '/moc 19800 19900 20000', '/langnghe on | off': '/langnghe on',
     '/hongchuyen 1..10': '/hongchuyen 5', '/xungho tui - mấy ông': '/xungho tui - mấy ông', '/tinhcach on | off': '/tinhcach on',
     '/tamtrang <mã>': '/tamtrang sieubua', '/tansuat 1..5': '/tansuat 1', '/canhbaocathang on | off': '/canhbaocathang on',
-    '/noituc 0..3': '/noituc 2', '/gionghi 20-6': '/gionghi 21-7', '/nguon wise,vcb,vpbank': '/nguon wise,vcb', '/phongcach <mô tả>': '/phongcach hay ví von',
+    '/noituc 0..3': '/noituc 2', '/gionghi 20-6': '/gionghi 21-7', '/nguon wise,vcb,vpbank': '/nguon wise,vcb', '/phongcach <mô tả>': '/phongcach hay ví von', '/nhactimesheet on | off': '/nhactimesheet off',
   };
   for (const [cmd] of OWNER_COMMAND_HELP) {
     const example = examples[cmd];
