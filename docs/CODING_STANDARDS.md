@@ -287,4 +287,4 @@ ATR-1 webhook kiểm mã trước khi đọc · ATR-2 nguồn gửi (IP) · ATR-
 | 42 | Gửi `thinkingConfig` cho model Gemini 3.x → lỗi **400 "invalid argument"** | Chỉ gửi tham số tối thiểu; **không** `thinkingConfig`, không `temperature`; test chặn ai thêm lại. Model `-latest` đổi bản bất cứ lúc nào *(Focus Tracker, 14/10/2026)* |
 | 43 | Gọi có tra web bị **429** dù lượt thường còn (quota tra Google của gói free tính riêng, rất thấp) | Tính năng phụ lỗi → **bỏ tính năng phụ, giữ câu trả lời**: gọi lại cùng model không tra web + dặn AI không bịa số *(Focus Tracker, 16/10/2026)* |
 | 44 | Key lọt vào log / tin báo lỗi / ảnh chụp (body lỗi của Google đôi khi chép lại key) | Key chỉ ở biến môi trường, gửi qua header; **che key ở mọi đường ra**; không chụp màn hình có key *(Focus Tracker)* |
-
+| 45 | Chạy `npm run check \| grep … && git commit` → lệnh `grep` thành công nên **test đỏ vẫn commit** | Cổng "đỏ không commit" phải là **barie**: git pre-commit hook `.githooks/pre-commit` (`git config core.hooksPath .githooks`, `npm install` tự bật); không bao giờ nối commit sau một ống `grep` *(BUG-0001 lần 3, 25/11/2026)* |
