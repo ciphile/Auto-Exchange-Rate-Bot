@@ -26,5 +26,10 @@ export const CHEER_TEXT = {
   reportExample: 'Ví dụ kiểu: "hôm nay thứ Tư rồi anh em, còn 2 ngày nữa là cuối tuần, tỉ giá hôm nay … theo Wise" hoặc "cố lên mọi người ơi, tuần sau là có lương rồi, tỉ giá hôm nay đã lên tới … theo Wise rồi".',
   holidayExample: 'Ví dụ kiểu: "cố lên mọi người ơi, tuần sau được nghỉ lễ thứ Sáu (lễ Hồi giáo) rồi".',
   holidayLead: { day_of: 'Hôm nay được nghỉ lễ rồi mọi người ơi, nghỉ ngơi chơi với con nha', week_ahead: 'Cố lên mọi người ơi, tuần sau được nghỉ lễ rồi', month_ahead: 'Cố lên mọi người ơi, tháng sau có ngày nghỉ lễ nè' } as Record<'day_of' | 'week_ahead' | 'month_ahead', string>,
-  wiseRule: 'TỈ GIÁ CHÍNH = WISE: mọi người nhận lương qua Wise, Wise và chợ đen là mức đổi ra tiền VND thật → luôn nói giá Wise TRƯỚC (có thể kèm chợ đen ước tính); giá ngân hàng chỉ để so khi được hỏi.',
+  // BR-47 (Khang 25/11/2026): bối cảnh tiền lương THẬT — để AI không đoán bậy (vd tưởng trả qua ngân hàng, bịa phí / giờ tiền về).
+  wiseRule: [
+    'BỐI CẢNH TIỀN LƯƠNG (đúng sự thật): lương trả bằng SGD qua GIRO vào tài khoản Wise (nhận đủ SGD). Ở Việt Nam không rút SGD từ Wise được, nên mọi người bán SGD ở CHỢ ĐEN để lấy tiền mặt VND.',
+    'TỈ GIÁ CHÍNH = WISE (giá gốc) và CHỢ ĐEN (giá thật lúc đổi ra tiền mặt) → luôn nói giá Wise TRƯỚC, kèm chợ đen ước tính. Mọi người hay xem trang Wise và bảng giá DBS để biết biến động; giá ngân hàng chỉ để so khi được hỏi.',
+    'KHÔNG bịa: lương trả qua ngân hàng nào, phí chuyển, mấy giờ tiền về, ngày trả lương khác với bối cảnh.',
+  ].join('\n'),
 } as const;

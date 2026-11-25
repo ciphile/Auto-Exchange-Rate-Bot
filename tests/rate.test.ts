@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { convertSgdToVnd, convertVndToSgdCents, describeRateSource, estimateBlackMarketVnd } from '../src/services/rate.service.ts';
 import { vn } from './helpers.ts';
 
-test('BR-12 chợ đen ước tính = Wise × 1,004, tròn 10 đ', () => {
-  assert.equal(estimateBlackMarketVnd(19975.2), 20060); // 20 055,1 → tròn tới 10 đ
-  assert.equal(estimateBlackMarketVnd(20000), 20080);
+test('BR-12 chợ đen ước tính = Wise × 1,0048, tròn 10 đ — khớp số thật Khang đối chiếu 25/11/2026', () => {
+  assert.equal(estimateBlackMarketVnd(20004.3), 20100); // Wise 20.004,30 ↔ chợ đen thật 20.100
+  assert.equal(estimateBlackMarketVnd(19975.2), 20070); // 20.071,1 → tròn tới 10 đ
+  assert.equal(estimateBlackMarketVnd(20000), 20100);
 });
 
 test('quy_doi: tiền luôn là số nguyên đơn vị nhỏ nhất', () => {

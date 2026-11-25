@@ -34,7 +34,7 @@ test('BR-46 / BR-47: báo giá thứ Tư, AI lỗi → câu soạn sẵn mở đ
   const post = fake.sent.find((s) => s.chatId === -1)?.text ?? '';
   assert.match(post, /^Cố lên mọi người ơi, hôm nay thứ Tư rồi, còn 2 ngày nữa là cuối tuần/);
   assert.match(post, /19\.950 đ \(theo Wise/);
-  assert.match(post, /chợ đen ước tính khoảng 20\.030 đ/);
+  assert.match(post, /chợ đen ước tính khoảng 20\.050 đ/);
   const p = prompts.find((x) => x.includes('Tự báo tỉ giá')) ?? '';
   assert.match(p, /TỈ GIÁ CHÍNH = WISE/);
   assert.match(p, /GIỌNG ĐỘNG VIÊN/);

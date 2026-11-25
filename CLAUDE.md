@@ -112,11 +112,12 @@ Kat chỉ làm khi Khang nhắn (không tự nhắn lúc nửa đêm). Mode 2 hi
 - **Tóm tắt chat cuối ngày — cả Rây (nhóm A) và Lũi (nhóm B)** (khi bật lắng nghe, D4 chốt): bot ghi **nguyên văn** từng tin của thành viên vào kho tạm **mã hóa** (không bóc tách, không tóm từng câu, **không gọi AI theo từng tin**), **xóa lúc 01:00 mỗi ngày**; **chỉ khi Khang hỏi** mới gọi AI 1 lần đọc cả ngày → gửi bản tóm tắt **riêng Khang**.
 - **Cả 2 bot — Khang điều khiển bằng lệnh** (chỉ Khang, mỗi lệnh đổi cấu hình có **thẻ xác nhận**): mốc / ngưỡng · **bật / tắt lắng nghe** (đọc tin nhắn trong group) · **mức hóng chuyện 1–10** · **cách xưng hô** (vd "tao – mày") · phong cách, tâm trạng · lịch, giờ nghỉ · nguồn tỉ giá (Rây) · mức tin (Lũi).
 - **Thứ tự: Rây trước (ưu tiên, hạn chót thứ Năm 03/12/2026 — Khang xác nhận), Lũi sau** (chờ Khang gửi tính cách, giọng văn, lĩnh vực tin).
-- Nguồn tỉ giá: Wise (mid-market, chuẩn cho mốc), VCB, VPBank (NH mua / NH bán), chợ đen (ước tính Wise +0,4%).
+- Nguồn tỉ giá: Wise (mid-market, chuẩn cho mốc), VCB, VPBank (NH mua / NH bán), chợ đen (ước tính Wise +0,48% — Khang đối chiếu 25/11/2026). **DBS**: Khang muốn thêm làm nguồn (25/11/2026) — chờ được phép đọc trang `www.dbs.com.sg` để viết bộ đọc đúng dữ liệu thật.
+- **Bối cảnh lương (Khang 25/11/2026):** lương trả SGD qua **GIRO vào Wise**; ở VN không rút SGD từ Wise → bán ở **chợ đen** lấy tiền mặt VND → **Wise + chợ đen** là 2 giá mọi người quan tâm nhất; hay xem trang Wise / DBS để biết biến động. Đã đưa vào SYSTEM của Rây (`shared/cheer.vi.ts` `wiseRule`).
 
 **Ràng buộc (Khang chốt 24/11/2026, lượt 2; FS duyệt):** **miễn phí hoàn toàn** (AI = Gemini bản miễn phí; **gọi AI theo 100% tài liệu của Khang** `docs/rieng-tu/Cach_viet_prompt_xac_dinh_action_v1.1_22_Nov_2026.md`; cấm `thinkingConfig`) · repo **private** · không tên người / tên công ty trong repo (Rule 5) · **hạn chót thứ Năm 03/12/2026** (Khang xác nhận) · phạm vi phase 1: bàn sau.
 
-**Dữ liệu nguồn (Khang chốt 24/11/2026, lượt 3; FS duyệt):** mốc so với **giá Wise** · không DBS · chợ đen = Wise +0,4% (ước tính, không hiệu chỉnh bằng giá thật) · Wise hỏng → nguồn dự phòng 1 lần / ngày + **ghi rõ trong tin** · độ trễ cảnh báo không quan trọng.
+**Dữ liệu nguồn (Khang chốt 24/11/2026, lượt 3; FS duyệt):** mốc so với **giá Wise** · DBS: Khang đổi ý 25/11/2026 → thêm làm nguồn (chờ quyền mạng) · chợ đen = Wise +0,48% (ước tính; Khang hiệu chỉnh theo giá thật 25/11/2026) · Wise hỏng → nguồn dự phòng 1 lần / ngày + **ghi rõ trong tin** · độ trễ cảnh báo không quan trọng.
 
 ## Kiến trúc (chốt ở FS phụ lục A — ADR-01…07, Kat chốt Mode 2 24/11/2026)
 2 bot (2 token) chung 1 bộ code · **Vercel Hobby + TypeScript + Telegram webhook** · **Supabase Free** · nhịp lịch **Supabase Cron → `/api/tick` mỗi 10 phút** (dự phòng GitHub Actions 30 phút) · **Gemini free** theo tài liệu của Khang · **AES-256-GCM** cho kho tin nhắn + log prompt · nguồn Wise (không chính thức) / VCB / VPBank / dự phòng open.er-api.

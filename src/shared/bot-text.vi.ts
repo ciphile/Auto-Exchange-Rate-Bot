@@ -4,7 +4,8 @@
 const vnd = (n: number) => n.toLocaleString('vi-VN');
 
 export const BOT_TEXT = {
-  rateLine: (rateVnd: number, sourceText: string) => `1 SGD = ${vnd(rateVnd)} đ (${sourceText}).`,
+  rateLine: (rateVnd: number, sourceText: string, blackMarketVnd?: number) =>
+    `1 SGD = ${vnd(rateVnd)} đ (${sourceText})${blackMarketVnd ? `, chợ đen ước tính khoảng ${vnd(blackMarketVnd)} đ` : ''}.`,
   // BR-46: có ý động viên (thứ Tư → thứ Sáu / gần lương) thì mở đầu bằng câu đó; BR-47: Wise trước, chợ đen ước tính kèm theo.
   rateReport: (rateVnd: number, sourceText: string, cheer: string | null, blackMarketVnd: number) =>
     `${cheer ? `Cố lên mọi người ơi, ${cheer.charAt(0).toLowerCase()}${cheer.slice(1)} ` : 'Dạ '}Tỉ giá hôm nay: 1 SGD = ${vnd(rateVnd)} đ (${sourceText}), chợ đen ước tính khoảng ${vnd(blackMarketVnd)} đ.`,

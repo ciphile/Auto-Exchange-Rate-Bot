@@ -83,7 +83,10 @@ function checkInvariants(c: Case, o: Outcome, label: string) {
   assert.match(o.prompt, /CÂU CẦN TRẢ LỜI — .+ nói:\n"""\n[\s\S]+\n"""/, `${label} — I3 khối câu hỏi`);
   // I4: luật số liệu luôn có; Rây có luật Wise là giá chính (BR-47)
   assert.match(o.system, /LUẬT SỐ LIỆU/, `${label} — I4`);
-  if ((c.bot ?? 'ray') === 'ray') assert.match(o.system, /TỈ GIÁ CHÍNH = WISE/, `${label} — I4 Wise`);
+  if ((c.bot ?? 'ray') === 'ray') {
+    assert.match(o.system, /TỈ GIÁ CHÍNH = WISE/, `${label} — I4 Wise`);
+    assert.match(o.system, /lương trả bằng SGD qua GIRO vào tài khoản Wise[\s\S]*KHÔNG bịa: lương trả qua ngân hàng nào/, `${label} — I4 bối cảnh lương (BR-47)`);
+  }
   // I5: số giá trong bối cảnh đúng số trong kho (code không bơm số sai)
   const wiseLine = /Giá Wise gần nhất: ([\d.]+) VND/.exec(o.prompt)?.[1];
   if (wiseLine) assert.equal(wiseLine, fmt(RATE), `${label} — I5`);

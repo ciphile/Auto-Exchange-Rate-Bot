@@ -19,7 +19,7 @@ import { getDaysUntilPayday } from './payday.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
 import { fetchAndStoreRates, getLatestMid } from './rate-feed.service.ts';
-import { describeRateSource } from './rate.service.ts';
+import { describeRateSource, estimateBlackMarketVnd } from './rate.service.ts';
 import { getTimesheetDay } from './reminder.service.ts';
 import type { Runtime } from './runtime.types.ts';
 import { mergeStoredSettings, type BotSettings } from './settings.service.ts';
@@ -131,7 +131,7 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
   const fallback = holiday ? holiday.plain : isData
-    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at))) : BOT_TEXT.noRate)
+    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), estimateBlackMarketVnd(mid.row.rate_vnd)) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {
     purpose: isData ? 'answer_data' : 'answer_chat',

@@ -8,7 +8,7 @@ import {
   GROUP_DESCRIPTION_MAX_CHARS, GROUP_FACT_MAX_CHARS, GROUP_FACTS_MAX, MEMBER_LINE_MAX_CHARS, MEMBERS_MAX, NEWS_HEADLINES_MAX, PROMPT_MAX_CHARS,
   RECENT_BOT_POSTS_MAX, SITUATION_MAX_FACTS, SYSTEM_MAX_CHARS, TREND_FLAT_PCT, TREND_STRONG_PCT, USER_MESSAGE_MAX_CHARS,
 } from '../config/prompt.ts';
-import { PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
+import { BLACK_MARKET_PREMIUM_TEXT, PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
 import { getVnDateKey, getVnParts } from '../shared/vn-time.ts';
 import { ASKER_RULE_TEXT } from '../shared/persona.vi.ts';
 
@@ -87,7 +87,7 @@ export function buildSituationFacts(input: SituationInput): string[] {
   if (r) {
     // BR-29: luôn có giờ lấy — nhãn nguồn đã có "lấy lúc" thì không ghi lặp.
     const when = /lấy lúc/.test(r.sourceLabel) ? '' : `, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}`;
-    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd, 0)} VND / 1 SGD (${r.sourceLabel}${when}); chợ đen ước tính ${vnNumber(estimateBlackMarketVnd(r.wiseVnd), 0)} VND (Wise +0,4%).`);
+    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd, 0)} VND / 1 SGD (${r.sourceLabel}${when}); chợ đen ước tính ${vnNumber(estimateBlackMarketVnd(r.wiseVnd), 0)} VND (Wise ${BLACK_MARKET_PREMIUM_TEXT}).`);
     const trends = [
       r.change24hPct !== null ? describeTrend(r.change24hPct, 'trong 24 giờ') : null,
       r.change7dPct !== null ? describeTrend(r.change7dPct, 'trong 7 ngày') : null,
