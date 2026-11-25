@@ -4,5 +4,10 @@
   "buildCommand": "",
   "installCommand": "npm ci",
   "outputDirectory": "public",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 60
+    }
+  }
 }

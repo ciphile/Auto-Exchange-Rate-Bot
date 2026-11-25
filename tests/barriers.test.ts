@@ -87,3 +87,11 @@ test('Barie (Khang 25/11/2026): biệt danh của repo KHÔNG BAO GIỜ nằm tr
   }
   assert.deepEqual(hits, []);
 });
+
+test('ATR-9 barie: MỌI bảng trong schema.sql đều bật RLS', () => {
+  const sql = readFileSync('src/repositories/schema.sql', 'utf8');
+  const tables = [...sql.matchAll(/create table if not exists (\w+)/g)].map((m) => m[1]);
+  const rls = new Set([...sql.matchAll(/alter table (\w+) enable row level security/g)].map((m) => m[1]));
+  assert.ok(tables.length >= 9);
+  assert.deepEqual(tables.filter((t) => !rls.has(t)), []);
+});
