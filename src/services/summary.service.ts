@@ -1,6 +1,7 @@
 // F-06 / BR-20 / D4: tóm tắt chat cả ngày — CHỈ khi Khang gõ /tomtat; gọi AI ĐÚNG 1 lần đọc kho tin hôm nay
 // (đã giải mã) → gửi RIÊNG Khang. Không tóm từng câu. Kho tin xóa 01:00 (store.cleanup).
 import { decryptText } from '../shared/crypto.ts';
+import { humanizeDateTimes } from '../shared/spoken-time.ts';
 import { getVnParts } from '../shared/vn-time.ts';
 import { renderGroupBlock, type ChatLine } from './prompt-context.service.ts';
 import type { GroupProfile } from './speech.service.ts';
@@ -49,6 +50,6 @@ export async function summarizeToday(rt: Runtime): Promise<string> {
   ].join('\n\n');
   const r = await rt.ai('daily_summary', system, prompt);
   if (!r.ok) return `Không tóm tắt được lúc này (${r.error.code}); hôm nay có ${lines.length} tin. Thử lại sau nha.`;
-  const out = r.data.text.trim().slice(0, SUMMARY_REPLY_MAX_CHARS);
+  const out = humanizeDateTimes(r.data.text.trim(), rt.now()).slice(0, SUMMARY_REPLY_MAX_CHARS);
   return out ? `Tóm tắt chat hôm nay (${lines.length} tin):\n${out}` : SUMMARY_FALLBACK_EMPTY;
 }

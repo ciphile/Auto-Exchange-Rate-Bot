@@ -20,7 +20,7 @@
 |---|---|---|---|---|
 | `/help` | Rây, Lũi | xem hướng dẫn dùng bot | mới vào nhóm, quên cách dùng | bot gửi bản hướng dẫn này vào nhóm |
 | `/tygia (hoặc /gia)` | Rây | hỏi tỉ giá SGD → VND đang có | muốn biết giá để đổi tiền | Rây trả lời giá Wise (kèm nguồn + giờ lấy) và chợ đen ước tính |
-| `/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise` | Rây | đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn | muốn biết lương / số tiền đổi ra được bao nhiêu | chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng ~5–15 phút → tự tính theo chợ đen + Wise |
+| `/doitien 5000 · /doitien 5000 chợ đen · /doitien 50tr wise` | Rây | đổi tiền: số SGD → VND (hoặc "50tr" VND → SGD) theo nguồn chọn | muốn biết lương / số tiền đổi ra được bao nhiêu | chưa nói nguồn → bot hỏi chợ đen / Wise / DBS / VCB / VPBank; trả lời là tính liền; im lặng 2 phút → Rây tự tính theo chợ đen + Wise và nói "do bạn không nói nguồn nên…" |
 | `/chodencontact` | Rây | xem nơi đổi chợ đen uy tín nhóm giới thiệu | sắp đổi lương ra tiền mặt VND | danh sách tên + số điện thoại + giá chợ đen ước tính bữa nay |
 | `/ngayle` | Rây | xem ngày nghỉ lễ Singapore sắp tới | tính chuyện nghỉ, về quê, đi chơi | danh sách ngày lễ 120 ngày tới (đã gồm nghỉ bù) |
 
@@ -34,7 +34,7 @@
 | "Rây ơi lấy giá ngay Wise đi" | Rây đi lấy giá Wise LIỀN rồi báo (mỗi nguồn tối đa 1 lần / 5 phút) |
 | "Rây ơi check giá VCB với VPBank coi" | lấy liền giá 2 ngân hàng (mua chuyển khoản / bán) |
 | "Rây ơi lấy giá ngay, tùy mày" | "tùy" = lấy Wise; nói "tất cả" = lấy mọi nguồn |
-| "Rây ơi lấy giá mới nhất đi" | chưa nói nguồn → Rây hỏi lại "nguồn nào?", trả lời "Wise" / "VCB" / "tùy"… |
+| "Rây ơi lấy giá mới nhất đi" | chưa nói nguồn → Rây hỏi lại "nguồn nào?"; bạn trả lời "Wise" / "VCB" / "tùy" là lấy liền; 2 phút không trả lời thì Rây tự lấy Wise và nói "do bạn không nói nguồn nên…"; câu nào về giá cũng ghi giờ + ngày lấy giá |
 | "Rây ơi tỉ giá tuần này lên hay xuống?" | xu hướng 24 giờ / 7 ngày, cao / thấp nhất 7 ngày |
 | "Rây ơi còn mấy ngày nữa có lương?" | số ngày tới ngày lương (ngày cuối tháng) |
 | "Rây ơi tháng sau có ngày lễ nào không?" | lịch nghỉ lễ Singapore từ hôm nay tới hết tháng sau |

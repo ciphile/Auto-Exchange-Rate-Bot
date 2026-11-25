@@ -89,7 +89,7 @@ export function buildSituationFacts(input: SituationInput): string[] {
   if (r) {
     // BR-29: luôn có giờ lấy — nhãn nguồn đã có "lấy lúc" thì không ghi lặp.
     const when = /lấy lúc/.test(r.sourceLabel) ? '' : `, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}`;
-    const bm = resolveBlackMarket(r.wiseVnd, input.blackMarket);
+    const bm = resolveBlackMarket(r.wiseVnd, input.blackMarket, input.now);
     facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd, 0)} VND / 1 SGD (${r.sourceLabel}${when}); ${bm.manual ? 'chợ đen' : 'chợ đen ước tính'} ${vnNumber(bm.vnd, 0)} VND (${bm.label}).`);
     const trends = [
       r.change24hPct !== null ? describeTrend(r.change24hPct, 'trong 24 giờ') : null,

@@ -108,7 +108,7 @@ Lũi làm sau (chờ Khang gửi tính cách, giọng văn, lĩnh vực tin). Mu
 
 ✅ **Kiểm:** góc trên bên trái ghi **`rate-bot`**, cạnh đó có chữ **"Free"**.
 
-> Lưu ý gói Free: project **tạm ngủ nếu 1 tuần không ai dùng**. Khi bot chạy (phần 7), bot "gõ cửa" mỗi 10 phút nên không bị ngủ. Lỡ bị ngủ: vào trang Supabase → bấm **"Restore project"**.
+> Lưu ý gói Free: project **tạm ngủ nếu 1 tuần không ai dùng**. Khi bot chạy (phần 7), bot "gõ cửa" mỗi phút nên không bị ngủ. Lỡ bị ngủ: vào trang Supabase → bấm **"Restore project"**.
 
 **Hai thứ phần 5 sẽ cần lấy ở đây** (chưa làm bây giờ, chỉ để biết chỗ):
 - **Project URL** → biến `SUPABASE_URL`: menu **bên trái, dưới cùng**, biểu tượng **bánh răng ⚙️ "Project Settings"** → mục **"Data API"** → ô **"Project URL"** (dạng `https://abcd1234.supabase.co`). Cái này **không bí mật**.
@@ -248,9 +248,9 @@ on conflict (bot, key) do update set value = excluded.value;
 ```
 - Bấm **"Run"** như trên. Kiểm: **Table Editor** → bảng `members` có đủ người.
 
-## Phần 7 — Bật nhịp lịch mỗi 10 phút — 10 phút
+## Phần 7 — Bật nhịp lịch mỗi PHÚT — 10 phút
 
-> Giống lên lịch job bằng `ADDJOBSCDE` trên AS400: cứ 10 phút Supabase "gõ cửa" địa chỉ `/api/tick` của bot; bot thức dậy lấy giá, báo giá, nhắc lễ, dọn dẹp. Lần gõ cửa đầu tiên bot cũng **tự đăng ký webhook với Telegram** (Khang không phải làm gì thêm).
+> Giống lên lịch job bằng `ADDJOBSCDE` trên AS400: cứ **1 phút** Supabase "gõ cửa" địa chỉ `/api/tick` của bot. Mỗi lần gõ bot làm việc **nhẹ** (có ai hỏi "nguồn nào?" mà im lặng 2 phút thì Rây tự trả lời); **cứ 10 phút 1 lần** bot mới làm việc **nặng** (lấy giá, báo giá, nhắc lễ, dọn dẹp) — bot tự canh, Khang không phải làm gì. Lần gõ cửa đầu tiên bot cũng **tự đăng ký webhook với Telegram** (Khang không phải làm gì thêm).
 
 **Cần có:** địa chỉ Vercel của bot (vd `https://ten-project.vercel.app` — xem ở Vercel → project → ô **"Domains"**) và mã `TICK_SECRET` đã dán vào Vercel ở phần 5.3 (dòng 7). **Không dán 2 thứ này vào chat.**
 
@@ -265,7 +265,7 @@ select vault.create_secret('DÁN-TICK_SECRET-VÀO-ĐÂY', 'tick_secret');
    - Gõ nhầm, muốn làm lại: chạy `delete from vault.secrets where name in ('tick_url', 'tick_secret');` rồi chạy lại bước 2.
 3. Snippet mới → dán nguyên văn (không sửa gì) → **"Run"**:
 ```sql
-select cron.schedule('ray-tick', '*/10 * * * *', $$
+select cron.schedule('ray-tick', '* * * * *', $$
   select net.http_post(
     url := (select decrypted_secret from vault.decrypted_secrets where name = 'tick_url'),
     headers := jsonb_build_object('Content-Type', 'application/json',
@@ -275,7 +275,9 @@ select cron.schedule('ray-tick', '*/10 * * * *', $$
   );
 $$);
 ```
-4. **Kiểm đã chạy (đợi 10–15 phút)** — snippet mới → dán → **"Run"**:
+> **Đã tạo lịch cũ `*/10` từ bản hướng dẫn trước?** Đổi sang mỗi phút bằng 1 lệnh: `select cron.alter_job((select jobid from cron.job where jobname = 'ray-tick'), schedule := '* * * * *');`
+
+4. **Kiểm đã chạy (đợi 2–3 phút)** — snippet mới → dán → **"Run"**:
 ```sql
 select status_code, content, created from net._http_response order by created desc limit 5;
 ```

@@ -96,7 +96,7 @@ async function renderRates(rt: Runtime): Promise<string> {
   const lines: string[] = [];
   for (const source of ['wise', 'wise_fallback', 'vcb', 'vpbank'] as const) {
     const r = await rt.store.getLatestRate(source);
-    if (r) lines.push(BOT_TEXT.rateLine(r.rate_vnd, describeRateSource(source as RateSource, new Date(r.fetched_at))));
+    if (r) lines.push(BOT_TEXT.rateLine(r.rate_vnd, describeRateSource(source as RateSource, new Date(r.fetched_at), rt.now())));
   }
   return lines.length ? lines.join('\n') : BOT_TEXT.noRate;
 }

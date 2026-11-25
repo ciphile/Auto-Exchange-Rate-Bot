@@ -1,11 +1,12 @@
 // BR-51: luồng đổi tiền trong nhóm — hỏi nguồn → nhận trả lời → (im lặng) tick tính mặc định chợ đen + Wise.
 // Trả lời bằng câu CODE dựng (không gọi AI): số chính xác, nhanh, không tốn lượt AI.
+import { NO_SOURCE_DEFAULT_AFTER_MS, NO_SOURCE_GIVE_UP_MS } from '../config/defaults.ts';
 import type { IncomingMessage } from '../domain/telegram.ts';
 import { BOT_DISPLAY_NAMES } from '../shared/persona.vi.ts';
 import { unwrap } from '../shared/result.ts';
 import {
-  askSourceText, CONVERT_ANSWER_TTL_MS, CONVERT_DEFAULT, CONVERT_DEFAULT_AFTER_MS, CONVERT_PENDING_KEY, CONVERT_PENDING_MAX,
-  loadRateTable, matchConvertSources, renderConversion, resolveSources, type ConvertSource, type PendingConvert,
+  askSourceText, CONVERT_ANSWER_TTL_MS, CONVERT_DEFAULT, CONVERT_PENDING_KEY, CONVERT_PENDING_MAX,
+  loadRateTable, matchConvertSources, noSourceLead, renderConversion, resolveSources, type ConvertSource, type PendingConvert,
 } from './convert.service.ts';
 import type { AmountQuestion } from './number-guard.service.ts';
 import type { Runtime } from './runtime.types.ts';
@@ -45,13 +46,22 @@ export async function answerPendingConvert(rt: Runtime, settings: BotSettings, m
   return true;
 }
 
-/** Tick: yêu cầu im lặng quá 5 phút → tính theo mặc định (chợ đen + Wise), trả lời ngay dưới tin hỏi ban đầu. */
+/**
+ * Nhịp lịch (mỗi phút): yêu cầu im lặng ≥ 2 phút → tự tính theo mặc định (chợ đen + Wise), trả lời ngay dưới tin hỏi ban đầu,
+ * KÈM câu "do … không nói nguồn nên …" (BR-55). Quá 30 phút (nhịp lịch hỏng) → bỏ, không trả lời muộn.
+ */
 export async function runConvertDefaults(rt: Runtime, settings: BotSettings): Promise<void> {
   const pending = await loadPending(rt);
   if (pending.length === 0) return;
   const t = rt.now().getTime();
-  const due = pending.filter((p) => t - p.askedAt >= CONVERT_DEFAULT_AFTER_MS);
+  const due = pending.filter((p) => t - p.askedAt >= NO_SOURCE_DEFAULT_AFTER_MS);
   if (due.length === 0) return;
   await rt.store.setState(rt.bot, CONVERT_PENDING_KEY, pending.filter((p) => !due.includes(p)));
-  for (const p of due) await reply(rt, settings, p.chatId, p.messageId, p.amount, CONVERT_DEFAULT);
+  for (const p of due) {
+    if (t - p.askedAt > NO_SOURCE_GIVE_UP_MS) continue;
+    if (!(await rt.store.claimOnce(`fu:${rt.bot}:cv:${p.askedAt}:${p.fromId}`))) continue; // 2 nhịp gọi chồng nhau → chỉ 1 người trả lời
+    const table = await loadRateTable(rt.store, rt.now(), blackMarketConfigOf(settings));
+    const lead = noSourceLead(settings, 'tính theo chợ đen + Wise');
+    await send(rt, p.chatId, p.messageId, renderConversion(p.amount, CONVERT_DEFAULT, table, !settings.personaOn, lead));
+  }
 }

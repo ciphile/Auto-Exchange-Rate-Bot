@@ -16,10 +16,13 @@ test('quy_doi: tiền luôn là số nguyên đơn vị nhỏ nhất', () => {
   assert.equal(convertVndToSgdCents(199_752_000, 19975.2), 1_000_000);
 });
 
-test('BR-29 câu về giá luôn kèm nguồn + thời điểm (giờ VN)', () => {
-  assert.equal(describeRateSource('wise', vn(2026, 11, 24, 11, 0)), 'theo Wise, lấy lúc 11:00 ngày 24/11/2026');
-  assert.equal(describeRateSource('vcb', vn(2026, 12, 1, 6, 5)), 'theo Vietcombank, lấy lúc 06:05 ngày 01/12/2026');
-  assert.match(describeRateSource('wise_fallback', vn(2026, 12, 1, 1)), /nguồn dự phòng/);
+test('BR-29 + BR-54 câu về giá luôn kèm nguồn + thời điểm, nói kiểu NGƯỜI (giờ VN): "mười một giờ sáng hôm nay", "sáu giờ sáng lẻ năm phút hôm qua", "ngày 22"', () => {
+  const now = vn(2026, 11, 24, 11, 30);
+  assert.equal(describeRateSource('wise', vn(2026, 11, 24, 11, 0), now), 'theo Wise, lấy lúc mười một giờ trưa hôm nay');
+  assert.equal(describeRateSource('vcb', vn(2026, 11, 23, 6, 5), now), 'theo Vietcombank, lấy lúc sáu giờ sáng lẻ năm phút hôm qua');
+  assert.equal(describeRateSource('wise', vn(2026, 11, 22, 14, 50), now), 'theo Wise, lấy lúc hai giờ chiều năm mươi phút ngày 22');
+  assert.equal(describeRateSource('wise', vn(2026, 10, 30, 21, 15), now), 'theo Wise, lấy lúc chín giờ tối mười lăm phút ngày 30 tháng 10');
+  assert.match(describeRateSource('wise_fallback', vn(2026, 11, 24, 1), now), /nguồn dự phòng.*lấy lúc một giờ sáng hôm nay/);
 });
 
 test('DBS (Khang 25/11/2026): đọc đúng dòng VND/SGD theo dữ liệu thật — 100 VND = 0,0051 SGD → 1 SGD = 19.607,84; giờ hiệu lực là giờ Singapore', async () => {
@@ -45,6 +48,6 @@ test('DBS: lấy giá lưu kho + bối cảnh ghi rõ "chỉ để so biến đ�
   const r = await fetchAndStoreRates(rt.store, rt.fetchers, ['dbs']);
   assert.deepEqual(r.saved, ['dbs']);
   const facts = (await buildBankFacts(rt.store, now)).join('\n');
-  assert.match(facts, /Giá DBS .*KHÔNG phải giá mọi người nhận.*1 SGD ≈ 19\.608 VND \(theo DBS, hiệu lực từ 09:15 ngày 25\/11\/2026\)/);
+  assert.match(facts, /Giá DBS .*KHÔNG phải giá mọi người nhận.*1 SGD ≈ 19\.608 VND \(theo DBS, hiệu lực từ chín giờ sáng mười lăm phút hôm nay\)/);
   assert.deepEqual(matchSourceKeywords('check giá DBS coi'), { kind: 'named', sources: ['dbs'] });
 });

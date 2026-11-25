@@ -208,11 +208,11 @@ test('BR-51 đổi tiền: hỏi số tiền không nói nguồn → bot hỏi l
   await handleUpdate(rt, groupMsg('chợ đen', 9)); // người khác
   assert.equal(fake.sent.length, before);
   await handleUpdate(rt, groupMsg('chợ đen', 5));
-  assert.equal(fake.sent.at(-1)?.text, 'Dạ 5.000 SGD đổi ra nè:\n- Chợ đen: ≈ 100.500.000 đ (1 SGD = 20.100 đ, chợ đen ước tính theo Wise)');
+  assert.equal(fake.sent.at(-1)?.text, 'Dạ 5.000 SGD đổi ra nè:\n- Chợ đen: ≈ 100.500.000 đ (1 SGD = 20.100 đ, chợ đen ước tính theo Wise, lấy lúc mười giờ sáng hôm nay)');
   assert.equal(prompts.length, 0, 'đổi tiền không gọi AI');
 });
 
-test('BR-51 đổi tiền: không ai trả lời → sau 5 phút nhịp lịch tự tính chợ đen + Wise, trả lời ngay dưới tin hỏi', async () => {
+test('BR-51 + BR-55 đổi tiền: không ai trả lời → sau 2 phút nhịp lịch (mỗi phút) tự tính chợ đen + Wise, có câu "do … không nói nguồn nên …", trả lời ngay dưới tin hỏi', async () => {
   let now = new Date('2026-11-25T03:00:00Z');
   const { rt, fake } = createTestRuntime({ now: () => now });
   await rt.store.saveGroup('ray', GROUP);
@@ -220,14 +220,18 @@ test('BR-51 đổi tiền: không ai trả lời → sau 5 phút nhịp lịch t
   await handleUpdate(rt, groupMsg('/doitien 1000', 5));
   assert.match(fake.sent.at(-1)?.text ?? '', /nguồn nào/);
   const { runTick } = await import('../src/services/tick.service.ts');
-  now = new Date('2026-11-25T03:03:00Z');
+  now = new Date('2026-11-25T03:01:59Z');
   await runTick(rt, null);
-  assert.ok(!fake.sent.some((s) => s.text.includes('đổi ra nè')), 'chưa đủ 5 phút');
-  now = new Date('2026-11-25T03:11:00Z');
-  await runTick(rt, null);
-  const out = fake.sent.find((s) => s.text.includes('đổi ra nè'));
+  assert.equal(fake.sent.length, 1, 'chưa đủ 2 phút → chưa trả lời');
+  now = new Date('2026-11-25T03:02:05Z'); // CÙNG mốc 10 phút với lần gọi trước: việc nặng bị khóa nhưng việc chờ 2 phút vẫn chạy
+  const r = await runTick(rt, null);
+  assert.equal(r.ran, false);
+  const out = fake.sent.at(-1);
   assert.equal(out?.replyTo, 50);
+  assert.match(out?.text ?? '', /^Dạ do anh chị không nói nguồn nên em tính theo chợ đen \+ Wise nè\.\n1\.000 SGD:/);
   assert.match(out?.text ?? '', /Chợ đen: ≈ 20\.100\.000 đ[\s\S]*Wise: ≈ 20\.004\.000 đ/);
+  await runTick(rt, null);
+  assert.equal(fake.sent.filter((s) => s.text.includes('không nói nguồn')).length, 1, 'chỉ trả lời 1 lần');
 });
 
 test('BR-51 /doitien: có nguồn → tính liền; "50tr wise" → VND sang SGD; sai cú pháp → hướng dẫn; tính cách bật → giọng xỏ lá ":))"', async () => {

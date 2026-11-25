@@ -1,4 +1,5 @@
-// Nhịp lịch mỗi 10 phút (Supabase Cron → /api/tick, ADR-04). Mỗi bước độc lập: bước lỗi → báo Khang, bước sau vẫn chạy.
+// Nhịp lịch: Supabase Cron gọi /api/tick MỖI PHÚT (ADR-04). Mỗi lần gọi: (1) việc nhẹ chờ 2 phút (BR-55 — trả lời "không nói nguồn"),
+// (2) việc nặng đúng 1 lần / 10 phút (khóa theo mốc 10 phút). Mỗi bước độc lập: bước lỗi → báo Khang, bước sau vẫn chạy.
 // BR-04 lấy giá · BR-05 dự phòng · BR-35 báo giá theo kế hoạch tháng · BR-08 / BR-35 cảnh báo · BR-42 / BR-43 nhắc lễ, timesheet
 // · BR-18 chen chuyện · dọn dẹp 01:00 (D4, 6.11) · tự đăng ký webhook. Chống chạy chồng: 1 khóa / nhịp 10 phút.
 import { FREQUENCY_PROFILES } from '../config/frequency.ts';
@@ -23,7 +24,7 @@ import { buildWorkCheer, formatHolidayLineVi } from './cheer.service.ts';
 import { resolveBlackMarket } from './rate.service.ts';
 import { getChimeFactor } from './style.service.ts';
 import { buildCommandMenus } from './help.service.ts';
-import { runConvertDefaults } from './convert-flow.service.ts';
+import { runFollowups } from './followup.service.ts';
 
 const TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô|vàng|coin|bitcoin|lương|thuế|kinh tế|lãi suất)/iu;
 const SENT_KEYS_MAX = 60;
@@ -32,8 +33,14 @@ type Ctx = { rt: Runtime; settings: BotSettings; groupChatId: number | null; now
 
 export async function runTick(rt: Runtime, webhookUrl: string | null): Promise<{ ran: boolean; failed: string[] }> {
   const now = rt.now();
+  // BR-55: MỖI lần gọi (mỗi phút) — câu hỏi "nguồn nào?" chờ ≥ 2 phút thì tự trả lời. Lỗi ở đây không chặn việc nặng.
+  const earlyFailed: string[] = [];
+  try { await runFollowups(rt); } catch (e) {
+    earlyFailed.push('followup');
+    await notifyOwnerError(rt, e instanceof AppFailure ? e.code : 'E-DB-001', `followup: ${e instanceof AppFailure ? e.detail : (e as Error).message}`).catch(() => undefined);
+  }
   const slot = `tick:${rt.bot}:${Math.floor(now.getTime() / 600_000)}`;
-  if (!(await rt.store.claimOnce(slot))) return { ran: false, failed: [] };
+  if (!(await rt.store.claimOnce(slot))) return { ran: false, failed: earlyFailed };
   await rt.store.setState(rt.bot, 'last_tick', now.getTime());
   const config = await rt.store.loadConfig(rt.bot);
   const p = getVnParts(now);
@@ -48,10 +55,9 @@ export async function runTick(rt: Runtime, webhookUrl: string | null): Promise<{
     { name: 'report', run: () => runScheduledReport(ctx) },
     { name: 'reminders', run: () => runReminders(ctx) },
     { name: 'chime', run: () => runChimeIn(ctx) },
-    { name: 'convert', run: () => runConvertDefaults(rt, ctx.settings) },
     { name: 'cleanup', run: () => (p.hour === 1 && p.minute < 10 ? rt.store.cleanup(now) : Promise.resolve()) },
   ];
-  const failed: string[] = [];
+  const failed: string[] = [...earlyFailed];
   for (const step of steps) {
     try { await step.run(); } catch (e) {
       failed.push(step.name);
@@ -111,7 +117,7 @@ async function runAlert(ctx: Ctx): Promise<void> {
   const r = evaluateAlert(state, mid.row.rate_vnd, now, settings.alertLevelsVnd, isAlertWindowOpen(now, settings.alertFullMonth),
     FREQUENCY_PROFILES[settings.frequencyLevel].alerts, settings.quietHours);
   if (r.action === 'send' && r.event) {
-    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
+    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at), now);
     const up = r.event.direction === 'up';
     const cheer = buildWorkCheer(now, getDaysUntilPayday(now));
     const sent = await postToGroup(ctx, {
@@ -142,7 +148,7 @@ async function runScheduledReport(ctx: Ctx): Promise<void> {
   if (minute === undefined || minuteOfDay < minute || (await rt.store.getState<boolean>(rt.bot, doneKey))) return;
   const mid = await getLatestMid(rt.store);
   if (!mid) return;
-  const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
+  const src = describeRateSource(mid.source, new Date(mid.row.fetched_at), now);
   const days = getDaysUntilPayday(now);
   // BR-46: thứ Tư → thứ Sáu / gần lương → giọng động viên; BR-47: Wise trước, kèm chợ đen ước tính.
   const cheer = buildWorkCheer(now, days);

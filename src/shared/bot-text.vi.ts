@@ -13,7 +13,9 @@ export const BOT_TEXT = {
   rateAlert: (rateVnd: number, levelVnd: number, up: boolean, sourceText: string) =>
     `Dạ báo nhanh: tỉ giá vừa ${up ? 'lên qua' : 'xuống dưới'} mốc ${vnd(levelVnd)} — giờ 1 SGD = ${vnd(rateVnd)} đ (${sourceText}).`,
   noRate: 'Dạ em chưa có giá nào trong kho, đợi lần lấy giá kế tiếp nha.',
-  askSource: 'Dạ lấy giá nguồn nào nè: Wise, VCB hay VPBank? Nói "tùy" thì em lấy Wise, nói "tất cả" thì em lấy hết.',
+  askSource: (polite: boolean) => polite
+    ? 'Dạ lấy giá nguồn nào nè: Wise, VCB, VPBank hay DBS? Nói "tùy" thì em lấy Wise, nói "tất cả" thì em lấy hết; sau 2 phút không thấy trả lời thì em tự lấy Wise nha.'
+    : 'Lấy giá nguồn nào, Wise, VCB, VPBank hay DBS? Nói "tất cả" cũng được; 2 phút hổng nói gì là tui tự lấy Wise đó =))',
   sourceDisabled: (enabled: string) => `Dạ nguồn đó đang tắt. Nguồn đang bật: ${enabled}.`,
   liveTooSoon: 'Dạ nguồn này em mới lấy chưa tới 5 phút, em gửi giá vừa lấy nha.',
   aiFallbackChat: 'Dạ em đang hơi lag, lát hỏi lại em nha.',
