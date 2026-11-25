@@ -13,6 +13,9 @@ import { handleConfirmPress, sendConfirmCard } from './confirm.service.ts';
 import { canFetchLiveNow, isSourceQuestionOpen, matchSourceKeywords, planLiveFetch, type LiveSource } from './live-rate.service.ts';
 import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
 import { renderGroupHelp } from './help.service.ts';
+import { buildWorkCheer } from './cheer.service.ts';
+import { getDaysUntilPayday } from './payday.service.ts';
+import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
 import { fetchAndStoreRates, getLatestMid } from './rate-feed.service.ts';
 import { describeRateSource } from './rate.service.ts';
@@ -105,13 +108,18 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   if (holiday) extraFacts.unshift(...holiday.facts);
   const isData = forceData || extraFacts.length > 0 || RATE_TOPIC_RE.test(msg.text);
   const mid = await getLatestMid(rt.store);
+  const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
   const fallback = holiday ? holiday.plain : isData
     ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at))) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {
     purpose: isData ? 'answer_data' : 'answer_chat',
-    task: inGroup ? 'Trả lời câu vừa được hỏi trong nhóm, đúng người hỏi, đúng chuyện.' : 'Chủ bot đang nhắn riêng với bạn: trả lời tự nhiên, đúng câu hỏi.',
+    task: [
+      inGroup ? 'Trả lời câu vừa được hỏi trong nhóm, đúng người hỏi, đúng chuyện.' : 'Chủ bot đang nhắn riêng với bạn: trả lời tự nhiên, đúng câu hỏi.',
+      // BR-46: hỏi giá vào thứ Tư → thứ Sáu / gần lương → trả lời kèm ý động viên (code tính).
+      cheer ? `${CHEER_TEXT.toneRule} Ý động viên nên có: ${cheer}` : null,
+    ].filter(Boolean).join('\n'),
     userMessage: { speaker: asker?.name ?? msg.fromName, text: msg.text }, asker, fallback, extraFacts,
     mustContainAny: isData && mid && extraFacts.length > 0 ? rateSpellings(mid.row.rate_vnd) : undefined,
     situation: { isTimesheetDay: getTimesheetDay(today, cal.dates) === today, nextHoliday: findNextHoliday(cal, today) },

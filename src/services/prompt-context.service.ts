@@ -84,7 +84,9 @@ export function buildSituationFacts(input: SituationInput): string[] {
     : d < PAYDAY_WEEK_DAYS ? `Còn ${d} ngày nữa là có lương (đang trong tuần lương).` : `Còn ${d} ngày nữa mới có lương.`);
   const r = input.rate;
   if (r) {
-    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd)} VND / 1 SGD (${r.sourceLabel}, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}); chợ đen ước tính ${vnNumber(estimateBlackMarketVnd(r.wiseVnd), 0)} VND (Wise +0,4%).`);
+    // BR-29: luôn có giờ lấy — nhãn nguồn đã có "lấy lúc" thì không ghi lặp.
+    const when = /lấy lúc/.test(r.sourceLabel) ? '' : `, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}`;
+    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd, 0)} VND / 1 SGD (${r.sourceLabel}${when}); chợ đen ước tính ${vnNumber(estimateBlackMarketVnd(r.wiseVnd), 0)} VND (Wise +0,4%).`);
     const trends = [
       r.change24hPct !== null ? describeTrend(r.change24hPct, 'trong 24 giờ') : null,
       r.change7dPct !== null ? describeTrend(r.change7dPct, 'trong 7 ngày') : null,
