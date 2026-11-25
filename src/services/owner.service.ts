@@ -12,9 +12,11 @@ import { parseHolidayCommand } from './holiday.service.ts';
 import { describeRateSource, type RateSource } from './rate.service.ts';
 import type { Runtime } from './runtime.types.ts';
 import { summarizeToday } from './summary.service.ts';
+import { BLACK_MARKET_USAGE, manualStaleWarning, parseBlackMarketCommand, planBlackMarketChange } from './black-market.service.ts';
+import { getLatestMid } from './rate-feed.service.ts';
 import { EXCHANGE_STATE_KEY, EXCHANGE_USAGE, parseExchangeCommand, renderExchangeList, type ExchangeContact } from './exchange.service.ts';
 import { renderOwnerGuide } from './help.service.ts';
-import { handleOwnerSettingsCommand, renderOwnerHelp, type BotSettings } from './settings.service.ts';
+import { formatSetting, handleOwnerSettingsCommand, renderOwnerHelp, type BotSettings } from './settings.service.ts';
 
 const HOLIDAY_LIST_DAYS = 120;
 const RELAY_MAX_CHARS = 4000;
@@ -51,6 +53,15 @@ export async function handleOwnerCommand(rt: Runtime, msg: IncomingMessage, sett
       const target = list[e.index - 1];
       if (!target) return reply(rt, 'Số thứ tự không có trong danh sách (gõ /chodencontact để xem).');
       return sendConfirmCard(rt, { type: 'exchange', action: 'remove', index: e.index }, `Xóa nơi đổi số ${e.index}: ${target.name}?`);
+    }
+    case 'chotden': {
+      const b = parseBlackMarketCommand(msg.text);
+      if (!b) return reply(rt, BLACK_MARKET_USAGE);
+      const mid = await getLatestMid(rt.store);
+      const fresh = mid && rt.now().getTime() - Date.parse(mid.row.fetched_at) <= 24 * 3600_000;
+      const plan = planBlackMarketChange(b, settings, fresh && mid ? mid.row.rate_vnd : null, rt.now().getTime());
+      if (plan.kind === 'reply') return reply(rt, plan.text);
+      return sendConfirmCard(rt, { type: 'settings', change: plan.change }, plan.confirmText);
     }
     case 'thuhoi': {
       const last = await rt.store.getState<{ chatId: number; messageId: number; at: number }>(rt.bot, 'last_relay');
@@ -99,6 +110,7 @@ async function renderStatus(rt: Runtime, settings: BotSettings): Promise<string>
     `Lắng nghe: ${settings.listenOn ? 'bật' : 'tắt'} · Tính cách: ${settings.personaOn ? 'bật' : 'tắt'} · Tâm trạng: ${settings.mood}`,
     `Nhịp lịch (tick) gần nhất: ${lastTick ? new Date(lastTick).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' }) : 'CHƯA CHẠY (kiểm Supabase Cron)'}`,
     `AI: model gần nhất ${ai.lastModel ?? '—'}${ai.offlineUntil ? ' · đang nghỉ do hết lượt' : ''} · model hết lượt: ${Object.keys(ai.quotaUntil).join(', ') || 'không'}`,
+    `Giá chợ đen: ${formatSetting('blackMarketManual', settings)}`, manualStaleWarning(settings, rt.now().getTime()),
     '', await renderRates(rt), '', await renderHolidayList(rt),
-  ].join('\n');
+  ].filter((x) => x !== null).join('\n');
 }

@@ -9,7 +9,7 @@ import {
 } from './convert.service.ts';
 import type { AmountQuestion } from './number-guard.service.ts';
 import type { Runtime } from './runtime.types.ts';
-import type { BotSettings } from './settings.service.ts';
+import { blackMarketConfigOf, type BotSettings } from './settings.service.ts';
 import { saveContextLine } from './speech.service.ts';
 
 async function send(rt: Runtime, chatId: number, replyTo: number, text: string): Promise<void> {
@@ -18,7 +18,7 @@ async function send(rt: Runtime, chatId: number, replyTo: number, text: string):
 }
 
 async function reply(rt: Runtime, settings: BotSettings, chatId: number, replyTo: number, amount: AmountQuestion, sources: readonly ConvertSource[]) {
-  const table = await loadRateTable(rt.store, rt.now());
+  const table = await loadRateTable(rt.store, rt.now(), blackMarketConfigOf(settings));
   await send(rt, chatId, replyTo, renderConversion(amount, sources, table, !settings.personaOn));
 }
 

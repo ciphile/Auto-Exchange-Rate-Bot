@@ -10,7 +10,7 @@
 | Abe Nguyen | **Mít** | người làm mẫu giọng văn cho bot; hay đăng bản tin giá buổi sáng |
 | Hưng | **Ổi** | |
 | Thuần (tên hiển thị "Thuan") | **Xoài** | |
-| Sang | **Mận** | Khang nhắc 24/11/2026 (có trong nhóm B) |
+| Sang | **Mận** | có trong **cả nhóm A và nhóm B** — đối xử như mọi thành viên khác (Khang 25/11/2026) |
 | Ted | **Sầu Riêng** | sếp ở công ty vendor (Prime) của Khang, Thuần, Hưng — siêu khó, tỉ mỉ, hay soi xét, ai cũng sợ (Khang 25/11/2026). Không phải thành viên nhóm |
 | Khang | **Khang** | chủ dự án — dùng tên thật theo bộ quy tắc |
 | (các thành viên còn lại của nhóm B — Khang bổ sung) | | |

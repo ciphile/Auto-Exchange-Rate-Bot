@@ -228,3 +228,8 @@
 - Đổi tiền: số do CODE tính (không AI); hỏi nguồn → nhận trả lời của đúng người (không cần gọi tên) → im lặng thì tick tính mặc định. Test bắt lỗi thật: "/doitien 100 tất cả" ghép thiếu dấu cách thành "sgdtất cả".
 - Khang sửa giữa chừng: viết gọn "1990" là do Khang gõ thiếu số → bot phải viết ĐỦ chữ số (chỉ bỏ dấu chấm) → gỡ phần cho phép viết gọn vừa làm. Bài học: ví dụ người dùng đưa có thể có lỗi gõ — hỏi lại / làm bản an toàn (đủ số) trước.
 - Chợ đen tròn 50 đ (Khang: họ hay làm tròn).
+
+## 25/11/2026 — Công tắc giá chợ đen /chotden (BR-53) + Mận trong cả 2 nhóm
+- Khang duyệt `/chotden`, rồi đổi thiết kế giữa chừng: công tắc TỰ TÍNH ↔ THỦ CÔNG (nhập giá thật). Kat bỏ bản "tính lại mức chênh từ giá nhập" (làm xong nửa chừng, test bắt lỗi regex `[+-−]` thành dải ký tự rộng) và dựng lại quanh 1 hàm `resolveBlackMarket` duy nhất → mọi chỗ dùng chợ đen đổi theo, không sót chỗ nào.
+- Giá thủ công có nguy cơ cũ (chợ đen đổi mỗi ngày) → ghi giờ nhập vào mọi câu nói giá + nhắc khi > 24 giờ.
+- Mận có trong nhóm A và B: bảng thành viên dùng chung cho 2 bot nên không cần đổi code; bảng đối chiếu riêng tư đã ghi lại.

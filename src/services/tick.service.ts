@@ -16,11 +16,11 @@ import { fetchAndStoreRates, getLatestFetchSlot, getLatestMid } from './rate-fee
 import { describeRateSource } from './rate.service.ts';
 import { pickReminderMinute, planHolidayReminders, planTimesheetReminder, getTimesheetDay } from './reminder.service.ts';
 import type { Runtime } from './runtime.types.ts';
-import { mergeStoredSettings, type BotSettings } from './settings.service.ts';
+import { blackMarketConfigOf, mergeStoredSettings, type BotSettings } from './settings.service.ts';
 import { rateSpellings, readContextLines, saveContextLine, speak, type SpeakRequest } from './speech.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { buildWorkCheer, formatHolidayLineVi } from './cheer.service.ts';
-import { estimateBlackMarketVnd } from './rate.service.ts';
+import { resolveBlackMarket } from './rate.service.ts';
 import { getChimeFactor } from './style.service.ts';
 import { buildCommandMenus } from './help.service.ts';
 import { runConvertDefaults } from './convert-flow.service.ts';
@@ -146,15 +146,15 @@ async function runScheduledReport(ctx: Ctx): Promise<void> {
   const days = getDaysUntilPayday(now);
   // BR-46: thứ Tư → thứ Sáu / gần lương → giọng động viên; BR-47: Wise trước, kèm chợ đen ước tính.
   const cheer = buildWorkCheer(now, days);
-  const black = estimateBlackMarketVnd(mid.row.rate_vnd);
+  const black = resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings));
   const sent = await postToGroup(ctx, {
     purpose: 'rate_report', mustContainAny: rateSpellings(mid.row.rate_vnd),
     task: [
-      `Tự báo tỉ giá cho nhóm như một thành viên: 1 SGD = ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}); chợ đen ước tính khoảng ${black.toLocaleString('vi-VN')} đ; còn ${days} ngày tới ngày lương.`,
+      `Tự báo tỉ giá cho nhóm như một thành viên: 1 SGD = ${mid.row.rate_vnd.toLocaleString('vi-VN')} đ (${src}); ${black.phrase}${black.manual ? ' (giá thật Khang vừa nhập)' : ''}; còn ${days} ngày tới ngày lương.`,
       'Nhắc đúng con số Wise + nguồn + giờ TRƯỚC, có thể kèm chợ đen và bình luận xu hướng theo bối cảnh.',
       cheer ? `${CHEER_TEXT.toneRule} Ý động viên phải có: ${cheer} ${CHEER_TEXT.reportExample}` : null,
     ].filter(Boolean).join('\n'),
-    fallback: BOT_TEXT.rateReport(mid.row.rate_vnd, src, cheer, black),
+    fallback: BOT_TEXT.rateReport(mid.row.rate_vnd, src, cheer, black.phrase),
   });
   if (sent) await rt.store.setState(rt.bot, doneKey, true);
 }

@@ -2,7 +2,7 @@
 > **Chế độ làm việc: Mode 2 (Tự động)** · Cập nhật: 25/11/2026 (tổng kết) · Mục đích: để KHANG nhớ việc.
 
 ## Giai đoạn hiện tại
-**FS bản 1.0** (BR-01 → BR-52). Rây đã có code nối dịch vụ thật (database, AI, webhook, tick) — **chưa deploy thật**. 813 / 813 test đạt (gồm 633 tình huống audit prompt). Hạn chót Rây: **thứ Năm 03/12/2026**.
+**FS bản 1.0** (BR-01 → BR-53). Rây đã có code nối dịch vụ thật (database, AI, webhook, tick) — **chưa deploy thật**. 821 / 821 test đạt (gồm 633 tình huống audit prompt). Hạn chót Rây: **thứ Năm 03/12/2026**.
 
 ## Việc dở / chờ
 | # | Việc | Ai / trạng thái |
@@ -16,8 +16,7 @@
 | 7 | Nhỏ: tách hàm `answer` trong `webhook.service.ts` (~70 dòng > 50) · lệnh xem tình trạng AI chi tiết / xóa cache (tài liệu Khang mục 13) · `/thanhvien` gắn mã Telegram | ⏳ Kat |
 
 ## Câu hỏi chờ Khang
-- Mận có trong nhóm A không? Nếu không, Kat thêm cột "nhóm" cho hồ sơ để Rây không nhắc người ngoài nhóm.
-- Muốn lệnh `/chotden <giá chợ đen thật>` để Khang tự hiệu chỉnh mức chênh chợ đen không?
+- Không có.
 
 ## Bug đang mở
 - Không có.

@@ -14,6 +14,8 @@ export const SETTING_LABELS = {
   alertFullMonth: 'Cảnh báo cả tháng',
   profanityLevel: 'Mức nói tục',
   timesheetReminderOn: 'Nhắc điền timesheet thứ Sáu',
+  blackMarketManual: 'Giá chợ đen (công tắc tự tính / thủ công)',
+  blackMarketPremiumPct: 'Mức chênh chợ đen khi tự tính',
 } as const;
 
 /** Bẫy 35: hướng dẫn phải khớp đúng cú pháp code nhận (test đối chiếu từng lệnh). */
@@ -39,6 +41,7 @@ export const OTHER_COMMAND_HELP: readonly (readonly [string, string])[] = [
   ['/caclenh', 'hướng dẫn ĐẦY ĐỦ mọi lệnh (tình huống dùng, cách dùng, kết quả)'],
   ['/tomtat', 'tóm tắt chat hôm nay của nhóm, gửi riêng Khang (cần bật /langnghe on để bot lưu tin)'],
   ['/gioithieu', 'bot tự giới thiệu ngắn trong nhóm (có thẻ xác nhận)'],
+  ['/chotden 20100', 'giá chợ đen: nhập giá thật = THỦ CÔNG · /chotden tudong = bot tự tính theo Wise (tròn 50 đ) · /chotden on · /chotden 0,5% · /chotden macdinh · /chotden (xem)'],
   ['/ngayle', 'xem ngày lễ Singapore sắp tới (thêm: /ngayle them 2027-01-01 Tên lễ · xóa: /ngayle xoa 2027-01-01)'],
 ];
 

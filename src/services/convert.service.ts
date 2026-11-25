@@ -5,7 +5,9 @@ import type { BankQuote } from '../adapters/rate-sources.adapter.ts';
 import type { Store } from '../repositories/store.repository.ts';
 import { parseCommand } from './access.service.ts';
 import { parseAmountQuestion, type AmountQuestion } from './number-guard.service.ts';
-import { convertSgdToVnd, convertVndToSgdCents, describeRateSource, estimateBlackMarketVnd, type RateSource } from './rate.service.ts';
+import {
+  convertSgdToVnd, convertVndToSgdCents, DEFAULT_BLACK_MARKET_CONFIG, describeRateSource, resolveBlackMarket, type BlackMarketConfig, type RateSource,
+} from './rate.service.ts';
 import { getLatestMid } from './rate-feed.service.ts';
 
 export type ConvertSource = 'cho_den' | 'wise' | 'dbs' | 'vcb' | 'vpbank';
@@ -59,14 +61,18 @@ export function parseConvertCommand(text: string): { amount: AmountQuestion; sou
 }
 
 /** Bảng giá dùng để quy đổi: Wise (gốc) · chợ đen ước tính · DBS · VCB / VPBank (ngân hàng MUA chuyển khoản SGD). Chỉ giá trong 24 giờ. */
-export async function loadRateTable(store: Store, now: Date): Promise<RateTable> {
+export async function loadRateTable(store: Store, now: Date, blackMarket: BlackMarketConfig = DEFAULT_BLACK_MARKET_CONFIG): Promise<RateTable> {
   const table: RateTable = {};
   const fresh = (iso: string) => now.getTime() - Date.parse(iso) <= DAY_MS;
   const mid = await getLatestMid(store);
   if (mid && fresh(mid.row.fetched_at)) {
     const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
     table.wise = { rate: mid.row.rate_vnd, label: src };
-    table.cho_den = { rate: estimateBlackMarketVnd(mid.row.rate_vnd), label: 'chợ đen ước tính theo Wise' };
+    const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarket);
+    table.cho_den = { rate: bm.vnd, label: bm.manual ? bm.label : 'chợ đen ước tính theo Wise' };
+  } else if (blackMarket.manual.on && blackMarket.manual.vnd !== null) {
+    // Thủ công: giá chợ đen do Khang nhập không cần Wise.
+    table.cho_den = { rate: blackMarket.manual.vnd, label: resolveBlackMarket(0, blackMarket).label };
   }
   for (const s of ['dbs', 'vcb', 'vpbank'] as const) {
     const r = await store.getLatestRate(s);
