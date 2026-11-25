@@ -66,3 +66,17 @@ export async function callGeminiModel(model: string, system: string, prompt: str
     return { kind: 'network', detail: redactSecrets((error as Error).message, [apiKey]) };
   }
 }
+
+/** Mục 13.4: hỏi Google danh sách model (GET /models — KHÔNG tốn quota sinh nội dung). Chỉ model có generateContent. */
+export async function listGeminiModels(apiKey: string, fetchImpl: typeof fetch = fetch): Promise<string[] | null> {
+  try {
+    const res = await fetchImpl(`${GEMINI_BASE}?pageSize=200`, { headers: { 'x-goog-api-key': apiKey }, signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { models?: { name?: string; supportedGenerationMethods?: string[] }[] };
+    return (json.models ?? [])
+      .filter((m) => typeof m.name === 'string' && (m.supportedGenerationMethods ?? []).includes('generateContent'))
+      .map((m) => (m.name as string).replace(/^models\//, ''));
+  } catch {
+    return null; // lỗi mạng → nơi gọi giữ danh sách cũ, không sập
+  }
+}

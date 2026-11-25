@@ -16,15 +16,25 @@ export const SERVER_RETRY_WAIT_MS = 5_000;
 export const GONE_REMEMBER_MS = 30 * 24 * 3600_000;
 export const OFFLINE_AFTER_DAILY_QUOTA_MS = 3 * 3600_000;
 export const QUOTA_RESET_UTC_HOUR = 8; // 0h giờ Thái Bình Dương ≈ 15:00 giờ VN
+export const MODEL_LIST_TTL_MS = 30 * 24 * 3600_000; // dò lại danh sách model sau 30 ngày
+export const MODEL_LIST_RETRY_MS = 24 * 3600_000; // dò lỗi → thử lại sau 1 ngày (giữ danh sách cũ)
+export const DISCOVERED_KEEP = 8;
+const EXCLUDED_MODEL_WORDS = ['embedding', 'tts', 'image', 'audio', 'live', 'veo', 'imagen', 'aqa', 'gemma', 'robotics', 'computer-use', 'pro'];
 export const CONTEXT_HEAD = 'BỐI CẢNH (bạn không có trí nhớ giữa các lần gọi, mọi thông tin cần thiết đều nằm dưới đây):';
 
 /** "Trí nhớ" model (mục 13.6) — lưu database, tự dọn mục hết hạn khi đọc. */
-export type AiModelState = { gone: Record<string, number>; quotaUntil: Record<string, number>; offlineUntil: number | null; lastModel: string | null };
+export type AiModelState = {
+  gone: Record<string, number>; quotaUntil: Record<string, number>; offlineUntil: number | null; lastModel: string | null;
+  /** Mục 13.4: model Google liệt kê (đã lọc + xếp hạng) và lúc dò. */
+  discovered?: string[]; discoveredAt?: number;
+};
 export const EMPTY_AI_STATE: AiModelState = { gone: {}, quotaUntil: {}, offlineUntil: null, lastModel: null };
 
 export type AiCallLog = { purpose: string; model: string | null; ok: boolean; error: string | null; ms: number; prompt: string; reply: string | null };
 export type AiDeps = {
   callModel: (model: string, system: string, prompt: string) => Promise<GeminiOutcome>;
+  /** GET danh sách model (không tốn quota); null = lỗi. Không truyền = không dò. */
+  listModels?: () => Promise<string[] | null>;
   loadState: () => Promise<AiModelState>;
   saveState: (s: AiModelState) => Promise<void>;
   log: (entry: AiCallLog) => Promise<void>;
@@ -41,7 +51,38 @@ export function getQuotaResetAfter(now: Date): number {
 /** Bỏ mục hết hạn (tự dọn khi đọc — Bẫy 31). */
 export function pruneAiState(s: AiModelState, t: number): AiModelState {
   const keep = (o: Record<string, number>) => Object.fromEntries(Object.entries(o).filter(([, until]) => until > t));
-  return { gone: keep(s.gone), quotaUntil: keep(s.quotaUntil), offlineUntil: s.offlineUntil && s.offlineUntil > t ? s.offlineUntil : null, lastModel: s.lastModel };
+  return { ...s, gone: keep(s.gone), quotaUntil: keep(s.quotaUntil), offlineUntil: s.offlineUntil && s.offlineUntil > t ? s.offlineUntil : null };
+}
+
+const versionOf = (name: string) => Number(/gemini-(\d+(?:\.\d+)?)/.exec(name)?.[1] ?? 0);
+const groupOf = (name: string): 'lite' | 'flash' | null => (name.includes('flash-lite') ? 'lite' : name.includes('flash') ? 'flash' : null);
+
+/** Mục 13.4: lọc + xếp hạng model Google liệt kê — lite trước flash; ổn định trước preview / exp / beta; bản mới trước. Không dùng `pro`. */
+export function rankDiscoveredModels(names: readonly string[]): string[] {
+  const rank = (n: string) => [groupOf(n) === 'lite' ? 0 : 1, /preview|exp|beta/.test(n) ? 1 : 0, -versionOf(n)] as const;
+  return [...new Set(names)]
+    .filter((n) => groupOf(n) !== null && !EXCLUDED_MODEL_WORDS.some((w) => n.includes(w)))
+    .sort((a, b) => { const ra = rank(a); const rb = rank(b); return ra[0] - rb[0] || ra[1] - rb[1] || ra[2] - rb[2] || a.localeCompare(b); })
+    .slice(0, DISCOVERED_KEEP);
+}
+
+/** Thứ tự thử: lite cố định → lite Google liệt kê → flash cố định → flash Google liệt kê (bỏ trùng). */
+export function buildModelOrder(discovered: readonly string[] = []): { model: string; group: 'lite' | 'flash' }[] {
+  const out: { model: string; group: 'lite' | 'flash' }[] = [];
+  const add = (model: string, group: 'lite' | 'flash') => { if (!out.some((m) => m.model === model)) out.push({ model, group }); };
+  for (const g of ['lite', 'flash'] as const) {
+    for (const m of MODEL_ORDER) if (m.group === g) add(m.model, g);
+    for (const n of discovered) if (groupOf(n) === g) add(n, g);
+  }
+  return out;
+}
+
+/** Danh sách đã cũ (> 30 ngày) → hỏi Google; lỗi → giữ danh sách cũ, thử lại sau 1 ngày. */
+async function refreshDiscovered(deps: AiDeps, s: AiModelState, t: number): Promise<AiModelState> {
+  if (!deps.listModels || (s.discoveredAt && t - s.discoveredAt < MODEL_LIST_TTL_MS)) return s;
+  const names = await deps.listModels();
+  if (!names) return { ...s, discoveredAt: t - MODEL_LIST_TTL_MS + MODEL_LIST_RETRY_MS };
+  return { ...s, discovered: rankDiscoveredModels(names), discoveredAt: t };
 }
 
 /** Khối BỐI CẢNH luôn đứng đầu SYSTEM (nơi gọi quên thì hàm này tự gắn). */
@@ -50,7 +91,7 @@ export const ensureContextHead = (system: string) => (system.startsWith(CONTEXT_
 /** Gọi AI: trả lời văn bản + model đã dùng; lỗi → mã E-AI-00x để nơi gọi dùng câu soạn sẵn (đường lui). */
 export async function generate(deps: AiDeps, purpose: string, systemRaw: string, prompt: string): Promise<Result<{ text: string; model: string }>> {
   const started = deps.now().getTime();
-  let state = pruneAiState(await deps.loadState(), started);
+  let state = await refreshDiscovered(deps, pruneAiState(await deps.loadState(), started), started);
   const system = ensureContextHead(systemRaw);
   const finish = async (r: Result<{ text: string; model: string }>, model: string | null, error: string | null) => {
     await deps.saveState(state);
@@ -59,7 +100,8 @@ export async function generate(deps: AiDeps, purpose: string, systemRaw: string,
   };
   if (state.offlineUntil) return finish(fail('E-AI-001', 'đang nghỉ sau khi hết lượt ngày'), null, 'offline');
 
-  const candidates = MODEL_ORDER.filter((m) => !state.gone[m.model] && !state.quotaUntil[m.model]).slice(0, MAX_MODELS_TRIED);
+  const order = buildModelOrder(state.discovered);
+  const candidates = order.filter((m) => !state.gone[m.model] && !state.quotaUntil[m.model]).slice(0, MAX_MODELS_TRIED);
   let badRequests = 0;
   let skipGroup: 'lite' | 'flash' | null = null;
   let serverGroupsFailed = 0;
@@ -96,7 +138,7 @@ export async function generate(deps: AiDeps, purpose: string, systemRaw: string,
     }
   }
   // Mọi model còn lại đều hết lượt ngày → nghỉ 3 tiếng, không gọi mạng vô ích (mục 13.5).
-  if (MODEL_ORDER.every((m) => state.gone[m.model] || state.quotaUntil[m.model])) {
+  if (order.every((m) => state.gone[m.model] || state.quotaUntil[m.model])) {
     state = { ...state, offlineUntil: deps.now().getTime() + OFFLINE_AFTER_DAILY_QUOTA_MS };
     return finish(fail('E-AI-001', lastError), null, lastError);
   }

@@ -106,3 +106,18 @@ test('Bẫy 22 / B7: database — khóa chỉ ở header apikey; giá trị lọ
   assert.equal(r.ok, false);
   assert.equal(seen.length, 1);
 });
+
+test('6.10a mục 13.4: tự dò model — lọc (bỏ pro / embedding / tts / image…), lite trước flash, ổn định trước preview, bản mới trước; dò lại sau 30 ngày', async () => {
+  const { rankDiscoveredModels, buildModelOrder } = await import('../src/services/ai.service.ts');
+  const ranked = rankDiscoveredModels(['gemini-2.5-pro', 'text-embedding-004', 'gemini-3.1-flash-lite-preview', 'gemini-3.0-flash-lite',
+    'gemini-2.5-flash-image', 'gemini-3.0-flash', 'gemini-2.5-flash-preview-tts', 'gemma-3-27b-it']);
+  assert.deepEqual(ranked, ['gemini-3.0-flash-lite', 'gemini-3.1-flash-lite-preview', 'gemini-3.0-flash']);
+  const order = buildModelOrder(ranked).map((m) => m.model);
+  assert.ok(order.indexOf('gemini-3.0-flash-lite') < order.indexOf('gemini-flash-latest'), 'lite mới dò được đứng trước nhóm flash');
+  let listed = 0;
+  const { deps } = makeDeps(() => ({ kind: 'ok', text: 'ok', truncated: false }));
+  deps.listModels = async () => { listed++; return ['gemini-3.0-flash-lite']; };
+  await generate(deps, 't', 's', 'p');
+  await generate(deps, 't', 's', 'p');
+  assert.equal(listed, 1, 'trong 30 ngày không hỏi lại Google');
+});

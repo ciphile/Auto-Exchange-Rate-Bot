@@ -55,6 +55,15 @@ export function createStore(db: Db) {
       const rows = unwrap(await db.select<{ enc: string }>('chat_context', { columns: 'enc', filters: [['bot', 'eq', bot]], order: 'id.desc', limit: CONTEXT_KEEP }));
       return rows.map((r) => r.enc).reverse();
     },
+    /** D4: kho tin cả ngày (đã mã hóa) cho /tomtat. */
+    async addChatLog(bot: BotKey, enc: string): Promise<void> {
+      unwrap(await db.insert('chat_log', { bot, enc }));
+    },
+    /** Tin trong kho cả ngày: cũ → mới, tối đa `limit` tin MỚI nhất. */
+    async listChatLog(bot: BotKey, limit = 600): Promise<string[]> {
+      const rows = unwrap(await db.select<{ enc: string }>('chat_log', { columns: 'enc', filters: [['bot', 'eq', bot]], order: 'id.desc', limit }));
+      return rows.map((r) => r.enc).reverse();
+    },
     async listMembers(): Promise<Member[]> {
       const rows = unwrap(await db.select<{ name: string; aliases: string; how_to_call: string; work: string; about: string; telegram_user_id: number | null }>('members', { order: 'id.asc', limit: 30 }));
       return rows.map((r) => ({
@@ -85,6 +94,7 @@ export function createStore(db: Db) {
         return new Date(now.getTime() - days * 86_400_000).toISOString();
       };
       unwrap(await db.remove('chat_context', [['created_at', 'lt', now.toISOString()]]));
+      unwrap(await db.remove('chat_log', [['created_at', 'lt', now.toISOString()]]));
       unwrap(await db.remove('ai_calls', [['at', 'lt', ago(RETENTION_DAYS.aiCalls)]]));
       unwrap(await db.remove('rates', [['fetched_at', 'lt', ago(RETENTION_DAYS.rates)]]));
       unwrap(await db.remove('audit_log', [['at', 'lt', ago(RETENTION_DAYS.auditLog)]]));

@@ -22,6 +22,5 @@
 
 ## Chưa làm (sau bản tối thiểu)
 - Tải lịch lễ MOM tự động trong tick (hiện: bảng 2026 có sẵn + `/ngayle them`; lịch 2027 cần trước 15/12).
-- Tự dò danh sách model Gemini 30 ngày (tài liệu Khang 13.4) — hiện dùng danh sách cố định 6 model.
-- Tóm tắt chat cuối ngày (D4) · lệnh xem tình trạng AI / xóa cache (mục 13) · `/thanhvien`.
+- Lệnh xem tình trạng AI chi tiết / xóa cache / gọi thử (tài liệu Khang mục 13 — `/trangthai` đã hiện model gần nhất + model hết lượt) · `/thanhvien`.
 - KC-06: Vercel có chạy được `import './x.ts'` không (đã bật `rewriteRelativeImportExtensions`) — biết ở lần deploy đầu.

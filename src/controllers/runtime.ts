@@ -1,7 +1,7 @@
 // Nối các mảnh cho 1 yêu cầu (webhook / tick): biến môi trường → database, Telegram, AI, nguồn tỉ giá.
 // Chỉ ghép, không quy tắc nghiệp vụ. Mọi đối tượng dùng `fetch` chuẩn của Node.
 import type { AppEnv } from '../config/env.ts';
-import { callGeminiModel } from '../adapters/gemini.adapter.ts';
+import { callGeminiModel, listGeminiModels } from '../adapters/gemini.adapter.ts';
 import { fetchFallbackMid, fetchVcb, fetchVpbank, fetchWiseLive } from '../adapters/rate-sources.adapter.ts';
 import { createDb } from '../adapters/supabase.adapter.ts';
 import { createTelegramClient } from '../adapters/telegram.adapter.ts';
@@ -22,6 +22,7 @@ export function createRuntime(bot: BotKey, env: AppEnv, requestId: string, modul
   const now = () => new Date();
   const ai = (purpose: string, system: string, prompt: string) => generate({
     callModel: (model, sys, p) => callGeminiModel(model, sys, p, env.GEMINI_API_KEY),
+    listModels: () => listGeminiModels(env.GEMINI_API_KEY),
     loadState: async () => (await store.getState<AiModelState>(bot, 'ai_model')) ?? EMPTY_AI_STATE,
     saveState: (s) => store.setState(bot, 'ai_model', s),
     // D1: log prompt MÃ HÓA, giữ ≤ 1 ngày (dọn 01:00). Log kỹ thuật chỉ ghi số liệu, không ghi chữ.

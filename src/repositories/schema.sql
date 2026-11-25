@@ -38,6 +38,15 @@ create table if not exists chat_context (
 );
 create index if not exists chat_context_bot_time on chat_context (bot, created_at desc);
 
+-- Kho tin nhắn cả ngày để TÓM TẮT khi Khang hỏi (D4, BR-16): chỉ khi bật lắng nghe; nguyên văn, MÃ HÓA; xóa sạch 01:00 mỗi ngày.
+create table if not exists chat_log (
+  id bigint generated always as identity primary key,
+  bot text not null,
+  enc text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists chat_log_bot_id on chat_log (bot, id);
+
 -- Hồ sơ thành viên (BR-40). Tên THẬT chỉ nằm ở đây (Khang tự nhập), không bao giờ trong repo. Giữ mãi.
 create table if not exists members (
   id bigint generated always as identity primary key,
@@ -91,6 +100,7 @@ alter table bot_config enable row level security;
 alter table bot_state enable row level security;
 alter table rates enable row level security;
 alter table chat_context enable row level security;
+alter table chat_log enable row level security;
 alter table members enable row level security;
 alter table holidays enable row level security;
 alter table audit_log enable row level security;

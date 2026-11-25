@@ -223,7 +223,7 @@ Mỗi mã là **64 ký tự** gồm số 0–9 và chữ a–f. **Mỗi dòng 1 
 
 ## Phần 6 — Tạo bảng dữ liệu trên Supabase — 5 phút
 
-> Giống tạo file vật lý trên AS400 (CRTPF) — chạy **1 lần**. Chạy lại cũng không sao (không xóa gì).
+> Giống tạo file vật lý trên AS400 (CRTPF) — chạy **1 lần**. Chạy lại cũng không sao (không xóa gì). **Bản code mới có thêm bảng → chạy lại file này** là đủ.
 
 1. Mở GitHub repo → bấm vào thư mục **`src`** → **`repositories`** → file **`schema.sql`** → bấm nút **"Copy raw file"** (biểu tượng 2 tờ giấy chồng nhau, **góc trên bên phải** khung chữ).
 2. Mở https://supabase.com/dashboard → bấm vào project của bot.
@@ -231,7 +231,7 @@ Mỗi mã là **64 ký tự** gồm số 0–9 và chữ a–f. **Mỗi dòng 1 
 4. Ô soạn thảo lớn ở giữa → bấm vào → `Ctrl + A` rồi `Delete` (xóa chữ có sẵn) → `Ctrl + V` (dán).
 5. Bấm nút xanh **"Run"** (**góc dưới bên phải** ô soạn thảo; hoặc `Ctrl + Enter`).
    - Nếu hiện hộp hỏi **"Potential issue detected"** / **"destructive operation"** → bấm **"Run this query"** (file không xóa gì).
-6. **Kiểm đã xong:** menu trái → **"Table Editor"** → thấy đủ **9 bảng**: `ai_calls`, `audit_log`, `bot_config`, `bot_state`, `chat_context`, `holidays`, `members`, `rates`, `tick_runs`. Bấm thử 1 bảng → góc trên có chữ **"RLS enabled"** (hoặc không có cảnh báo đỏ "RLS disabled") là đúng.
+6. **Kiểm đã xong:** menu trái → **"Table Editor"** → thấy đủ **10 bảng**: `ai_calls`, `audit_log`, `bot_config`, `bot_state`, `chat_context`, `chat_log`, `holidays`, `members`, `rates`, `tick_runs`. Bấm thử 1 bảng → góc trên có chữ **"RLS enabled"** (hoặc không có cảnh báo đỏ "RLS disabled") là đúng.
 
 ### 6.1. (Nên làm) Nhập hồ sơ thành viên — để bot biết ai là ai, gọi đúng tên thật
 Tên thật **chỉ nằm trong database** (không bao giờ trong repo). Kat soạn sẵn đoạn SQL từ hồ sơ riêng tư của Khang khi Khang nhắn "soạn SQL thành viên"; hoặc Khang tự gõ theo mẫu:

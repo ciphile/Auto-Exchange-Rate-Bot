@@ -3,6 +3,7 @@
 import { BOT_CALL_NAMES } from '../config/defaults.ts';
 import type { IncomingMessage, IncomingUpdate } from '../domain/telegram.ts';
 import { BOT_TEXT } from '../shared/bot-text.vi.ts';
+import { encryptText } from '../shared/crypto.ts';
 import { BOT_DISPLAY_NAMES } from '../shared/persona.vi.ts';
 import { unwrap } from '../shared/result.ts';
 import { getVnDateKey } from '../shared/vn-time.ts';
@@ -53,9 +54,10 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
   });
   rt.log('info', 'route', { route: decision.route, reason: decision.reason });
   const members = decision.route === 'ignore' && !decision.storeInContext ? [] : await rt.store.listMembers();
-  if (decision.storeInContext) {
-    await saveContextLine(rt.store, rt.bot, rt.key, { at: update.sentAt, speaker: resolveSpeaker(update.fromId, update.fromName, members), isBot: false, text: update.text });
-  }
+  const line = { at: update.sentAt, speaker: resolveSpeaker(update.fromId, update.fromName, members), isBot: false, text: update.text };
+  if (decision.storeInContext) await saveContextLine(rt.store, rt.bot, rt.key, line);
+  // D4 / BR-16: kho cả ngày cho /tomtat — chỉ khi đang lắng nghe; nguyên văn, mã hóa, không gọi AI theo từng tin.
+  if (decision.storeInChatLog) await rt.store.addChatLog(rt.bot, encryptText(JSON.stringify(line), rt.key));
   switch (decision.route) {
     case 'owner_command': return handleOwnerCommand(rt, update, settings);
     case 'owner_chat': return answer(rt, settings, update, members, rt.ownerId, false);

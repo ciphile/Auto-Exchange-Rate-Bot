@@ -11,6 +11,7 @@ import { RECALL_MAX_MS, sendConfirmCard } from './confirm.service.ts';
 import { parseHolidayCommand } from './holiday.service.ts';
 import { describeRateSource, type RateSource } from './rate.service.ts';
 import type { Runtime } from './runtime.types.ts';
+import { summarizeToday } from './summary.service.ts';
 import { handleOwnerSettingsCommand, renderOwnerHelp, type BotSettings } from './settings.service.ts';
 
 const HOLIDAY_LIST_DAYS = 120;
@@ -26,6 +27,7 @@ export async function handleOwnerCommand(rt: Runtime, msg: IncomingMessage, sett
   switch (cmd?.name) {
     case 'start': case 'lenh': case 'help': return reply(rt, renderOwnerHelp());
     case 'tygia': return reply(rt, await renderRates(rt));
+    case 'tomtat': return reply(rt, await summarizeToday(rt));
     case 'trangthai': return reply(rt, await renderStatus(rt, settings));
     case 'noi': {
       const text = (cmd.args ?? '').trim();

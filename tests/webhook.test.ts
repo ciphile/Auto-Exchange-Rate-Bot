@@ -149,3 +149,23 @@ test('BR-42: hỏi Rây "tháng sau có ngày lễ nào không" → prompt có l
   assert.match(prompts.at(-1) ?? '', /25\/12 \(T6\)/);
   assert.match(fake.sent.at(-1)?.text ?? '', /25\/12 \(T6\): Christmas Day/);
 });
+
+test('F-06 / BR-20 / D4: bật lắng nghe → tin nhóm vào kho cả ngày (mã hóa); /tomtat gọi AI ĐÚNG 1 lần, gửi RIÊNG Khang; tắt lắng nghe → không lưu', async () => {
+  const { rt, fake, mem, prompts } = createTestRuntime({ aiReply: () => '- Mọi người bàn tỉ giá' });
+  await rt.store.saveGroup('ray', GROUP);
+  await handleUpdate(rt, groupMsg('tỉ giá hôm nay cao ghê'));
+  assert.equal(mem.tables.get('chat_log')?.length ?? 0, 0, 'tắt lắng nghe → không lưu kho cả ngày');
+  await rt.store.saveSettings('ray', { listenOn: true });
+  await handleUpdate(rt, groupMsg('tỉ giá hôm nay cao ghê'));
+  await handleUpdate(rt, groupMsg('ừ mai đổi tiền'));
+  assert.equal(mem.tables.get('chat_log')?.length, 2);
+  assert.ok(!JSON.stringify(mem.tables.get('chat_log')).includes('đổi tiền'), 'kho cả ngày phải mã hóa');
+  const before = prompts.length;
+  await handleUpdate(rt, msg('/tomtat'));
+  assert.equal(prompts.length - before, 1);
+  assert.match(prompts.at(-1) ?? '', /ừ mai đổi tiền/);
+  assert.equal(fake.sent.at(-1)?.chatId, OWNER_ID);
+  assert.match(fake.sent.at(-1)?.text ?? '', /Tóm tắt chat hôm nay \(2 tin\)/);
+  await rt.store.cleanup(new Date(Date.now() + 1000));
+  assert.equal(mem.tables.get('chat_log')?.length, 0, 'dọn 01:00 xóa sạch kho cả ngày');
+});
