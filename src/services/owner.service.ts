@@ -33,6 +33,10 @@ export async function handleOwnerCommand(rt: Runtime, msg: IncomingMessage, sett
       if ((await rt.store.loadConfig(rt.bot)).groupChatId === null) return reply(rt, BOT_TEXT.relayNoGroup);
       return sendConfirmCard(rt, { type: 'relay', text: text.slice(0, RELAY_MAX_CHARS) }, BOT_TEXT.relayAsk(text.slice(0, RELAY_MAX_CHARS)));
     }
+    case 'gioithieu': {
+      if ((await rt.store.loadConfig(rt.bot)).groupChatId === null) return reply(rt, BOT_TEXT.relayNoGroup);
+      return sendConfirmCard(rt, { type: 'intro' }, 'Cho bot tự giới thiệu ngắn trong nhóm?');
+    }
     case 'thuhoi': {
       const last = await rt.store.getState<{ chatId: number; messageId: number; at: number }>(rt.bot, 'last_relay');
       if (!last || rt.now().getTime() - last.at > RECALL_MAX_MS) return reply(rt, BOT_TEXT.recallNone);

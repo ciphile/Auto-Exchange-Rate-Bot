@@ -7,7 +7,8 @@ import { BOT_TEXT } from '../shared/bot-text.vi.ts';
 import { BOT_DISPLAY_NAMES } from '../shared/persona.vi.ts';
 import { unwrap } from '../shared/result.ts';
 import { applySettingsChange, mergeStoredSettings, type SettingsChange } from './settings.service.ts';
-import { saveContextLine } from './speech.service.ts';
+import { saveContextLine, speak } from './speech.service.ts';
+import { INTRO_FALLBACK, INTRO_FEATURES } from '../shared/intro.vi.ts';
 
 export const CONFIRM_TTL_MS = 10 * 60_000;
 export const RECALL_MAX_MS = 48 * 3600_000; // BR: /thuhoi trong 48 giờ (giới hạn của Telegram)
@@ -16,6 +17,7 @@ export type ConfirmCard =
   | { type: 'settings'; change: SettingsChange; createdAt: number }
   | { type: 'bind'; chatId: number; title: string; createdAt: number }
   | { type: 'relay'; text: string; createdAt: number }
+  | { type: 'intro'; createdAt: number }
   | { type: 'holiday'; action: 'add' | 'remove'; date: string; name: string; createdAt: number };
 type CardBody = ConfirmCard extends infer C ? (C extends ConfirmCard ? Omit<C, 'createdAt'> : never) : never;
 
@@ -60,6 +62,18 @@ async function applyCard(rt: Runtime, card: ConfirmCard): Promise<string> {
       await store.setState(bot, 'last_relay', { chatId: groupChatId, messageId: sent, at: rt.now().getTime() });
       await saveContextLine(store, bot, rt.key, { at: rt.now().getTime(), speaker: BOT_DISPLAY_NAMES[bot], isBot: true, text: card.text });
       await store.audit(bot, 'owner', 'relay', { chars: card.text.length });
+      return `✅ ${BOT_TEXT.confirmDone}`;
+    }
+    case 'intro': {
+      const { groupChatId, settings } = await store.loadConfig(bot);
+      if (groupChatId === null) return BOT_TEXT.relayNoGroup;
+      const r = await speak(rt, mergeStoredSettings(bot, settings), {
+        purpose: 'reminder', fallback: INTRO_FALLBACK[bot],
+        task: `Tự giới thiệu bản thân với cả nhóm THẬT NGẮN (tối đa 4 câu): tên mình + các việc chính sau, không thêm việc khác:\n- ${INTRO_FEATURES[bot].join('\n- ')}\nKết bằng 1 câu mời mọi người gọi tên khi cần.`,
+      });
+      unwrap(await rt.tg.sendMessage(groupChatId, r.text));
+      await saveContextLine(store, bot, rt.key, { at: rt.now().getTime(), speaker: BOT_DISPLAY_NAMES[bot], isBot: true, text: r.text });
+      await store.audit(bot, 'owner', 'intro', { usedAi: r.usedAi });
       return `✅ ${BOT_TEXT.confirmDone}`;
     }
     case 'holiday': {

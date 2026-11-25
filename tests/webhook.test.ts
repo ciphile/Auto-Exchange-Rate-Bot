@@ -115,3 +115,27 @@ test('Cài đặt lưu trong database bị hỏng → dùng mặc định từng
   assert.equal(s.chattinessLevel, 4);
   assert.ok(s.alertLevelsVnd.length > 0);
 });
+
+test('F-08 /gioithieu: thẻ xác nhận → bấm ✅ → bot tự giới thiệu ngắn trong nhóm (AI lỗi → câu soạn sẵn có chức năng chính)', async () => {
+  const { rt, fake, prompts } = createTestRuntime();
+  await handleUpdate(rt, msg('/gioithieu'));
+  assert.match(fake.sent.at(-1)?.text ?? '', /Chưa gắn nhóm/);
+  await rt.store.saveGroup('ray', GROUP);
+  await handleUpdate(rt, msg('/gioithieu'));
+  await handleUpdate(rt, press(cardData(fake.sent.at(-1)?.buttons, 0)));
+  const intro = fake.sent.filter((s) => s.chatId === GROUP).at(-1)?.text ?? '';
+  assert.match(intro, /Rây/);
+  assert.match(intro, /tỉ giá/);
+  assert.match(intro, /nghỉ lễ/);
+  assert.match(prompts.at(-1) ?? '', /tối đa 4 câu/);
+});
+
+test('BR-45: prompt của Lũi (nhóm B) KHÔNG mang tỉ giá / ngày lễ / timesheet / ngày lương', async () => {
+  const { rt, prompts } = createTestRuntime({ aiReply: () => 'Dạ tin nóng nè' });
+  await rt.store.insertRate('wise', 19950);
+  const lui = { ...rt, bot: 'lui' as const };
+  const { speak } = await import('../src/services/speech.service.ts');
+  await speak(lui, mergeStoredSettings('lui', {}), { purpose: 'answer_chat', task: 'trả lời', fallback: 'x', situation: { isTimesheetDay: true, nextHoliday: { date: '2026-12-25', name: 'Christmas', daysAway: 3 } } });
+  const p = prompts.at(-1) ?? '';
+  for (const word of ['19.950', 'TIMESHEET', 'Christmas', 'lương']) assert.ok(!p.includes(word), `prompt Lũi có "${word}"`);
+});

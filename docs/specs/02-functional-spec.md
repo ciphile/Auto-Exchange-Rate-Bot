@@ -1,6 +1,6 @@
 # FS — Functional Spec — Auto-Exchange-Rate-Bot (Rây + Lũi)
 
-> **Bản 0.9 · 25/11/2026 (0.1–0.3: 24/11/2026; 0.4–0.7: 25/11/2026) · Kat viết ở Mode 2 · Khang đã duyệt bản 0.2 (24/11/2026 22:40)** — Khang có quyền sửa bất kỳ mục nào.
+> **Bản 1.0 · 25/11/2026 (1.0: nối dịch vụ thật — database, AI, webhook, tick; BR-45; /gioithieu) (0.1–0.3: 24/11/2026; 0.4–0.7: 25/11/2026) · Kat viết ở Mode 2 · Khang đã duyệt bản 0.2 (24/11/2026 22:40)** — Khang có quyền sửa bất kỳ mục nào.
 > **Dự án này chỉ có FS** (Khang chốt 24/11/2026: không BRD, không TS). Cổng chặn: **FS chốt mới được code**. Kiến trúc (ADR), kiểm chứng (KC), bảng ATR bảo mật nằm ở **phụ lục** của FS.
 > Nguồn yêu cầu: `docs/specs/00-phong-van.md` (lượt 1–5). Tên người dùng **biệt danh** (Rule 5). Mã quy tắc `BR-xx`, mã chức năng `F-xx`, mã lỗi `E-...` — **bỏ qua số 13**.
 > **Phạm vi bản này:** **Rây đầy đủ** (ưu tiên, hạn chót **thứ Năm 03/12/2026** — Khang xác nhận 24/11/2026). **Lũi: khung + phần dùng chung**; tính cách, giọng văn, lĩnh vực tin **chờ Khang gửi** (mục 8).
@@ -66,6 +66,7 @@
 | **BR-42** | **Rây nhắc ngày lễ Singapore trong nhóm A** (AI diễn đạt, tự nhiên, không rập khuôn; ngày + tên lễ do code đưa): **đúng ngày lễ** (kể cả nghỉ bù) — buổi sáng 07:30–09:30 · **tuần sau có lễ** → 1 lần trong thứ Tư…Sáu tuần trước · **tháng sau có lễ** → 1 lần trong 3–5 ngày cuối tháng trước. Lỡ ngày (bot nghỉ) → nhắc bù trong cùng tuần / tháng nếu chưa nhắc. Lễ đầu tháng sau vừa được nhắc \"tháng sau\" trong tuần → không nhắc \"tuần sau\" nữa. Không nhắc trong giờ nghỉ (BR-09). Bối cảnh mọi prompt có dòng \"còn N ngày nữa là lễ …\" (30 ngày tới). | \"bot phải nhắc trong group A đúng vào ngày lễ… tuần sau… tháng sau… lời nhắc tự nhiên không rập khuôn\" | Khang (ý) · Kat (khung ngày giờ — Mode 2) · 25/11/2026 |
 | **BR-43** | **Nhắc điền timesheet**: ngày điền = **thứ Sáu** (thứ Sáu là lễ → ngày làm việc liền trước); **\"thỉnh thoảng\" = 60% số tuần**, giờ ngẫu nhiên 14:00–17:00, trong nhóm A; công tắc `/nhactimesheet on|off` (mặc định bật). Ngày điền timesheet → bối cảnh prompt có dòng \"hôm nay là ngày điền TIMESHEET\" để bot nhắc lồng trong câu trả lời (vd \"lo code BAU cho xong rồi điền timesheet, nay thứ Sáu rồi\"). | \"thứ 6 mọi người phải điền timesheet, bot thỉnh thoảng nhắc\" | Khang · Kat (60%, giờ — Mode 2) · 25/11/2026 |
 | **BR-44** | **Bot hiểu AI ĐANG HỎI và hoàn cảnh người đó** (cả 2 bot): người hỏi được nhận ra (BR-40) → PROMPT có khối \"NGƯỜI ĐANG HỎI\" (hồ sơ người đó: việc đang làm — vd Ổi luôn làm BAU / check prod issue — tính tình, gia đình) để trả lời **hợp hoàn cảnh**. Nhưng **không kể lại hồ sơ**; bị hỏi \"mày biết gì về tao / về X\" → **giả vờ chỉ biết sơ sơ**, đùa lảng đi. | \"bot phải hiểu ai đang hỏi và hoàn cảnh của người hỏi… khi người dùng hỏi 'mày biết gì về tao' thì bot giả vờ không biết rõ\" | Khang · 25/11/2026 |
+| **BR-45** | **Nhóm B không cần tỉ giá / ngày lễ / timesheet / ngày lương**: Lũi không nhắc lễ, không báo giá, không nhắc timesheet; prompt của Lũi **không mang** các dữ liệu đó (code lọc — test `BR-45`). Lời tự giới thiệu của Lũi chỉ nói tin tức + trò chuyện. | "Lủi không cần nhắc nghỉ phép hay là tỉ giá hay là timesheet… group B không cần mấy thứ đó" | Khang · 25/11/2026 |
 | **BR-35** | **Mức tần suất 1–5** (`/tansuat <1-5>`, mặc định **3**): Rây tự báo giá và cảnh báo thường xuyên tới đâu — bảng mục 10. Mức 1, 2 theo đúng lời Khang; mức 3–5 tăng dần. Ngày lương luôn báo; mỗi ngày ≤ 1 lần báo, giờ ngẫu nhiên (BR-11). Đổi mức giữa tháng → lập lại lịch các ngày còn lại. Cảnh báo chỉ trong 14 ngày cuối tháng (BR-03), trừ khi bật cảnh báo cả tháng (BR-39). | "có command để Khang điều chỉnh mức độ thường xuyên mà Rẩy thông báo hay cảnh báo tỉ giá" | Khang (mức 1, 2) · Kat (mức 3–5, mặc định — Mode 2) · 25/11/2026 |
 
 ---
@@ -131,6 +132,7 @@
 | `/noituc 0..3` | Mức nói tục (BR-38) | đổi |
 | `/nhactimesheet on|off` | Nhắc điền timesheet thứ Sáu (BR-43) | đổi |
 | `/ngayle` · `/ngayle them <YYYY-MM-DD> <tên>` · `/ngayle xoa <YYYY-MM-DD>` | Xem lễ Singapore sắp tới · thêm / xóa tay (BR-41) | xem / đổi |
+| `/gioithieu` | Bot **tự giới thiệu ngắn** trong nhóm (tên + chức năng chính, tối đa ~4 câu, AI diễn đạt; AI lỗi → câu soạn sẵn). Rây: tỉ giá, cảnh báo, lấy giá ngay, nhắc lễ + timesheet. Lũi: tin tức + trò chuyện (BR-45). Khang 25/11/2026 | gửi nhóm (thẻ xác nhận) |
 | `/thanhvien` | Xem / sửa danh sách thành viên dùng trong prompt (tên thật, vai trò, cách gọi) — lưu database, không repo (BR-21) | đổi |
 | `/noi`, `/thuhoi` | F-07 | đổi |
 | `/tomtat` | F-06 | xem (gọi AI) |
@@ -154,6 +156,8 @@ Xóa kho tin nhắn tạm của các ngày trước · log prompt > 1 ngày · b
 | `E-TG-001` | Gửi tin vào group thất bại (<mã Telegram>). | Kiểm bot còn trong group, chưa bị chặn. |
 | `E-SRC-003` | Không tải / không đọc được lịch lễ MOM; đang dùng lịch đã lưu / có sẵn, mai thử lại. | Nếu thiếu lịch: `/ngayle them <ngày> <tên>`. |
 | `E-SRC-004` | Qua 15/12 chưa có lịch lễ năm sau. | Bot vẫn thử mỗi ngày; muốn chắc thì `/ngayle them …` từng ngày. |
+| `E-AI-003` | Gemini nghẽn / lỗi tạm thời (đã thử nhiều model); bot dùng câu soạn sẵn. | Không cần làm gì; lặp cả ngày thì báo Kat. |
+| `E-DB-001` | Bot không đọc / ghi được database Supabase. | Vào supabase.com xem project có bị Paused không (bấm Restore); kiểm SUPABASE_URL, SUPABASE_SECRET_KEY. |
 | `E-SYS-001` | Dọn dẹp 01:00 thất bại. | Báo Kat; dữ liệu riêng tư có thể chưa xóa. |
 | `E-CFG-001` | Thiếu biến môi trường <tên>. | Thêm biến đó trên Vercel theo hướng dẫn cài đặt. |
 

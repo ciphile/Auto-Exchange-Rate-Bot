@@ -50,13 +50,17 @@ export const saveContextLine = (store: Store, bot: BotKey, key: Buffer, line: Ch
 export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakRequest): Promise<SpeakResult> {
   const { store, bot, key } = deps;
   const now = deps.now();
+  // BR-45 (Khang 25/11/2026): nhóm B không cần tỉ giá / ngày lễ / timesheet → prompt của Lũi không mang các dữ liệu đó.
+  const isRay = bot === 'ray';
   const [members, profile, chat, rate, bankFacts] = await Promise.all([
     store.listMembers(), store.getState<GroupProfile>(bot, 'group_profile'), readContextLines(store, bot, key),
-    buildRateSnapshot(store, now), buildBankFacts(store, now),
+    isRay ? buildRateSnapshot(store, now) : null, isRay ? buildBankFacts(store, now) : [],
   ]);
   const group = profile ?? DEFAULT_GROUP;
+  const situation = isRay ? req.situation : { ...req.situation, isTimesheetDay: false, nextHoliday: null };
   const facts = [
-    ...buildSituationFacts({ now, daysUntilPayday: getDaysUntilPayday(now), rate, recentBotPosts: [], news: [], ...req.situation }),
+    ...buildSituationFacts({ now, daysUntilPayday: getDaysUntilPayday(now), rate, recentBotPosts: [], news: [], ...situation })
+      .filter((f) => isRay || !/lương/i.test(f)),
     ...bankFacts, ...(req.extraFacts ?? []),
   ];
   const styleSettings = { bot, personaOn: settings.personaOn, mood: settings.mood, profanityLevel: settings.profanityLevel };

@@ -36,6 +36,7 @@ export const OWNER_COMMAND_HELP: readonly (readonly [string, string])[] = [
 
 /** Lệnh không phải cài đặt (xử lý ở service riêng) — vẫn hiện trong /lenh. */
 export const OTHER_COMMAND_HELP: readonly (readonly [string, string])[] = [
+  ['/gioithieu', 'bot tự giới thiệu ngắn trong nhóm (có thẻ xác nhận)'],
   ['/ngayle', 'xem ngày lễ Singapore sắp tới (thêm: /ngayle them 2027-01-01 Tên lễ · xóa: /ngayle xoa 2027-01-01)'],
 ];
 
