@@ -11,6 +11,7 @@
 | Hưng | **Ổi** | |
 | Thuần (tên hiển thị "Thuan") | **Xoài** | |
 | Sang | **Mận** | Khang nhắc 24/11/2026 (có trong nhóm B) |
+| Ted | **Sầu Riêng** | sếp ở công ty vendor (Prime) của Khang, Thuần, Hưng — siêu khó, tỉ mỉ, hay soi xét, ai cũng sợ (Khang 25/11/2026). Không phải thành viên nhóm |
 | Khang | **Khang** | chủ dự án — dùng tên thật theo bộ quy tắc |
 | (các thành viên còn lại của nhóm B — Khang bổ sung) | | |
 | Prime (công ty vendor ở Singapore) | **công ty SGP** | công ty vendor IT — Khang, Ổi, Xoài là người của công ty này, làm từ xa ở VN (Khang làm rõ 25/11/2026) |

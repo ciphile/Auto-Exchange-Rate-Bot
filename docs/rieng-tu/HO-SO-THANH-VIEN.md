@@ -10,6 +10,8 @@
 - Tất cả làm từ xa ở Việt Nam, ngồi nhà (work from home), cho công ty vendor Prime ở Singapore. Riêng Abe sống và làm ở Singapore.
 - **Thứ Sáu mọi người phải điền timesheet** (bot thỉnh thoảng nhắc).
 - BAU = check prod issue (Hưng luôn làm BAU; Abe làm BAU nhưng có thể đổi).
+- **Sếp của Khang, Thuần, Hưng ở Prime là Ted** — siêu khó, tỉ mỉ, hay soi xét; ai cũng sợ ổng (không phải thành viên nhóm, bot chỉ biết để nói chuyện cho đúng).
+- **Bot gọi mọi người bằng TÊN THẬT** (vd "sếp Thuần ơi"), không bao giờ dùng biệt danh của repo.
 - Khang, Thuần, Hưng từng làm chung công ty trước; giờ ở công ty mới vẫn làm chung, là đồng nghiệp thân thiết.
 
 ## Từng người

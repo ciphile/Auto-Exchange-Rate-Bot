@@ -133,7 +133,7 @@ export function renderGroupBlock(groupName: string, description: string, groupFa
   return [
     `NHÓM: ${clip(groupName, 60)} — ${defuse(clip(description, GROUP_DESCRIPTION_MAX_CHARS))}`,
     facts.length > 0 ? `BỐI CẢNH CHUNG CỦA NHÓM:\n${facts.join('\n')}` : null,
-    'THÀNH VIÊN (dùng để trả lời đúng người, đúng chuyện; KHÔNG bịa thêm chuyện riêng ngoài hồ sơ này):',
+    'THÀNH VIÊN (dùng để trả lời đúng người, đúng chuyện; KHÔNG bịa thêm chuyện riêng ngoài hồ sơ này). Gọi mọi người ĐÚNG tên / cách gọi ghi dưới đây (vd "sếp <tên> ơi"), không tự đặt biệt danh khác:',
     ...lines,
   ].filter((x): x is string => x !== null).join('\n');
 }

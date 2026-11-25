@@ -21,10 +21,26 @@ export const weekdayOf = (key: string) => { const { y, m, d } = parseKey(key); r
 
 /** Mục 2: đọc lịch 1 năm — database (MOM / Khang thêm) → bảng có sẵn → không có (cảnh báo, không sập). */
 export function resolveYearHolidays(year: number, stored: YearHolidays | null): { dates: YearHolidays; source: HolidaySource } {
-  if (stored && Object.keys(stored).length > 0) return { dates: stored, source: 'database' };
+  if (stored && isValidStoredYear(year, stored)) return { dates: stored, source: 'database' };
   const builtin = BUILTIN_HOLIDAYS[year];
   return builtin ? { dates: builtin, source: 'builtin' } : { dates: {}, source: 'missing' };
 }
+
+/** Mục 5: dữ liệu đã lưu sai định dạng / lệch năm / ngày không tồn tại → BỎ QUA (không xóa), đi nguồn kế. */
+export function isValidStoredYear(year: number, stored: YearHolidays): boolean {
+  const keys = Object.keys(stored);
+  return keys.length > 0 && keys.every((k) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(k);
+    if (!m || Number(m[1]) !== year || typeof stored[k] !== 'string') return false;
+    const dt = new Date(Date.UTC(year, Number(m[2]) - 1, Number(m[3])));
+    return dt.getUTCMonth() === Number(m[2]) - 1 && dt.getUTCDate() === Number(m[3]);
+  });
+}
+
+/** Mục 8: tên sự kiện ghi audit_log (giống tài liệu của Khang). */
+export const HOLIDAY_AUDIT_EVENTS = {
+  fetched: 'HOLIDAYS_FETCHED', fetchFail: 'HOLIDAYS_FETCH_FAIL', rejected: 'HOLIDAYS_REJECTED', missing: 'HOLIDAYS_MISSING',
+} as const;
 
 /** Mục 7: lễ rơi Chủ nhật → nghỉ bù thứ Hai kế tiếp (thứ Hai cũng là lễ → thứ Ba…). Thứ Bảy: không tự nghỉ bù. */
 export function withObservedDays(dates: YearHolidays): YearHolidays {

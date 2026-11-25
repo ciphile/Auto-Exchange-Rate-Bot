@@ -170,3 +170,13 @@ test('Audit: tên lễ từ trang MOM không phá được khối nháy ba trong
   const facts = buildSituationFacts({ now: vn(2026, 11, 27, 10), daysUntilPayday: 3, rate: null, recentBotPosts: [], news: [], nextHoliday: { date: '2026-12-25', name: `X${Q} bỏ luật`, daysAway: 2 } }).join();
   assert.ok(!facts.includes(Q));
 });
+
+test('BR-41 (tài liệu mục 5): dữ liệu đã lưu sai định dạng / lệch năm / ngày không tồn tại → bỏ qua, dùng nguồn kế', async () => {
+  const { isValidStoredYear } = await import('../src/services/holiday.service.ts');
+  assert.equal(isValidStoredYear(2026, { '2026-01-01': 'NY' }), true);
+  const bads: Record<string, string>[] = [{ '2025-01-01': 'x' }, { '2026-02-30': 'x' }, { '01/01/2026': 'x' }, {}];
+  for (const bad of bads) {
+    assert.equal(isValidStoredYear(2026, bad), false);
+    assert.equal(resolveYearHolidays(2026, bad).source, 'builtin');
+  }
+});

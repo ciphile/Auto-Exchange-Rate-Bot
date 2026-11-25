@@ -77,3 +77,13 @@ test('KC-07 barie: Vercel chỉ phát thư mục public/ và không tải docs/,
   const publicFiles = trackedFiles().filter((f) => f.startsWith('public/'));
   assert.deepEqual(publicFiles, ['public/robots.txt'], 'public/ chỉ được có robots.txt');
 });
+
+test('Barie (Khang 25/11/2026): biệt danh của repo KHÔNG BAO GIỜ nằm trong src/ — bot gọi tên thật lấy từ database', () => {
+  const nicknames = ['Mít', 'Ổi', 'Xoài', 'Mận', 'Sầu Riêng'];
+  const hits: string[] = [];
+  for (const f of srcFiles()) {
+    const code = readFileSync(f, 'utf8').split('\n').filter((l) => !l.trim().startsWith('//') && !l.trim().startsWith('*')).join('\n');
+    for (const n of nicknames) if (new RegExp(`(?<![\\p{L}])${n}(?![\\p{L}])`, 'u').test(code)) hits.push(`${f}: ${n}`);
+  }
+  assert.deepEqual(hits, []);
+});
