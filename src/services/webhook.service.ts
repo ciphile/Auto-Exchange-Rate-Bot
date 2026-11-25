@@ -7,7 +7,7 @@ import { BOT_DISPLAY_NAMES } from '../shared/persona.vi.ts';
 import { unwrap } from '../shared/result.ts';
 import { getVnDateKey } from '../shared/vn-time.ts';
 import { parseCommand, routeMessage } from './access.service.ts';
-import { findNextHoliday, loadHolidayCalendar } from './calendar.service.ts';
+import { buildHolidayFacts, findNextHoliday, loadHolidayCalendar } from './calendar.service.ts';
 import { handleConfirmPress, sendConfirmCard } from './confirm.service.ts';
 import { canFetchLiveNow, isSourceQuestionOpen, matchSourceKeywords, planLiveFetch, type LiveSource } from './live-rate.service.ts';
 import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
@@ -21,6 +21,8 @@ import { rateSpellings, saveContextLine, speak } from './speech.service.ts';
 
 /** BR-30: câu đòi lấy giá NGAY (luật trước, AI sau). */
 const LIVE_RE = /(lấy|check|coi|xem|cập nhật|update)\s.{0,20}(giá|tỉ giá|tỷ giá)|(giá|tỉ giá|tỷ giá).{0,25}(ngay|bây giờ|giờ này|hiện tại|mới nhất|lúc này|live)/iu;
+/** BR-42: câu hỏi về ngày lễ / ngày nghỉ (chỉ Rây — BR-45). */
+const HOLIDAY_Q_RE = /(ngày lễ|nghỉ lễ|lễ gì|lễ nào|có lễ|được nghỉ|nghỉ ngày nào|holiday)/iu;
 const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate\b|lương)/iu;
 const usernameCache = new Map<string, string>();
 
@@ -93,12 +95,14 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
     const report = await fetchAndStoreRates(rt.store, rt.fetchers, allowed);
     extraFacts.push(`Vừa lấy giá NGAY theo yêu cầu: ${report.saved.join(', ') || 'không lấy thêm được (dùng giá gần nhất)'}${report.failed.length ? `; lỗi: ${report.failed.join(', ')}` : ''}.`);
   }
-  const isData = forceData || extraFacts.length > 0 || RATE_TOPIC_RE.test(msg.text);
-  const mid = await getLatestMid(rt.store);
   const today = getVnDateKey(now);
   const cal = await loadHolidayCalendar(rt.store, today);
+  const holiday = rt.bot === 'ray' && HOLIDAY_Q_RE.test(msg.text) ? buildHolidayFacts(cal, today) : null;
+  if (holiday) extraFacts.unshift(...holiday.facts);
+  const isData = forceData || extraFacts.length > 0 || RATE_TOPIC_RE.test(msg.text);
+  const mid = await getLatestMid(rt.store);
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
-  const fallback = isData
+  const fallback = holiday ? holiday.plain : isData
     ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at))) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {

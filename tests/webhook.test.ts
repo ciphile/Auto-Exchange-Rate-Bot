@@ -139,3 +139,13 @@ test('BR-45: prompt của Lũi (nhóm B) KHÔNG mang tỉ giá / ngày lễ / ti
   const p = prompts.at(-1) ?? '';
   for (const word of ['19.950', 'TIMESHEET', 'Christmas', 'lương']) assert.ok(!p.includes(word), `prompt Lũi có "${word}"`);
 });
+
+test('BR-42: hỏi Rây "tháng sau có ngày lễ nào không" → prompt có lịch lễ tới hết tháng sau; AI lỗi → danh sách soạn sẵn đúng ngày', async () => {
+  const now = vn(2026, 11, 25, 10, 0);
+  const { rt, fake, prompts } = createTestRuntime({ now: () => now });
+  await rt.store.saveGroup('ray', GROUP);
+  await handleUpdate(rt, groupMsg('@ray_test_bot tháng sau có ngày lễ nào không'));
+  assert.match(prompts.at(-1) ?? '', /LỊCH NGHỈ LỄ SINGAPORE từ hôm nay tới hết 31\/12\/2026/);
+  assert.match(prompts.at(-1) ?? '', /25\/12 \(T6\)/);
+  assert.match(fake.sent.at(-1)?.text ?? '', /25\/12 \(T6\): Christmas Day/);
+});

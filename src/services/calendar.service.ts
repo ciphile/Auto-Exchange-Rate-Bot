@@ -30,3 +30,30 @@ export function findNextHoliday(cal: HolidayCalendar, todayKey: string, days = 3
   const daysAway = Math.round((Date.parse(`${next.date}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 86_400_000);
   return { ...next, daysAway };
 }
+
+const WEEKDAYS_VI = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+const HOLIDAY_FACT_MAX_LINES = 4;
+
+/** Hết tháng SAU của ngày `todayKey` (vd 25/11 → 31/12). */
+export function endOfNextMonth(todayKey: string): string {
+  const [y = 0, m = 0] = todayKey.split('-').map(Number);
+  const d = new Date(Date.UTC(y, m + 1, 0));
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * BR-42 (Khang 25/11/2026: hỏi "tháng sau có ngày lễ nào không" thì phải biết trả lời): dòng bối cảnh lịch lễ
+ * từ hôm nay tới hết tháng sau (đã gồm nghỉ bù) — AI chỉ đọc lại, không tự đoán ngày lễ.
+ */
+export function buildHolidayFacts(cal: HolidayCalendar, todayKey: string): { facts: string[]; plain: string } {
+  const end = endOfNextMonth(todayKey);
+  const items = Object.keys(cal.dates).filter((d) => d >= todayKey && d <= end).sort()
+    .map((d) => `${d.slice(8, 10)}/${d.slice(5, 7)} (${WEEKDAYS_VI[new Date(`${d}T00:00:00Z`).getUTCDay()]}): ${(cal.dates[d] ?? '').replace(/"{3,}/g, "''").slice(0, 60)}`);
+  const range = `từ hôm nay tới hết ${end.slice(8, 10)}/${end.slice(5, 7)}/${end.slice(0, 4)}`;
+  if (items.length === 0) return { facts: [`LỊCH NGHỈ LỄ SINGAPORE ${range}: KHÔNG có ngày lễ nào.`], plain: `Dạ ${range} không có ngày nghỉ lễ Singapore nào hết.` };
+  const shown = items.slice(0, HOLIDAY_FACT_MAX_LINES);
+  return {
+    facts: [`LỊCH NGHỈ LỄ SINGAPORE ${range} (đã gồm nghỉ bù; chỉ dùng đúng lịch này):`, ...shown.map((x) => `- ${x}`)],
+    plain: `Dạ lịch nghỉ lễ Singapore ${range}:\n${items.map((x) => `- ${x}`).join('\n')}`,
+  };
+}

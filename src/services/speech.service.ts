@@ -58,10 +58,12 @@ export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakR
   ]);
   const group = profile ?? DEFAULT_GROUP;
   const situation = isRay ? req.situation : { ...req.situation, isTimesheetDay: false, nextHoliday: null };
+  // Dòng do nơi gọi đưa (giá vừa lấy, lịch lễ được hỏi) đứng ĐẦU: trần 8 dòng bối cảnh không được cắt mất chúng.
   const facts = [
+    ...(req.extraFacts ?? []),
     ...buildSituationFacts({ now, daysUntilPayday: getDaysUntilPayday(now), rate, recentBotPosts: [], news: [], ...situation })
       .filter((f) => isRay || !/lương/i.test(f)),
-    ...bankFacts, ...(req.extraFacts ?? []),
+    ...bankFacts,
   ];
   const styleSettings = { bot, personaOn: settings.personaOn, mood: settings.mood, profanityLevel: settings.profanityLevel };
   const profanityKey = `profanity:${getVnDateKey(now)}`;
