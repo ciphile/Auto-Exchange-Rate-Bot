@@ -29,7 +29,7 @@ test('Bẫy 35: MỌI ví dụ trong bảng hướng dẫn đều chạy đượ
     '/caidat': '/caidat', '/moc 19800 19900 20000': '/moc 19800 19900 20000', '/langnghe on | off': '/langnghe on',
     '/hongchuyen 1..10': '/hongchuyen 5', '/xungho tui - mấy ông': '/xungho tui - mấy ông', '/tinhcach on | off': '/tinhcach on',
     '/tamtrang <mã>': '/tamtrang sieubua', '/tansuat 1..5': '/tansuat 1', '/canhbaocathang on | off': '/canhbaocathang on',
-    '/noituc 0..3': '/noituc 2', '/gionghi 20-6': '/gionghi 21-7', '/nguon wise,vcb,vpbank': '/nguon wise,vcb', '/phongcach <mô tả>': '/phongcach hay ví von', '/nhactimesheet on | off': '/nhactimesheet off',
+    '/noituc 0..3': '/noituc 2', '/gionghi 20-6': '/gionghi 21-7', '/nguon wise,vcb,vpbank,dbs': '/nguon wise,vcb,dbs', '/phongcach <mô tả>': '/phongcach hay ví von', '/nhactimesheet on | off': '/nhactimesheet off',
   };
   for (const [cmd] of OWNER_COMMAND_HELP) {
     const example = examples[cmd];
@@ -72,7 +72,7 @@ test('F-08 /xungho, /gionghi, /nguon, /noituc, /tansuat, /hongchuyen: đúng th�
   assert.deepEqual(propose('/gionghi 22:00-07:00').change.patch.quietHours, { startHour: 22, endHour: 7 });
   assert.deepEqual(propose('/nguon VCB, wise').change.patch.sources, ['wise', 'vcb']);
   assert.equal(propose('/noituc 3').change.patch.profanityLevel, 3);
-  for (const bad of ['/xungho tao', '/gionghi 20-20', '/gionghi 25-6', '/nguon dbs', '/noituc 4', '/tansuat 13', '/hongchuyen 0']) {
+  for (const bad of ['/xungho tao', '/gionghi 20-20', '/gionghi 25-6', '/nguon acb', '/noituc 4', '/tansuat 13', '/hongchuyen 0']) {
     assert.equal(handleOwnerSettingsCommand(bad, DEF).kind, 'reply', bad);
   }
 });

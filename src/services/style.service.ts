@@ -1,14 +1,14 @@
 // BR-31 → BR-34: tính cách + tâm trạng → "chỉ thị nói" gửi AI, và kiểm lời AI trả về. Hàm thuần. Dùng cho cả Rây và Lũi.
 // Theo tài liệu gọi AI của Khang mục 3.1: khối STYLE (ổn định theo cấu hình) nằm ở SYSTEM; phần đổi theo
 // từng lần nói (lập trường bốc ngẫu nhiên, độ dài, emoji, tâm trạng bốc khi "không ổn định") nằm ở PROMPT.
-import {
+import { TERSE_WORDS,
   DEFAULT_ADDRESS, MAX_POKE_PROBABILITY, MAX_REBUTTAL_PROBABILITY, MOOD_CODES, MOOD_PROFILES, PERSONA_PROFILES,
   POLITE_EMOJI_MAX, PURPOSE_LENGTH_FACTOR, STYLE_HARD_LENGTH_FACTOR, SUMMARY_WORDS, UNSTABLE_CHIME_FACTOR,
   UNSTABLE_MOOD_POOL, UNSTABLE_POKE_BOOST,
   PERSONA_PENDING, PROFANITY_LEVELS, type MoodCode, type ProfanityLevel, type PersonaMode, type StableMood,
 } from '../config/persona.ts';
 import type { BotKey } from '../domain/telegram.ts';
-import {
+import { SLANG_WORDS, TEXT_EMOTICONS,
   BOT_DISPLAY_NAMES, MOOD_TEXT, MOOD_TEXT_OVERRIDES, NORTHERN_REPLACEMENTS, NORTHERN_WATCH_WORDS, PERSONA_TEXT, PROFANITY_TIERS, SENSITIVE_TOPIC_WORDS,
   SOUTHERN_SPEECH_TEXT, STANCE_TEXT, type Stance,
 } from '../shared/persona.vi.ts';
@@ -31,6 +31,8 @@ export type StyleDirective = {
   /** BR-38: số từ tục tối đa lần này (0 = cấm) + bậc được dùng. */
   profanityMax: number;
   profanityTiers: readonly ('nhe' | 'vua')[];
+  /** Lần này nói CỤT (1 câu ngắn) — chỉ khi bật tính cách (terseChance). */
+  terse: boolean;
   signature: string; // mã ngắn của chỉ thị — đưa vào log AI + khóa cache
 };
 
@@ -117,8 +119,11 @@ export function computeStyleDirective(
   const profanityAllowed = profile.profanityOk && ctx.purpose !== 'daily_summary' && stance !== 'trung_lap';
   const profanityMax = profanityAllowed ? Math.max(0, Math.min(rule.perMessage, rule.perDay - (ctx.profanityUsedToday ?? 0))) : 0;
   const profanityTiers = profanityMax > 0 ? rule.tiers : [];
-  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`, `${profanityMax}t`].join('|');
-  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, profanityMax, profanityTiers, signature };
+  // Khang 25/11/2026: bật tính cách thì nhiều khi nói CỤT (bốc sau cùng để không đổi các lần bốc phía trên).
+  const terse = ctx.purpose !== 'daily_summary' && persona.terseChance > 0 && random() < persona.terseChance;
+  if (terse) { words = TERSE_WORDS; maxSentences = 1; }
+  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`, `${profanityMax}t`, terse ? 'cut' : 'full'].join('|');
+  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, profanityMax, profanityTiers, terse, signature };
 }
 
 /** Khối STYLE cho SYSTEM (ổn định theo cấu hình — đổi tính cách / tâm trạng / xưng hô mới đổi). */
@@ -145,6 +150,9 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     moodLine,
     `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
+    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn nếu nói giá (giờ lấy giá không bắt buộc khi nói cụt). Vd "Wise 19950 :))".' : null,
+    d.mode === 'on' ? `- Biểu cảm bằng ký tự (${TEXT_EMOTICONS.map((e) => `"${e}"`).join(', ')}) dùng thoải mái, không tính vào emoji; từ lóng ${SLANG_WORDS.map((w) => `"${w}"`).join(', ')} được dùng vừa phải.` : '- KHÔNG dùng từ lóng (vãi, éo, móa).',
+    d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi 19900 =)), éo gì cũng giảm".' : null,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
     d.profanityMax > 0
@@ -159,6 +167,7 @@ const BANNED_RE = wordRe(PROFANITY_TIERS.cam.map(escapeRe).join('|'));
 const SOFT_WORDS = [...PROFANITY_TIERS.nhe.map((w) => ({ w, tier: 'nhe' as const })), ...PROFANITY_TIERS.vua.map((w) => ({ w, tier: 'vua' as const }))]
   .sort((a, b) => b.w.length - a.w.length);
 const SOFT_RE = wordRe(SOFT_WORDS.map((x) => escapeRe(x.w)).join('|'), 'giu');
+const SLANG_RE = wordRe(SLANG_WORDS.map(escapeRe).join('|'), 'giu');
 const tierOf = (word: string) => SOFT_WORDS.find((x) => x.w === word.toLowerCase())?.tier ?? 'vua';
 const mask = (word: string) => `${word[0] ?? ''}${'*'.repeat(Math.max(1, word.length - 1))}`;
 const EMOJI_RE = /\p{Extended_Pictographic}/gu;
@@ -193,7 +202,9 @@ export function checkStyledOutput(text: string, d: StyleDirective): { ok: boolea
   if (BANNED_RE.test(text.normalize('NFC'))) return { ok: false, text: '', warnings: ['có từ cấm tuyệt đối'], profanityUsed: 0 };
   // BR-38: từ tục trong giới hạn được giữ; vượt số lượng / sai bậc → che (đ*) thay vì bỏ cả câu.
   let profanityUsed = 0;
-  let out = normalizeSouthern(text.trim()).replace(SOFT_RE, (m) => {
+  // Khang 25/11/2026: từ lóng (vãi, éo, móa) được dùng khi KHÔNG ngoan; ngoan → che.
+  const base = d.mode === 'on' ? normalizeSouthern(text.trim()) : normalizeSouthern(text.trim()).replace(SLANG_RE, (m) => { warnings.push(`che từ lóng "${mask(m)}"`); return mask(m); });
+  let out = base.replace(SOFT_RE, (m) => {
     if (profanityUsed < d.profanityMax && d.profanityTiers.includes(tierOf(m))) { profanityUsed++; return m; }
     warnings.push(`che từ tục "${mask(m)}"`);
     return mask(m);

@@ -208,3 +208,23 @@
 - **Yêu cầu gốc:** "nhớ khi làm cho ngày lễ, code xử lý ngày lễ giống tài liệu md mình gởi nha" · sếp ở công ty vendor "ai cũng sợ ổng vì siêu khó tỉ mĩ hay soi xét" (đã đổi biệt danh: Sầu Riêng) · "bot đừng có gọi mật danh cho mọi người nha… phải kêu đúng tên thật" · (ảnh) email CI đỏ của commit `ae32ccc`
 - **Kết quả:** commit `ae32ccc` lọt tên thật vào sổ quy trình + bị commit dù test đỏ → sửa, thêm git pre-commit hook (đã thử: chặn đúng), Bẫy 45, cập nhật BUG-0001 (lần 3). Bảng tên thật + hồ sơ: Sầu Riêng. Prompt dặn gọi đúng tên; barie biệt danh không nằm trong `src/`. Ngày lễ: `isValidStoredYear`, `HOLIDAY_AUDIT_EVENTS`, FS 0.9 mục 11 đối chiếu từng mục tài liệu. 139 / 139 test đạt.
 - **Bài học cho skill:** (1) **"Test đỏ không commit" phải là barie (git hook)**, không phải thói quen — 1 ống `| grep` là đủ làm hỏng. (2) Chép nguyên văn lời chủ dự án vào sổ là chỗ lọt tên thật nhiều nhất (3/3 lần) → luôn đổi tên **trước khi** viết mục "Yêu cầu gốc". (3) Khi chủ dự án đưa tài liệu cách làm có sẵn → viết **bảng đối chiếu từng mục** (giống / khác + lý do) để chứng minh làm theo 100%.
+
+## 25/11/2026 — Rây chạy được tối thiểu (Mode 2)
+- **Bối cảnh:** Khang báo giới hạn tuần 80%, muốn có Rây dùng trước khi hết lượt. Kat dồn sức nối dịch vụ thật, không tách nhiều commit nhỏ.
+- **Làm:** database Supabase (9 bảng + RLS + barie), cửa AI duy nhất theo tài liệu Khang, webhook + thẻ xác nhận, tick 10 phút, `/gioithieu` (Khang yêu cầu giữa lượt), BR-45 Lũi không mang tỉ giá / lễ / timesheet (Khang yêu cầu), hỏi lễ tháng sau (Khang yêu cầu), hướng dẫn cài phần 6–8.
+- **Bài học:** barie có sẵn bắt đúng 2 lỗi lúc viết code (chữ "thinkingConfig" trong comment, đọc process.env ngoài config) → sửa theo barie, không tắt barie. Test luồng bằng database giả trong bộ nhớ chạy đúng repository thật.
+
+## 25/11/2026 — Audit prompt 633 tình huống (Khang yêu cầu ≥ 500)
+- **Cách làm:** test sinh tự động chạy ĐÚNG đường thật (tin Telegram → prompt → AI giả lỗi / đúng / bịa số → kiểm lời → gửi), mỗi tình huống kiểm 9 luật bất biến + kỳ vọng riêng (tỉ giá × 6 ngày × 3 kiểu AI, kho giá trống / dự phòng / cũ, ngày lễ × 5 ngày, 41 câu cắc cớ / lừa bot, quy đổi, Lũi, chat riêng).
+- **Bắt được 5 lỗi thật:** AI bịa số lọt ra nhóm (câu hỏi thường + câu tán gẫu) · hỏi quy đổi để AI tự nhân · câu không dấu không hiểu · 1 điểm giá mà nói "đi ngang 0%, thấp nhất 7 ngày" · (trước đó) giờ lặp + ",0".
+- **Bài học:** test "chạy đường thật + luật bất biến + sinh hàng trăm tình huống" bắt được lỗi mà test từng hàm không bắt; số liệu được phép phải lấy từ dữ liệu CODE, không từ chữ người dùng (chống lừa).
+
+## 25/11/2026 — Thêm nguồn DBS (Khang cho phép đọc trang DBS)
+- Mạng máy ảo chặn `www.dbs.com.sg` → Kat xin thêm vào môi trường (Khang duyệt); lệnh tải trang bị bộ lọc quyền của phiên chặn → **dừng, hỏi Khang**, không lách. Khang nhắn "cho Kat đọc trang DBS" → thử lại 1 lần.
+- Dò: dữ liệu nhúng sẵn trong trang là bản **2020** (bẫy!) → đọc `fx-board-rate.js` tìm đường dẫn thật `sg-rates-api/.../getCurrencyConversionRates` → dòng VND/SGD khớp từng số lẻ với ảnh Khang (19.607,8431).
+- Bài học: dữ liệu "có sẵn trong HTML" có thể là bản cũ — luôn xem ngày hiệu lực; viết bộ đọc theo dữ liệu thật, không theo phỏng đoán. Node `fetch` trên máy ảo cần `NODE_USE_ENV_PROXY=1` mới đi qua proxy (chỉ máy ảo, Vercel không cần).
+
+## 25/11/2026 — Đổi tiền cho nhóm (BR-51) + giọng / quan điểm / không tìm kiếm (BR-52)
+- Đổi tiền: số do CODE tính (không AI); hỏi nguồn → nhận trả lời của đúng người (không cần gọi tên) → im lặng thì tick tính mặc định. Test bắt lỗi thật: "/doitien 100 tất cả" ghép thiếu dấu cách thành "sgdtất cả".
+- Khang sửa giữa chừng: viết gọn "1990" là do Khang gõ thiếu số → bot phải viết ĐỦ chữ số (chỉ bỏ dấu chấm) → gỡ phần cho phép viết gọn vừa làm. Bài học: ví dụ người dùng đưa có thể có lỗi gõ — hỏi lại / làm bản an toàn (đủ số) trước.
+- Chợ đen tròn 50 đ (Khang: họ hay làm tròn).

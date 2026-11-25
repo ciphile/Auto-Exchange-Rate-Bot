@@ -22,8 +22,12 @@ export const PAYDAY_POSTS_MAX = 6;
 export const RANDOM_TALK_FROM_MINUTE = 6 * 60 + 30;
 export const RANDOM_TALK_TO_MINUTE = 19 * 60 + 30;
 // BR-12: chợ đen ước tính = Wise × (1 + mức chênh), làm tròn tới 10 đ.
-export const BLACK_MARKET_PREMIUM = 0.004;
-export const BLACK_MARKET_ROUND_VND = 10;
+// 0,48%: Khang đối chiếu 25/11/2026 — Wise 20.004,30 ↔ chợ đen thật 20.100 (0,4% cũ ra 20.080, thấp 20 đ).
+export const BLACK_MARKET_PREMIUM = 0.0048;
+/** Mức chênh dạng chữ cho prompt / tin ("+0,48%"). */
+export const BLACK_MARKET_PREMIUM_TEXT = `+${(BLACK_MARKET_PREMIUM * 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}%`;
+// Khang 25/11/2026: chợ đen hay làm tròn → tròn tới 50 đ (20.096 → 20.100).
+export const BLACK_MARKET_ROUND_VND = 50;
 // BR-18 + FS mục 6: bảng mức hóng chuyện (vị trí 0 = mức 1 … vị trí 9 = mức 10).
 export const CHATTINESS_TABLE: readonly { probability: number; dailyCap: number }[] = [
   { probability: 0, dailyCap: 0 },

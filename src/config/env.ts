@@ -76,3 +76,12 @@ export function loadEnv(source: Record<string, string | undefined>): Result<AppE
     LUI_WEBHOOK_SECRET: luiSecret || null,
   });
 }
+
+/** Đọc biến môi trường của tiến trình (chỉ file này được chạm process.env — barie 6.8). */
+export const loadProcessEnv = (): Result<AppEnv> => loadEnv(process.env);
+
+/**
+ * Tên miền chính của project trên Vercel — biến HỆ THỐNG Vercel tự tạo (Khang không phải thêm), dùng để bot tự đăng ký webhook.
+ * Không có (chạy ngoài Vercel) → null: bỏ bước tự đăng ký.
+ */
+export const getVercelProductionHost = (): string | null => process.env.VERCEL_PROJECT_PRODUCTION_URL || null;

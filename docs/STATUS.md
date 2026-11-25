@@ -1,22 +1,23 @@
 # STATUS — Auto-Exchange-Rate-Bot
-> **Chế độ làm việc: Mode 2 (Tự động)** · Cập nhật: 25/11/2026 07:03 · Mục đích: để KHANG nhớ việc.
+> **Chế độ làm việc: Mode 2 (Tự động)** · Cập nhật: 25/11/2026 (tổng kết) · Mục đích: để KHANG nhớ việc.
 
 ## Giai đoạn hiện tại
-**FS bản 0.9** (`docs/specs/02-functional-spec.md` — Khang đã duyệt bản 0.2; 0.3–0.6 Kat viết Mode 2: tính cách / tâm trạng / tần suất / ngữ cảnh prompt / nói tục / lệnh cài đặt / hồ sơ thành viên / ngày lễ SG / timesheet / người đang hỏi). Hạn chót Rây: **thứ Năm 03/12/2026** (Khang xác nhận). Code: logic thuần + kiểm biến môi trường + barie; typecheck chạy được. 139 / 139 test đạt. Chưa nối dịch vụ thật.
+**FS bản 1.0** (BR-01 → BR-52). Rây đã có code nối dịch vụ thật (database, AI, webhook, tick) — **chưa deploy thật**. 813 / 813 test đạt (gồm 633 tình huống audit prompt). Hạn chót Rây: **thứ Năm 03/12/2026**.
 
 ## Việc dở / chờ
 | # | Việc | Ai / trạng thái |
 |---|---|---|
-| 1 | **Xem + mợt PR #4** (tính cách × tâm trạng, tần suất, ngữ cảnh prompt, nói tục, lệnh cài đặt) | 👤 Khang · ⭐ |
-| 2 | **Tạo dịch vụ theo `docs/huong-dan-cai-dat.md` phần 1–5** (Telegram ID, BotFather + tắt Group Privacy, Supabase, Gemini, Vercel + 7 biến). Không dán khóa vào chat. Xong báo Kat: tên bot, địa chỉ Vercel, kết quả kiểm 404 | 👤 Khang · ⭐ |
-| 3 | **Lũi — lĩnh vực tin, tính cách + tâm trạng riêng (cơ chế bật / tắt + tâm trạng đã dùng chung), giọng văn** | 👤 Khang gửi sau |
-| 4 | **Code đợt 2**: Telegram adapter + webhook (ATR-1), Supabase (bảng + RLS + migration) → hướng dẫn phần 6, `/api/tick` + Vault → phần 7, AI adapter (100% tài liệu Khang), lệnh của Khang + `/gannhom`, action `lay_ty_gia_ngay` | ⏳ Kat |
-| 4b | Nạp hồ sơ thành viên (`docs/rieng-tu/HO-SO-THANH-VIEN.md`) vào database + lệnh `/thanhvien` gắn mã Telegram từng người (BR-40) — làm cùng phần database, hướng dẫn phần 6 | ⏳ Kat |
-| 5 | KC-01 (Supabase Cron mỗi 10 phút gói Free) · KC-06 (Vercel build `import './x.ts'`) · KC-07 (404 cho `docs/`) · KC-08 (Vercel vào được trang MOM không) | ⏳ Kat (sau việc 2) |
-| 6 | Nguồn Wise không chính thức — đã có ADR-07 + nguồn dự phòng | ✅ theo dõi |
+| 1 | **Mợt PR #5** (khi CI xanh) | 👤 Khang · ⭐ |
+| 2 | **Cài Rây theo `docs/huong-dan-cai-dat.md` phần 1–8** + chạy `thanh-vien.sql` (file riêng Kat gửi, không trong repo) + `/chodencontact them …` cho nơi đổi chợ đen. Không dán khóa vào chat. Xong báo Kat tên bot + địa chỉ Vercel | 👤 Khang · ⭐ |
+| 3 | **Kiểm sau deploy**: `/robots.txt` · `/docs/...` phải 404 · `/api/ray` GET → 405 · `curl -X POST /api/tick` → 401 · Build Logs (KC-06) · `/trangthai` trong Telegram | 👤 Khang + ⏳ Kat sửa theo lỗi thật |
+| 4 | **Tải lịch lễ MOM tự động** trong tick (lịch 2027 cần trước 15/12; tạm: `/ngayle them`) — KC-08 | ⏳ Kat |
+| 5 | **Lũi** — tính cách, tâm trạng riêng, giọng văn, lĩnh vực tin, token | 👤 Khang gửi sau |
+| 6 | KC-01 (Supabase Cron 10 phút gói Free) · KC-06 (Vercel chạy `import './x.ts'`) · KC-08 (Vercel vào được MOM) | ⏳ sau việc 2 |
+| 7 | Nhỏ: tách hàm `answer` trong `webhook.service.ts` (~70 dòng > 50) · lệnh xem tình trạng AI chi tiết / xóa cache (tài liệu Khang mục 13) · `/thanhvien` gắn mã Telegram | ⏳ Kat |
 
 ## Câu hỏi chờ Khang
-- Có việc nào Khang làm ngoài chat (GitHub, BotFather…) mà Kat chưa ghi vào sổ quy trình không?
+- Mận có trong nhóm A không? Nếu không, Kat thêm cột "nhóm" cho hồ sơ để Rây không nhắc người ngoài nhóm.
+- Muốn lệnh `/chotden <giá chợ đen thật>` để Khang tự hiệu chỉnh mức chênh chợ đen không?
 
 ## Bug đang mở
 - Không có.

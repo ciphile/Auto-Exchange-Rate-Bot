@@ -11,6 +11,12 @@ const WISE_HISTORY_URL = 'https://wise.com/rates/history+live?source=SGD&target=
 const FALLBACK_URL = 'https://open.er-api.com/v6/latest/SGD';
 const VCB_URL = 'https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx?b=10';
 const VPBANK_URL = 'https://www.vpbank.com.vn/uiux-api/api/exchange-rate';
+// DBS Singapore: dữ liệu bảng giá của trang rates-online (Kat dò từ fx-board-rate.js, 25/11/2026). FETCH_LATEST = mốc thời gian chống cache.
+const DBS_URL = 'https://www.dbs.com.sg/sg-rates-api/v1/api/sgrates/getCurrencyConversionRates?FETCH_LATEST=';
+const DBS_TIME_OFFSET = '+08:00'; // giờ trong dữ liệu DBS là giờ Singapore
+
+/** DBS: giá SGD → VND (ngân hàng bán VND) + thời điểm hiệu lực. */
+export type DbsQuote = { rateVnd: number; effectiveAt: number | null };
 
 /** '19,497.26' | '19454.97' | 19648 | '-' | '' → số hoặc null. */
 export function parseNumber(value: unknown): number | null {
@@ -62,6 +68,27 @@ export function parseVpbank(body: unknown): BankQuote | null {
   return null;
 }
 
+type DbsRow = { currency?: unknown; quoteCurrency?: unknown; ttSell?: unknown; ttInverseBuy?: unknown; baseCurrencyUnit?: unknown; quoteCurrencyUnit?: unknown };
+
+/**
+ * Dòng {currency: VND, quoteCurrency: SGD, baseCurrencyUnit: 100, ttSell: 0.0051, ttInverseBuy: 196.07…} nghĩa là
+ * 100 VND = 0,0051 SGD → 1 SGD = 19.607,84 VND (khớp "Exchange Rate" trên trang DBS). Ngoài 10.000–40.000 → coi như hỏng.
+ */
+export function parseDbsVnd(body: unknown): DbsQuote | null {
+  const root = body as { results?: { assets?: { recData?: DbsRow[] }[] }; effectiveDateAndTime?: unknown };
+  const rows = (root?.results?.assets ?? []).flatMap((a) => a?.recData ?? []);
+  const row = rows.find((r) => r?.currency === 'VND' && r?.quoteCurrency === 'SGD');
+  if (!row) return null;
+  const base = parseNumber(row.baseCurrencyUnit) ?? 1;
+  const quote = parseNumber(row.quoteCurrencyUnit) ?? 1;
+  const inverse = parseNumber(row.ttInverseBuy);
+  const sell = parseNumber(row.ttSell);
+  const rate = inverse && inverse > 0 ? (inverse * base) / quote : sell && sell > 0 ? (base / sell) * quote : null;
+  if (rate === null || rate < 10_000 || rate > 40_000) return null;
+  const t = typeof root.effectiveDateAndTime === 'string' ? Date.parse(`${root.effectiveDateAndTime.replace(' ', 'T')}${DBS_TIME_OFFSET}`) : NaN;
+  return { rateVnd: rate, effectiveAt: Number.isFinite(t) ? t : null };
+}
+
 async function getText(url: string): Promise<Result<string>> {
   try {
     const res = await fetch(url, { headers: { 'User-Agent': HTTP_USER_AGENT }, signal: AbortSignal.timeout(HTTP_TIMEOUT_MS) });
@@ -104,6 +131,13 @@ export async function fetchVcb(): Promise<Result<BankQuote>> {
   if (!r.ok) return r;
   const q = parseVcbXml(r.data);
   return q === null ? fail('E-SRC-002', 'VCB không có SGD') : ok(q);
+}
+
+export async function fetchDbs(): Promise<Result<DbsQuote>> {
+  const r = await getJson(`${DBS_URL}${Date.now()}`);
+  if (!r.ok) return r;
+  const q = parseDbsVnd(r.data);
+  return q === null ? fail('E-SRC-002', 'DBS không có giá SGD → VND') : ok(q);
 }
 
 export async function fetchVpbank(): Promise<Result<BankQuote>> {

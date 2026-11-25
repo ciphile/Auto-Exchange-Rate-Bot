@@ -26,6 +26,14 @@ export const ERROR_MESSAGES: Record<ErrorCode, { message: string; fix: string }>
     message: 'Khóa Gemini bị từ chối (sai hoặc bị chặn); bot không gọi được AI.',
     fix: 'Tạo khóa mới ở Google AI Studio rồi dán vào biến môi trường GEMINI_API_KEY trên Vercel.',
   },
+  'E-AI-003': {
+    message: 'Gemini đang nghẽn hoặc lỗi tạm thời (đã thử nhiều model); bot trả lời bằng câu soạn sẵn.',
+    fix: 'Không cần làm gì; bot tự thử lại ở lần sau. Lặp lại cả ngày thì báo Kat.',
+  },
+  'E-DB-001': {
+    message: 'Bot không đọc / ghi được database Supabase.',
+    fix: 'Mở supabase.com xem project có bị tạm dừng (Paused) không — bấm Restore nếu có; kiểm biến SUPABASE_URL, SUPABASE_SECRET_KEY trên Vercel.',
+  },
   'E-TG-001': {
     message: 'Gửi tin vào group thất bại.',
     fix: 'Kiểm bot còn trong group và chưa bị chặn; nếu vẫn lỗi, gửi Kat mã lỗi Telegram kèm theo.',

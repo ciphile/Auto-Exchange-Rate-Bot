@@ -44,7 +44,7 @@ export type AlertGate = 'ok' | 'quiet' | 'gap' | 'quota';
  * BR-08 + BR-09 + BR-35: được gửi cảnh báo lúc này không.
  * 'quiet' giờ nghỉ và 'gap' chưa đủ khoảng cách → CHỜ; 'quota' đã đủ số lần trong khoảng đếm của mức → BỎ.
  */
-export function checkAlertGate(state: AlertState, now: Date, limits: AlertLimits = DEFAULT_LIMITS, quiet = DEFAULT_QUIET_HOURS): AlertGate {
+export function checkAlertGate(state: AlertState, now: Date, limits: AlertLimits = DEFAULT_LIMITS, quiet: { startHour: number; endHour: number } = DEFAULT_QUIET_HOURS): AlertGate {
   if (isInQuietHours(now, quiet)) return 'quiet';
   const t = now.getTime();
   const last = state.recentSentAts.at(-1);
@@ -59,7 +59,7 @@ export function checkAlertGate(state: AlertState, now: Date, limits: AlertLimits
  */
 export function evaluateAlert(
   state: AlertState, rateVnd: number, now: Date, levels: readonly number[], windowOpen: boolean,
-  limits: AlertLimits = DEFAULT_LIMITS, quiet = DEFAULT_QUIET_HOURS,
+  limits: AlertLimits = DEFAULT_LIMITS, quiet: { startHour: number; endHour: number } = DEFAULT_QUIET_HOURS,
 ): { state: AlertState; action: AlertAction; event: AlertEvent | null } {
   const nextBand = updateBand(state.band, rateVnd, levels);
   let pending = state.pending;

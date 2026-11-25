@@ -6,3 +6,20 @@ export type Result<T> = { ok: true; data: T } | { ok: false; error: AppError };
 
 export const ok = <T>(data: T): Result<T> => ({ ok: true, data });
 export const fail = <T = never>(code: ErrorCode, detail?: string): Result<T> => ({ ok: false, error: { code, detail } });
+
+/** Lỗi đã có mã, ném ra từ tầng dưới khi không xử lý tiếp được; controller bắt, ghi log, báo riêng Khang (BR-15). */
+export class AppFailure extends Error {
+  readonly code: ErrorCode;
+  readonly detail: string | undefined;
+  constructor(error: AppError) {
+    super(error.code);
+    this.code = error.code;
+    this.detail = error.detail;
+  }
+}
+
+/** Lấy dữ liệu hoặc ném AppFailure (dùng ở chỗ lỗi = không làm tiếp được, vd database hỏng). */
+export function unwrap<T>(r: Result<T>): T {
+  if (!r.ok) throw new AppFailure(r.error);
+  return r.data;
+}

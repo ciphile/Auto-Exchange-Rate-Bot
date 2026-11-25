@@ -1,6 +1,6 @@
 # Hướng dẫn cài đặt — Rây (và Lũi) — từng bước một
 
-> Viết cho Khang · Kat soạn 24/11/2026 · Bản 1 (phần 0 → 5). **Phần 6 → 8** Kat viết tiếp khi code phần database và nhịp lịch xong.
+> Viết cho Khang · Kat soạn 24/11/2026 · Bản 2 (25/11/2026): đủ phần 0 → 8.
 > Cách đọc: làm **đúng thứ tự**, mỗi bước 1 việc. Chữ **in đậm trong ngoặc kép** như **"New project"** là **chữ trên nút / menu** đúng như màn hình (tiếng Anh). Màn hình các trang web hay đổi chút ít; nếu không thấy đúng chữ → xem dòng **"Nếu không thấy"** ngay dưới bước đó, hoặc chụp màn hình gửi Kat (**che hết khóa trước khi chụp**).
 
 ---
@@ -221,16 +221,76 @@ Mỗi mã là **64 ký tự** gồm số 0–9 và chữ a–f. **Mỗi dòng 1 
 
 ---
 
-## Phần 6 — Tạo bảng dữ liệu trên Supabase *(Kat viết khi code xong phần database)*
-Sẽ có: mở **SQL Editor** trên Supabase → dán đúng 1 file SQL trong repo → bấm **"Run"** → cách kiểm đã có đủ bảng và đã bật khóa bảo vệ (RLS).
+## Phần 6 — Tạo bảng dữ liệu trên Supabase — 5 phút
 
-## Phần 7 — Bật nhịp lịch mỗi 10 phút + `TICK_SECRET` *(Kat viết khi code xong `/api/tick`)*
-Sẽ có: tạo mã `TICK_SECRET` (lệnh ở 5.4) → dán **cùng lúc** vào Vercel và kho bí mật **Vault** của Supabase → chạy 1 đoạn SQL bật lịch → cách kiểm lịch đã chạy (KC-01).
+> Giống tạo file vật lý trên AS400 (CRTPF) — chạy **1 lần**. Chạy lại cũng không sao (không xóa gì). **Bản code mới có thêm bảng → chạy lại file này** là đủ.
 
-## Phần 8 — Đưa Rây vào nhóm A *(sau phần 7)*
-Sẽ có: thêm bot vào nhóm A → Khang gõ `/gannhom` **trong nhóm** → bấm ✅ → Rây chỉ phục vụ đúng nhóm đó (group khác thêm bot vào → bot im lặng).
+1. Mở GitHub repo → bấm vào thư mục **`src`** → **`repositories`** → file **`schema.sql`** → bấm nút **"Copy raw file"** (biểu tượng 2 tờ giấy chồng nhau, **góc trên bên phải** khung chữ).
+2. Mở https://supabase.com/dashboard → bấm vào project của bot.
+3. Thanh menu dọc **bên trái** → bấm **"SQL Editor"** (biểu tượng `>_`).
+4. Ô soạn thảo lớn ở giữa → bấm vào → `Ctrl + A` rồi `Delete` (xóa chữ có sẵn) → `Ctrl + V` (dán).
+5. Bấm nút xanh **"Run"** (**góc dưới bên phải** ô soạn thảo; hoặc `Ctrl + Enter`).
+   - Nếu hiện hộp hỏi **"Potential issue detected"** / **"destructive operation"** → bấm **"Run this query"** (file không xóa gì).
+6. **Kiểm đã xong:** menu trái → **"Table Editor"** → thấy đủ **10 bảng**: `ai_calls`, `audit_log`, `bot_config`, `bot_state`, `chat_context`, `chat_log`, `holidays`, `members`, `rates`, `tick_runs`. Bấm thử 1 bảng → góc trên có chữ **"RLS enabled"** (hoặc không có cảnh báo đỏ "RLS disabled") là đúng.
 
----
+### 6.1. (Nên làm) Nhập hồ sơ thành viên — để bot biết ai là ai, gọi đúng tên thật
+Tên thật **chỉ nằm trong database** (không bao giờ trong repo). Kat soạn sẵn đoạn SQL từ hồ sơ riêng tư của Khang khi Khang nhắn "soạn SQL thành viên"; hoặc Khang tự gõ theo mẫu:
+```sql
+insert into members (name, aliases, how_to_call, work, about) values
+('Tên thật', 'tên hiển thị Telegram, tên gọi khác', 'cách bot gọi, vd: sếp Tên', 'công việc', 'tính tình, gia đình (1–2 câu)');
+```
+- Cột `aliases`: ghi **đúng tên hiển thị trên Telegram** của người đó (bot dò tên này để biết ai đang nói).
+- Bối cảnh chung của nhóm (vd "nhóm code COBOL trên AS400, làm từ xa, thứ Sáu điền timesheet"):
+```sql
+insert into bot_state (bot, key, value) values ('ray', 'group_profile',
+  '{"name": "tên nhóm", "description": "mô tả 1 câu", "facts": ["ý 1", "ý 2"]}'::jsonb)
+on conflict (bot, key) do update set value = excluded.value;
+```
+- Bấm **"Run"** như trên. Kiểm: **Table Editor** → bảng `members` có đủ người.
+
+## Phần 7 — Bật nhịp lịch mỗi 10 phút — 10 phút
+
+> Giống lên lịch job bằng `ADDJOBSCDE` trên AS400: cứ 10 phút Supabase "gõ cửa" địa chỉ `/api/tick` của bot; bot thức dậy lấy giá, báo giá, nhắc lễ, dọn dẹp. Lần gõ cửa đầu tiên bot cũng **tự đăng ký webhook với Telegram** (Khang không phải làm gì thêm).
+
+**Cần có:** địa chỉ Vercel của bot (vd `https://ten-project.vercel.app` — xem ở Vercel → project → ô **"Domains"**) và mã `TICK_SECRET` đã dán vào Vercel ở phần 5.3 (dòng 7). **Không dán 2 thứ này vào chat.**
+
+1. Supabase → menu trái **"Database"** → **"Extensions"** → ô tìm kiếm gõ `pg_cron` → gạt công tắc **bật** (màu xanh) → bấm **"Enable extension"**. Làm lại với `pg_net`.
+   - Nếu không thấy "Extensions": menu trái **"Integrations"** → **"Cron"** → **"Enable"**.
+2. Menu trái **"SQL Editor"** → bấm **"+"** (**góc trên bên trái**, cạnh chữ "SQL Editor") → **"Create a new snippet"** → dán đoạn dưới, **sửa 2 chỗ** trong dấu nháy đơn:
+```sql
+select vault.create_secret('https://ĐỊA-CHỈ-VERCEL-CỦA-KHANG/api/tick', 'tick_url');
+select vault.create_secret('DÁN-TICK_SECRET-VÀO-ĐÂY', 'tick_secret');
+```
+   → bấm **"Run"** → thấy 2 dòng mã dài (uuid) là xong. **Xóa ngay đoạn chữ vừa dán** (`Ctrl + A`, `Delete`) để mã không nằm trên màn hình.
+   - Gõ nhầm, muốn làm lại: chạy `delete from vault.secrets where name in ('tick_url', 'tick_secret');` rồi chạy lại bước 2.
+3. Snippet mới → dán nguyên văn (không sửa gì) → **"Run"**:
+```sql
+select cron.schedule('ray-tick', '*/10 * * * *', $$
+  select net.http_post(
+    url := (select decrypted_secret from vault.decrypted_secrets where name = 'tick_url'),
+    headers := jsonb_build_object('Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'tick_secret')),
+    body := '{}'::jsonb,
+    timeout_milliseconds := 60000
+  );
+$$);
+```
+4. **Kiểm đã chạy (đợi 10–15 phút)** — snippet mới → dán → **"Run"**:
+```sql
+select status_code, content, created from net._http_response order by created desc limit 5;
+```
+   - Thấy `200` và chữ `ok` → **đúng** ✅.
+   - Thấy `401` → mã `TICK_SECRET` trong Vault khác với trên Vercel → làm lại bước 2 (xóa rồi tạo lại).
+   - Thấy `404` → sai địa chỉ (thiếu `/api/tick` hoặc sai tên project).
+   - Thấy `500` → thiếu / sai biến môi trường trên Vercel → Vercel → project → **"Logs"** tìm dòng `env_invalid` (dòng đó ghi **tên** biến sai, không ghi giá trị).
+5. Mở Telegram → chat riêng với Rây → gõ `/trangthai` → dòng **"Nhịp lịch (tick) gần nhất"** có giờ là xong. Bot trả lời được tức là webhook đã tự đăng ký.
+
+## Phần 8 — Đưa Rây vào nhóm A — 3 phút
+1. Telegram → mở nhóm A → bấm **tên nhóm** (trên cùng) → **"Add members"** / **"Thêm thành viên"** → tìm tên bot Rây → **"Add"**.
+2. Rây nhắn riêng Khang: *"Bot vừa được thêm vào nhóm…"*.
+3. **Trong nhóm A**, Khang gõ: `/gannhom` → Rây gửi **thẻ xác nhận vào chat riêng** của Khang → bấm **✅ Làm**.
+4. Chat riêng với Rây gõ `/gioithieu` → bấm **✅** → Rây tự giới thiệu ngắn trong nhóm.
+5. Gõ `/lenh` để xem mọi lệnh; `/caidat` xem cài đặt. Mặc định: **ngoan**, **tắt lắng nghe** (chỉ trả lời khi được reply / @tên bot), mức tần suất 3. Muốn gọi "Rây ơi" là trả lời → `/langnghe on`.
 
 ## Phụ lục A — Bảng biến môi trường (để dò)
 | Biến | Bắt buộc | Khi nào dán |

@@ -153,3 +153,33 @@ export function handleOwnerSettingsCommand(text: string, current: BotSettings): 
 export function applySettingsChange(current: BotSettings, change: SettingsChange): BotSettings {
   return { ...current, ...change.patch };
 }
+
+/**
+ * Đọc cài đặt đã lưu trong database: gộp với mặc định; ô nào sai kiểu / ngoài miền → dùng mặc định (dữ liệu hỏng không làm sập bot).
+ * Cài đặt mới thêm sau này tự có giá trị mặc định cho bản ghi cũ.
+ */
+export function mergeStoredSettings(bot: BotKey, stored: Record<string, unknown>): BotSettings {
+  const d = getDefaultSettings(bot);
+  const s = stored as Partial<Record<SettingKey, unknown>>;
+  const isInt = (v: unknown, lo: number, hi: number): v is number => typeof v === 'number' && Number.isInteger(v) && v >= lo && v <= hi;
+  const bool = (v: unknown, def: boolean) => (typeof v === 'boolean' ? v : def);
+  const levels = Array.isArray(s.alertLevelsVnd) && s.alertLevelsVnd.every((v) => isInt(v, MIN_LEVEL_VND, MAX_LEVEL_VND)) ? (s.alertLevelsVnd as number[]) : d.alertLevelsVnd;
+  const addr = s.address as BotSettings['address'] | undefined;
+  const quiet = s.quietHours as BotSettings['quietHours'] | undefined;
+  const sources = Array.isArray(s.sources) && s.sources.length > 0 && s.sources.every((v) => (LIVE_SOURCES as readonly unknown[]).includes(v)) ? (s.sources as LiveSource[]) : d.sources;
+  return {
+    alertLevelsVnd: levels,
+    listenOn: bool(s.listenOn, d.listenOn),
+    chattinessLevel: isInt(s.chattinessLevel, 1, 10) ? s.chattinessLevel : d.chattinessLevel,
+    address: addr && typeof addr.self === 'string' && typeof addr.others === 'string' ? addr : null,
+    personaOn: bool(s.personaOn, d.personaOn),
+    mood: (MOOD_CODES as readonly unknown[]).includes(s.mood) ? (s.mood as MoodCode) : d.mood,
+    styleNote: typeof s.styleNote === 'string' ? s.styleNote.slice(0, MAX_STYLE_CHARS) : '',
+    quietHours: quiet && isInt(quiet.startHour, 0, 23) && isInt(quiet.endHour, 0, 23) ? quiet : d.quietHours,
+    sources,
+    frequencyLevel: isInt(s.frequencyLevel, 1, 5) ? (s.frequencyLevel as FrequencyLevel) : d.frequencyLevel,
+    alertFullMonth: bool(s.alertFullMonth, d.alertFullMonth),
+    profanityLevel: isInt(s.profanityLevel, 0, 3) ? (s.profanityLevel as ProfanityLevel) : d.profanityLevel,
+    timesheetReminderOn: bool(s.timesheetReminderOn, d.timesheetReminderOn),
+  };
+}

@@ -24,7 +24,7 @@ export function isBurstComplete(newMessageCount: number, lastMessageAt: number, 
   return newMessageCount >= BURST_MIN_MESSAGES && now.getTime() - lastMessageAt >= BURST_SILENCE_MS;
 }
 
-export function decideChimeIn(input: ChimeInInput, random: () => number, quiet = DEFAULT_QUIET_HOURS): ChimeInDecision {
+export function decideChimeIn(input: ChimeInInput, random: () => number, quiet: { startHour: number; endHour: number } = DEFAULT_QUIET_HOURS): ChimeInDecision {
   const level = Math.min(10, Math.max(1, Math.round(input.level)));
   const row = CHATTINESS_TABLE[level - 1];
   if (!row) return { speak: false, reason: 'mức không hợp lệ' };

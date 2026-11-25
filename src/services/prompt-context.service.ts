@@ -1,12 +1,14 @@
 // BR-36 + BR-37: dựng phần NGỮ CẢNH của prompt (cả Rây và Lũi) — AI không có trí nhớ, nên mỗi lần gọi phải mang:
 // đoạn chat gần nhất của nhóm + các dòng "bối cảnh tình hình" do CODE tính (giá đang trượt, mấy ngày nữa có lương,
 // bot vừa gửi gì). Mọi phần có trần; cả prompt có trần tổng → không phình theo thời gian. Hàm thuần.
+import { estimateBlackMarketVnd } from './rate.service.ts';
+import { describeHolidayVi } from './cheer.service.ts';
 import {
   CHAT_CONTEXT_BUFFER_MAX, CHAT_CONTEXT_MESSAGES, CHAT_CONTEXT_MIN_MESSAGES, CHAT_LINE_MAX_CHARS, FACT_MAX_CHARS,
   GROUP_DESCRIPTION_MAX_CHARS, GROUP_FACT_MAX_CHARS, GROUP_FACTS_MAX, MEMBER_LINE_MAX_CHARS, MEMBERS_MAX, NEWS_HEADLINES_MAX, PROMPT_MAX_CHARS,
   RECENT_BOT_POSTS_MAX, SITUATION_MAX_FACTS, SYSTEM_MAX_CHARS, TREND_FLAT_PCT, TREND_STRONG_PCT, USER_MESSAGE_MAX_CHARS,
 } from '../config/prompt.ts';
-import { PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
+import { BLACK_MARKET_PREMIUM_TEXT, PAYDAY_WEEK_DAYS } from '../config/defaults.ts';
 import { getVnDateKey, getVnParts } from '../shared/vn-time.ts';
 import { ASKER_RULE_TEXT } from '../shared/persona.vi.ts';
 
@@ -77,13 +79,15 @@ export function buildSituationFacts(input: SituationInput): string[] {
   if (input.isTimesheetDay) facts.push('Hôm nay là ngày điền TIMESHEET (mọi người hay quên).');
   const h = input.nextHoliday;
   // Tên lễ lấy từ trang MOM (chữ từ ngoài) → gỡ dấu đóng khối + cắt ngắn (audit 25/11/2026).
-  const hName = h ? defuse(clip(h.name, 60)) : '';
+  const hName = h ? defuse(clip(describeHolidayVi(h.name), 90)) : '';
   if (h) facts.push(h.daysAway === 0 ? `Hôm nay là ngày lễ Singapore: ${hName} (được nghỉ).` : `Còn ${h.daysAway} ngày nữa là lễ Singapore ${hName} (${h.date.slice(8, 10)}/${h.date.slice(5, 7)}).`);
   facts.push(d === 0 ? 'Hôm nay là NGÀY LƯƠNG.' : d === 1 ? 'Mai có lương.'
     : d < PAYDAY_WEEK_DAYS ? `Còn ${d} ngày nữa là có lương (đang trong tuần lương).` : `Còn ${d} ngày nữa mới có lương.`);
   const r = input.rate;
   if (r) {
-    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd)} VND / 1 SGD (${r.sourceLabel}, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}).`);
+    // BR-29: luôn có giờ lấy — nhãn nguồn đã có "lấy lúc" thì không ghi lặp.
+    const when = /lấy lúc/.test(r.sourceLabel) ? '' : `, lấy lúc ${formatChatTime(r.fetchedAt, input.now)}`;
+    facts.push(`Giá Wise gần nhất: ${vnNumber(r.wiseVnd, 0)} VND / 1 SGD (${r.sourceLabel}${when}); chợ đen ước tính ${vnNumber(estimateBlackMarketVnd(r.wiseVnd), 0)} VND (Wise ${BLACK_MARKET_PREMIUM_TEXT}).`);
     const trends = [
       r.change24hPct !== null ? describeTrend(r.change24hPct, 'trong 24 giờ') : null,
       r.change7dPct !== null ? describeTrend(r.change7dPct, 'trong 7 ngày') : null,
