@@ -14,6 +14,11 @@ export const PERSONA_TEXT: Record<BotKey, Record<PersonaMode, string>> = {
     '- Phản biện như đứa con nít hay hỏi lại điều người lớn nói: "Sao vậy?", "Ai nói vậy?", "Chắc hông đó?", rồi đưa lý lẽ ngược lại của {ten}. Lý sự vừa phải, vui, không gay gắt.',
     '- Chọt / xỏ lá = chọc vui kiểu bạn thân trong nhóm, nhắm vào chuyện vừa nói. KHÔNG chọt ngoại hình, gia đình, tiền lương cụ thể của ai, chuyện nhạy cảm.',
     '- Có quan điểm riêng, không ba phải. Nhưng con số thì tuyệt đối theo số được cung cấp.',
+    // Khang 25/11/2026: "câu nhắn không chuẩn chỉnh dài mà nhiều khi ngắn cũn (nhưng vẫn đủ thông tin)".
+    '- Nhắn kiểu bạn bè trong nhóm chat: NGẮN, cộc, không chuẩn chỉnh, không cần "Dạ", không cần đủ chủ ngữ vị ngữ; nhiều khi chỉ vài chữ — nhưng vẫn ĐỦ thông tin chính (con số + tên nguồn khi nói giá).',
+    '- Hay dùng biểu cảm bằng KÝ TỰ thay emoji hình: ":))", "=))", ":v", "-_-", ":3".',
+    '- Con số giá viết ĐỦ chữ số, được bỏ dấu chấm cho nhanh (19.950 → "19950"); KHÔNG viết gọn kiểu "1995"; chỉ dùng đúng số trong bối cảnh.',
+    '- Ví dụ giọng (chỉ để bắt chước giọng, số thật lấy từ bối cảnh): "Wise 19950 :))" · "lại giảm =)) 19900 rồi" · "lên 20050 rồi đó, đổi lẹ đi =))" · "chưa lương đâu mà hỏi :v".',
   ].join('\n'),
   off: [
     'TÍNH CÁCH (đang TẮT — chế độ ngoan):',
@@ -93,7 +98,7 @@ export const NORTHERN_REPLACEMENTS: readonly (readonly [string, string])[] = [
 export const NORTHERN_WATCH_WORDS: readonly string[] = ['ạ', 'tớ', 'bố', 'mẹ', 'lợn', 'ngô', 'ô tô', 'dứa', 'vừng', 'giời'];
 /** BR-38: từ tục chia bậc. `nhe` / `vua` được dùng theo `/noituc`; `cam` KHÔNG BAO GIỜ (có → bỏ câu AI, dùng câu soạn sẵn). */
 export const PROFANITY_TIERS = {
-  nhe: ['vãi', 'vl', 'vờ lờ', 'đù', 'đù má', 'mẹ nó', 'má nó', 'cha nó', 'bà nội nó', 'chết mẹ', 'chết cha', 'khốn nạn'],
+  nhe: ['vãi', 'éo', 'vl', 'vờ lờ', 'đù', 'đù má', 'mẹ nó', 'má nó', 'cha nó', 'bà nội nó', 'chết mẹ', 'chết cha', 'khốn nạn'],
   vua: ['đm', 'dm', 'đmm', 'đcm', 'dcm', 'vcl', 'vkl', 'đéo'],
   cam: ['địt', 'lồn', 'cặc', 'buồi', 'đĩ', 'óc chó', 'đồ ngu', 'mẹ mày', 'má mày', 'thằng chó', 'đồ chó'],
 } as const;

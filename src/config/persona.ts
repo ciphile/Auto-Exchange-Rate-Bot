@@ -50,10 +50,12 @@ export const UNSTABLE_CHIME_FACTOR = 1.1;
 
 /** Tính cách chỉ BẬT / TẮT (BR-31). Rây: bật = xỏ lá, tắt = ngoan. Lũi: chờ Khang (tạm dùng số của Rây). */
 export type PersonaMode = 'on' | 'off';
-export type PersonaProfile = { rebuttalBase: number; pokeBase: number; chime: number; wordsFactor: number; politeEmojiCap: boolean };
+/** terseChance: xác suất lần này nói CỤT 1 câu ngắn (Khang 25/11/2026: bật tính cách thì "nhiều khi ngắn cũn"). */
+export type PersonaProfile = { rebuttalBase: number; pokeBase: number; chime: number; wordsFactor: number; politeEmojiCap: boolean; terseChance: number };
 const RAY_PERSONA: Record<PersonaMode, PersonaProfile> = {
-  on: { rebuttalBase: 0.55, pokeBase: 0.35, chime: 1.3, wordsFactor: 1.25, politeEmojiCap: false },
-  off: { rebuttalBase: 0.08, pokeBase: 0, chime: 0.8, wordsFactor: 1, politeEmojiCap: true },
+  // on: nói ngắn, cộc, hay cụt (Khang 25/11/2026) — wordsFactor 0,85 + 45% lần nói CỤT.
+  on: { rebuttalBase: 0.55, pokeBase: 0.35, chime: 1.3, wordsFactor: 0.85, politeEmojiCap: false, terseChance: 0.45 },
+  off: { rebuttalBase: 0.08, pokeBase: 0, chime: 0.8, wordsFactor: 1, politeEmojiCap: true, terseChance: 0 },
 };
 export const PERSONA_PROFILES: Record<BotKey, Record<PersonaMode, PersonaProfile>> = {
   ray: RAY_PERSONA,
@@ -65,6 +67,8 @@ export const MAX_REBUTTAL_PROBABILITY = 0.9;
 export const MAX_POKE_PROBABILITY = 0.7;
 /** Tính cách tắt (politeEmojiCap): emoji tối đa (dễ thương, không spam), bất kể tâm trạng. */
 export const POLITE_EMOJI_MAX = 1;
+/** Câu CỤT: số chữ + số câu. */
+export const TERSE_WORDS: readonly [number, number] = [2, 12];
 
 /** Độ dài theo mục đích lời nói (nhân vào khoảng chữ của tâm trạng). Tóm tắt cho Khang có độ dài riêng. */
 export const PURPOSE_LENGTH_FACTOR = { answer_data: 1, answer_chat: 1, chime_in: 0.7, rate_report: 0.8, rate_alert: 0.8, reminder: 0.8 } as const;

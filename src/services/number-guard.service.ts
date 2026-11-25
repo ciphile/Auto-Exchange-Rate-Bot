@@ -15,6 +15,7 @@ export function extractBigNumbers(text: string): number[] {
 
 /** Số lớn trong lời AI mà không có trong dữ liệu được phép → trả danh sách số lạ (rỗng = đạt). */
 export function findUnknownNumbers(reply: string, allowedSources: readonly string[]): number[] {
+  // Khang 25/11/2026: số phải ĐỦ chữ số (chỉ được bỏ dấu chấm: 19950) — không chấp nhận viết gọn kiểu "1995".
   const allowed = new Set(allowedSources.flatMap(extractBigNumbers));
   return extractBigNumbers(reply).filter((n) => !allowed.has(n));
 }

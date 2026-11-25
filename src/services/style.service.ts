@@ -1,7 +1,7 @@
 // BR-31 → BR-34: tính cách + tâm trạng → "chỉ thị nói" gửi AI, và kiểm lời AI trả về. Hàm thuần. Dùng cho cả Rây và Lũi.
 // Theo tài liệu gọi AI của Khang mục 3.1: khối STYLE (ổn định theo cấu hình) nằm ở SYSTEM; phần đổi theo
 // từng lần nói (lập trường bốc ngẫu nhiên, độ dài, emoji, tâm trạng bốc khi "không ổn định") nằm ở PROMPT.
-import {
+import { TERSE_WORDS,
   DEFAULT_ADDRESS, MAX_POKE_PROBABILITY, MAX_REBUTTAL_PROBABILITY, MOOD_CODES, MOOD_PROFILES, PERSONA_PROFILES,
   POLITE_EMOJI_MAX, PURPOSE_LENGTH_FACTOR, STYLE_HARD_LENGTH_FACTOR, SUMMARY_WORDS, UNSTABLE_CHIME_FACTOR,
   UNSTABLE_MOOD_POOL, UNSTABLE_POKE_BOOST,
@@ -31,6 +31,8 @@ export type StyleDirective = {
   /** BR-38: số từ tục tối đa lần này (0 = cấm) + bậc được dùng. */
   profanityMax: number;
   profanityTiers: readonly ('nhe' | 'vua')[];
+  /** Lần này nói CỤT (1 câu ngắn) — chỉ khi bật tính cách (terseChance). */
+  terse: boolean;
   signature: string; // mã ngắn của chỉ thị — đưa vào log AI + khóa cache
 };
 
@@ -117,8 +119,11 @@ export function computeStyleDirective(
   const profanityAllowed = profile.profanityOk && ctx.purpose !== 'daily_summary' && stance !== 'trung_lap';
   const profanityMax = profanityAllowed ? Math.max(0, Math.min(rule.perMessage, rule.perDay - (ctx.profanityUsedToday ?? 0))) : 0;
   const profanityTiers = profanityMax > 0 ? rule.tiers : [];
-  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`, `${profanityMax}t`].join('|');
-  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, profanityMax, profanityTiers, signature };
+  // Khang 25/11/2026: bật tính cách thì nhiều khi nói CỤT (bốc sau cùng để không đổi các lần bốc phía trên).
+  const terse = ctx.purpose !== 'daily_summary' && persona.terseChance > 0 && random() < persona.terseChance;
+  if (terse) { words = TERSE_WORDS; maxSentences = 1; }
+  const signature = [bot, mode, settings.mood, effectiveMood, stance, `${words[0]}-${words[1]}w`, `${maxSentences}s`, `${emojiMax}e`, `${profanityMax}t`, terse ? 'cut' : 'full'].join('|');
+  return { bot, mode, mood: settings.mood, effectiveMood, stance, words, maxSentences, emojiMax, profanityMax, profanityTiers, terse, signature };
 }
 
 /** Khối STYLE cho SYSTEM (ổn định theo cấu hình — đổi tính cách / tâm trạng / xưng hô mới đổi). */
@@ -145,6 +150,9 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     moodLine,
     `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
+    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn nếu nói giá (giờ lấy giá không bắt buộc khi nói cụt). Vd "Wise 19950 :))".' : null,
+    d.mode === 'on' ? '- Biểu cảm bằng ký tự (":))", "=))", ":v") được dùng thoải mái, không tính vào emoji.' : null,
+    d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi 19900 =)), éo gì cũng giảm".' : null,
     `- Emoji: tối đa ${d.emojiMax}.`,
     `- Mức đùa: ${MOOD_PROFILES[d.effectiveMood].humor}/3.`,
     d.profanityMax > 0
