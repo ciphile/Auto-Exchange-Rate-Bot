@@ -65,10 +65,13 @@ export async function buildRateSnapshot(store: Store, now: Date): Promise<RateSn
   const at = Date.parse(latest.row.fetched_at);
   const near = (target: number) => week.find((r) => Date.parse(r.fetched_at) <= target)?.rate_vnd ?? null;
   const values = week.map((r) => r.rate_vnd);
+  // Audit 25/11: chỉ 1 điểm giá thì CHƯA có xu hướng / cao-thấp (không được nói "đi ngang 0%", "thấp nhất 7 ngày").
+  const oldest = week.at(-1);
+  const hasWeek = week.length >= 2 && oldest !== undefined && at - Date.parse(oldest.fetched_at) >= DAY_MS;
   return {
     wiseVnd: latest.row.rate_vnd, fetchedAt: at, sourceLabel: describeRateSource(latest.source, new Date(at)),
-    change24hPct: pct(latest.row.rate_vnd, near(at - DAY_MS)), change7dPct: pct(latest.row.rate_vnd, values.at(-1) ?? null),
-    low7dVnd: values.length ? Math.min(...values) : null, high7dVnd: values.length ? Math.max(...values) : null,
+    change24hPct: pct(latest.row.rate_vnd, near(at - DAY_MS)), change7dPct: hasWeek ? pct(latest.row.rate_vnd, oldest?.rate_vnd ?? null) : null,
+    low7dVnd: hasWeek ? Math.min(...values) : null, high7dVnd: hasWeek ? Math.max(...values) : null,
   };
 }
 

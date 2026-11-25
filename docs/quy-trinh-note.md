@@ -213,3 +213,8 @@
 - **Bối cảnh:** Khang báo giới hạn tuần 80%, muốn có Rây dùng trước khi hết lượt. Kat dồn sức nối dịch vụ thật, không tách nhiều commit nhỏ.
 - **Làm:** database Supabase (9 bảng + RLS + barie), cửa AI duy nhất theo tài liệu Khang, webhook + thẻ xác nhận, tick 10 phút, `/gioithieu` (Khang yêu cầu giữa lượt), BR-45 Lũi không mang tỉ giá / lễ / timesheet (Khang yêu cầu), hỏi lễ tháng sau (Khang yêu cầu), hướng dẫn cài phần 6–8.
 - **Bài học:** barie có sẵn bắt đúng 2 lỗi lúc viết code (chữ "thinkingConfig" trong comment, đọc process.env ngoài config) → sửa theo barie, không tắt barie. Test luồng bằng database giả trong bộ nhớ chạy đúng repository thật.
+
+## 25/11/2026 — Audit prompt 633 tình huống (Khang yêu cầu ≥ 500)
+- **Cách làm:** test sinh tự động chạy ĐÚNG đường thật (tin Telegram → prompt → AI giả lỗi / đúng / bịa số → kiểm lời → gửi), mỗi tình huống kiểm 9 luật bất biến + kỳ vọng riêng (tỉ giá × 6 ngày × 3 kiểu AI, kho giá trống / dự phòng / cũ, ngày lễ × 5 ngày, 41 câu cắc cớ / lừa bot, quy đổi, Lũi, chat riêng).
+- **Bắt được 5 lỗi thật:** AI bịa số lọt ra nhóm (câu hỏi thường + câu tán gẫu) · hỏi quy đổi để AI tự nhân · câu không dấu không hiểu · 1 điểm giá mà nói "đi ngang 0%, thấp nhất 7 ngày" · (trước đó) giờ lặp + ",0".
+- **Bài học:** test "chạy đường thật + luật bất biến + sinh hàng trăm tình huống" bắt được lỗi mà test từng hàm không bắt; số liệu được phép phải lấy từ dữ liệu CODE, không từ chữ người dùng (chống lừa).

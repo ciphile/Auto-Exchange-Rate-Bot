@@ -161,7 +161,7 @@ test('BR-42 + BR-43 bối cảnh tình hình: hôm nay ngày timesheet · lễ s
   const base = { now: vn(2026, 11, 27, 10), daysUntilPayday: 3, rate: null, recentBotPosts: [], news: [] };
   const facts = buildSituationFacts({ ...base, isTimesheetDay: true, nextHoliday: { date: '2026-12-25', name: 'Christmas Day', daysAway: 28 } }).join('\n');
   assert.match(facts, /ngày điền TIMESHEET/);
-  assert.match(facts, /Còn 28 ngày nữa là lễ Singapore Christmas Day \(25\/12\)/);
+  assert.match(facts, /Còn 28 ngày nữa là lễ Singapore Christmas Day \(Giáng sinh\) \(25\/12\)/);
   assert.match(buildSituationFacts({ ...base, nextHoliday: { date: '2026-12-25', name: 'Christmas Day', daysAway: 0 } }).join(), /Hôm nay là ngày lễ Singapore/);
 });
 

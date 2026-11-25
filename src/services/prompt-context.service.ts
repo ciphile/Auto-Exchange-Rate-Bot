@@ -2,6 +2,7 @@
 // đoạn chat gần nhất của nhóm + các dòng "bối cảnh tình hình" do CODE tính (giá đang trượt, mấy ngày nữa có lương,
 // bot vừa gửi gì). Mọi phần có trần; cả prompt có trần tổng → không phình theo thời gian. Hàm thuần.
 import { estimateBlackMarketVnd } from './rate.service.ts';
+import { describeHolidayVi } from './cheer.service.ts';
 import {
   CHAT_CONTEXT_BUFFER_MAX, CHAT_CONTEXT_MESSAGES, CHAT_CONTEXT_MIN_MESSAGES, CHAT_LINE_MAX_CHARS, FACT_MAX_CHARS,
   GROUP_DESCRIPTION_MAX_CHARS, GROUP_FACT_MAX_CHARS, GROUP_FACTS_MAX, MEMBER_LINE_MAX_CHARS, MEMBERS_MAX, NEWS_HEADLINES_MAX, PROMPT_MAX_CHARS,
@@ -78,7 +79,7 @@ export function buildSituationFacts(input: SituationInput): string[] {
   if (input.isTimesheetDay) facts.push('Hôm nay là ngày điền TIMESHEET (mọi người hay quên).');
   const h = input.nextHoliday;
   // Tên lễ lấy từ trang MOM (chữ từ ngoài) → gỡ dấu đóng khối + cắt ngắn (audit 25/11/2026).
-  const hName = h ? defuse(clip(h.name, 60)) : '';
+  const hName = h ? defuse(clip(describeHolidayVi(h.name), 90)) : '';
   if (h) facts.push(h.daysAway === 0 ? `Hôm nay là ngày lễ Singapore: ${hName} (được nghỉ).` : `Còn ${h.daysAway} ngày nữa là lễ Singapore ${hName} (${h.date.slice(8, 10)}/${h.date.slice(5, 7)}).`);
   facts.push(d === 0 ? 'Hôm nay là NGÀY LƯƠNG.' : d === 1 ? 'Mai có lương.'
     : d < PAYDAY_WEEK_DAYS ? `Còn ${d} ngày nữa là có lương (đang trong tuần lương).` : `Còn ${d} ngày nữa mới có lương.`);

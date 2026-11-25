@@ -14,6 +14,7 @@ import { canFetchLiveNow, isSourceQuestionOpen, matchSourceKeywords, planLiveFet
 import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
 import { renderGroupHelp } from './help.service.ts';
 import { buildWorkCheer } from './cheer.service.ts';
+import { buildConversionFact, parseAmountQuestion } from './number-guard.service.ts';
 import { getDaysUntilPayday } from './payday.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
@@ -28,7 +29,23 @@ import { rateSpellings, saveContextLine, speak } from './speech.service.ts';
 export const LIVE_RE = /(lấy|check|coi|xem|cập nhật|update)\s.{0,20}(giá|tỉ giá|tỷ giá)|(giá|tỉ giá|tỷ giá).{0,25}(ngay|bây giờ|giờ này|hiện tại|mới nhất|lúc này|live)/iu;
 /** BR-42: câu hỏi về ngày lễ / ngày nghỉ (chỉ Rây — BR-45). */
 export const HOLIDAY_Q_RE = /(ngày lễ|nghỉ lễ|lễ gì|lễ nào|có lễ|được nghỉ|nghỉ ngày nào|holiday)/iu;
-export const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate\b|lương)/iu;
+export const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate\b|lương|đổi tiền|đổi ra)/iu;
+
+/**
+ * Câu gõ KHÔNG DẤU ("ray oi gia sao roi") — so bằng từ khóa không dấu, CHỈ khi cả câu không có dấu
+ * (Bẫy 16: "già sao rồi" có dấu thì không được bỏ dấu rồi hiểu thành "giá").
+ */
+const FOLDED = {
+  live: /\b(lay|check|coi|xem|cap nhat|update) (ty )?gia\b|\bgia\b.{0,25}\b(ngay|bay gio|hien tai|moi nhat|luc nay|live)\b/,
+  holiday: /\b(ngay le|nghi le|le gi|le nao|co le|duoc nghi|holiday)\b/,
+  rate: /\b(ty gia|gia(?! dinh)|sgd|do sing|rate|luong|doi tien|doi ra)\b/,
+};
+const hasVietnameseMarks = (t: string) => /[^\x00-\x7F]/.test(t.replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, ''));
+/** Câu này thuộc ý nào (luật trước, AI sau) — có dấu dùng regex có dấu, không dấu dùng bộ không dấu. */
+export function matchesIntent(text: string, intent: 'live' | 'holiday' | 'rate'): boolean {
+  const accented = { live: LIVE_RE, holiday: HOLIDAY_Q_RE, rate: RATE_TOPIC_RE }[intent];
+  return accented.test(text) || (!hasVietnameseMarks(text) && FOLDED[intent].test(text.toLowerCase()));
+}
 const usernameCache = new Map<string, string>();
 
 async function getBotUsername(rt: Runtime): Promise<string> {
@@ -89,7 +106,7 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const sourceQ = await rt.store.getState<{ askedAt: number }>(rt.bot, 'source_question');
   const choice = matchSourceKeywords(msg.text);
   const answersQuestion = choice !== null && isSourceQuestionOpen(sourceQ?.askedAt ?? null, now);
-  if (LIVE_RE.test(msg.text) || answersQuestion) {
+  if (matchesIntent(msg.text, 'live') || answersQuestion) {
     const plan = planLiveFetch(choice, settings.sources);
     if (plan.kind === 'ask') { await rt.store.setState(rt.bot, 'source_question', { askedAt: now.getTime() }); return send(BOT_TEXT.askSource); }
     if (plan.kind === 'disabled') return send(BOT_TEXT.sourceDisabled(plan.enabled.join(', ')));
@@ -104,10 +121,13 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   }
   const today = getVnDateKey(now);
   const cal = await loadHolidayCalendar(rt.store, today);
-  const holiday = rt.bot === 'ray' && HOLIDAY_Q_RE.test(msg.text) ? buildHolidayFacts(cal, today) : null;
+  const holiday = rt.bot === 'ray' && matchesIntent(msg.text, 'holiday') ? buildHolidayFacts(cal, today) : null;
   if (holiday) extraFacts.unshift(...holiday.facts);
-  const isData = forceData || extraFacts.length > 0 || RATE_TOPIC_RE.test(msg.text);
+  const isData = forceData || extraFacts.length > 0 || matchesIntent(msg.text, 'rate') || (rt.bot === 'ray' && parseAmountQuestion(msg.text) !== null);
   const mid = await getLatestMid(rt.store);
+  // Hỏi quy đổi ("1000 đô được bao nhiêu") → CODE tính, AI chỉ đọc lại (CODING_STANDARDS 6.10a: app tính số).
+  const amount = rt.bot === 'ray' ? parseAmountQuestion(msg.text) : null;
+  if (amount && mid) extraFacts.unshift(buildConversionFact(amount, mid.row.rate_vnd, mid.source, new Date(mid.row.fetched_at)));
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
   const fallback = holiday ? holiday.plain : isData

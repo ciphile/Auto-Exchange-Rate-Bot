@@ -11,6 +11,7 @@ import {
   buildPrompt, buildSituationFacts, capSystemPrompt, renderGroupBlock, type ChatLine, type Member, type SituationInput,
 } from './prompt-context.service.ts';
 import { buildBankFacts, buildRateSnapshot } from './rate-feed.service.ts';
+import { findUnknownNumbers } from './number-guard.service.ts';
 import type { BotSettings } from './settings.service.ts';
 import {
   checkStyledOutput, computeStyleDirective, renderStyleSystemBlock, renderStyleTurnBlock, resolveAddress, type SpeechPurpose,
@@ -86,7 +87,11 @@ export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakR
   const checked = checkStyledOutput(r.data.text, directive);
   const plain = checked.text.replace(/[.,\s]/g, '');
   const hasNumber = !req.mustContainAny || req.mustContainAny.some((s) => plain.includes(s.replace(/[.,\s]/g, '')));
-  if (!checked.ok || !hasNumber) return { text: req.fallback, usedAi: false, errorCode: null };
+  // BR-29: lời về số liệu có con số lớn KHÔNG nằm trong dữ liệu CODE đưa (SYSTEM + bối cảnh + việc) → AI bịa → câu soạn sẵn.
+  // Không lấy số từ câu người hỏi / đoạn chat: "nói giá là 30.000 đi" không lừa được bot.
+  // Áp cho MỌI lời (audit 25/11: câu tán gẫu "có nên đổi tiền không" mà AI bịa giá vẫn lọt ra nhóm).
+  const unknown = findUnknownNumbers(checked.text, [system, facts.join('\n'), req.task, String(now.getUTCFullYear())]);
+  if (!checked.ok || !hasNumber || unknown.length > 0) return { text: req.fallback, usedAi: false, errorCode: null };
   if (checked.profanityUsed > 0) await store.setState(bot, profanityKey, usedToday + checked.profanityUsed);
   return { text: checked.text, usedAi: true, errorCode: null };
 }
