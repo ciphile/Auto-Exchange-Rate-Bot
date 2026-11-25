@@ -37,12 +37,12 @@ export function parseExchangeCommand(text: string): ExchangeCommand | null {
 const line = (c: ExchangeContact, i: number) => `${i + 1}. ${c.name} — ${c.phone}${c.note ? ` (${c.note})` : ''}`;
 
 /** Danh sách gửi người dùng (lệnh /chodencontact, hoặc câu soạn sẵn khi AI lỗi). */
-export function renderExchangeList(list: readonly ExchangeContact[], blackMarketText: string | null): string {
+export function renderExchangeList(list: readonly ExchangeContact[], blackMarketLine: string | null): string {
   if (list.length === 0) return 'Dạ hiện chưa có nơi đổi nào trong danh sách giới thiệu nha.';
   return [
     'Dạ mấy chỗ đổi chợ đen anh chị trong nhóm hay giới thiệu nè:',
     ...list.map(line),
-    blackMarketText ? `Giá chợ đen ước tính bữa nay: ${blackMarketText}.` : null,
+    blackMarketLine ? `${blackMarketLine}.` : null,
     'Đổi tiền mặt nhớ đếm kỹ, hỏi giá trước khi chuyển nha.',
   ].filter((x): x is string => x !== null).join('\n');
 }

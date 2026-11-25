@@ -21,11 +21,14 @@ export const PAYDAY_POSTS_MAX = 6;
 // BR-11: khung bốc giờ nói ngẫu nhiên (phút trong ngày, giờ VN): 06:30 → 19:30.
 export const RANDOM_TALK_FROM_MINUTE = 6 * 60 + 30;
 export const RANDOM_TALK_TO_MINUTE = 19 * 60 + 30;
-// BR-12: chợ đen ước tính = Wise × (1 + mức chênh), làm tròn tới 10 đ.
-// 0,48%: Khang đối chiếu 25/11/2026 — Wise 20.004,30 ↔ chợ đen thật 20.100 (0,4% cũ ra 20.080, thấp 20 đ).
-export const BLACK_MARKET_PREMIUM = 0.0048;
-/** Mức chênh dạng chữ cho prompt / tin ("+0,48%"). */
-export const BLACK_MARKET_PREMIUM_TEXT = `+${(BLACK_MARKET_PREMIUM * 100).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}%`;
+// BR-12: chợ đen ước tính = Wise × (1 + mức chênh), làm tròn tới 50 đ.
+// Mặc định 0,48%: Khang đối chiếu 25/11/2026 — Wise 20.004,30 ↔ chợ đen thật 20.100 (0,4% cũ ra 20.080, thấp 20 đ).
+// Khang tự chỉnh bằng /chotden (lưu trong cài đặt `blackMarketPremiumPct`, BR-53) — hằng số này chỉ là giá trị mặc định.
+export const DEFAULT_BLACK_MARKET_PREMIUM_PCT = 0.48;
+export const BLACK_MARKET_PREMIUM = DEFAULT_BLACK_MARKET_PREMIUM_PCT / 100;
+/** Giới hạn mức chênh Khang được đặt (%) — ngoài khoảng này coi như gõ nhầm. */
+export const BLACK_MARKET_PREMIUM_MIN_PCT = -2;
+export const BLACK_MARKET_PREMIUM_MAX_PCT = 5;
 // Khang 25/11/2026: chợ đen hay làm tròn → tròn tới 50 đ (20.096 → 20.100).
 export const BLACK_MARKET_ROUND_VND = 50;
 // BR-18 + FS mục 6: bảng mức hóng chuyện (vị trí 0 = mức 1 … vị trí 9 = mức 10).

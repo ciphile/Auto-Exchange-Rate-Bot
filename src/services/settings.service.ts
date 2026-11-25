@@ -1,7 +1,9 @@
 // F-08 + BR-23: cài đặt từng bot + lệnh của Khang để TỰ ĐỔI MỌI THỨ (Khang 25/11/2026). Hàm thuần:
 // đọc lệnh → kiểm cú pháp → trả "đề xuất đổi" (cũ → mới) để controller hiện THẺ XÁC NHẬN ✅ / ❌; bấm ✅ mới áp.
 // Chỉ gọi khi routeMessage đã xác định là Khang trong chat riêng (ATR-8). Lưu database + audit_log ở tầng repository.
-import { DEFAULT_ALERT_LEVELS_VND, DEFAULT_CHATTINESS_LEVEL, DEFAULT_QUIET_HOURS } from '../config/defaults.ts';
+import {
+  BLACK_MARKET_PREMIUM_MAX_PCT, BLACK_MARKET_PREMIUM_MIN_PCT, DEFAULT_ALERT_LEVELS_VND, DEFAULT_BLACK_MARKET_PREMIUM_PCT, DEFAULT_CHATTINESS_LEVEL, DEFAULT_QUIET_HOURS,
+} from '../config/defaults.ts';
 import { DEFAULT_ALERT_FULL_MONTH, DEFAULT_FREQUENCY_LEVEL, type FrequencyLevel } from '../config/frequency.ts';
 import { DEFAULT_MOOD, DEFAULT_PERSONA_ON, DEFAULT_PROFANITY_LEVEL, MOOD_CODES, type MoodCode, type ProfanityLevel } from '../config/persona.ts';
 import type { BotKey } from '../domain/telegram.ts';
@@ -11,6 +13,7 @@ import { MOOD_TEXT } from '../shared/persona.vi.ts';
 import { parseCommand } from './access.service.ts';
 import { parseFrequencyLevel } from './frequency.service.ts';
 import { LIVE_SOURCES, type LiveSource } from './live-rate.service.ts';
+import { DEFAULT_BLACK_MARKET_CONFIG, formatPremiumPct, resolveBlackMarket, type BlackMarketConfig, type BlackMarketManual } from './rate.service.ts';
 import { parseMood } from './style.service.ts';
 
 export type BotSettings = {
@@ -27,6 +30,10 @@ export type BotSettings = {
   alertFullMonth: boolean;
   profanityLevel: ProfanityLevel;
   timesheetReminderOn: boolean; // BR-43
+  /** BR-53: mức chênh chợ đen so với Wise, đơn vị % (0,48 = +0,48%). Khang chỉnh bằng /chotden. */
+  blackMarketPremiumPct: number;
+  /** BR-53: công tắc THỦ CÔNG — bật + có giá thì dùng đúng giá chợ đen Khang nhập; tắt = tự tính theo công thức. */
+  blackMarketManual: BlackMarketManual;
 };
 export type SettingKey = keyof BotSettings;
 
@@ -37,6 +44,7 @@ export function getDefaultSettings(bot: BotKey): BotSettings {
     personaOn: DEFAULT_PERSONA_ON[bot], mood: DEFAULT_MOOD, styleNote: '', quietHours: { ...DEFAULT_QUIET_HOURS },
     sources: [...LIVE_SOURCES], frequencyLevel: DEFAULT_FREQUENCY_LEVEL, alertFullMonth: DEFAULT_ALERT_FULL_MONTH,
     profanityLevel: DEFAULT_PROFANITY_LEVEL, timesheetReminderOn: DEFAULT_TIMESHEET_REMINDER_ON,
+    blackMarketPremiumPct: DEFAULT_BLACK_MARKET_PREMIUM_PCT, blackMarketManual: { ...DEFAULT_BLACK_MARKET_CONFIG.manual },
   };
 }
 
@@ -66,6 +74,10 @@ export function formatSetting(key: SettingKey, s: BotSettings): string {
     case 'quietHours': return `${String(s.quietHours.startHour).padStart(2, '0')}:00 → ${String(s.quietHours.endHour).padStart(2, '0')}:00`;
     case 'sources': return s.sources.join(', ');
     case 'frequencyLevel': return `mức ${s.frequencyLevel} / 5`;
+    case 'blackMarketManual': return s.blackMarketManual.on && s.blackMarketManual.vnd !== null
+      ? `THỦ CÔNG: ${s.blackMarketManual.vnd.toLocaleString('vi-VN')} đ (Khang nhập ${resolveBlackMarket(0, blackMarketConfigOf(s)).label.replace('giá thật Khang nhập tay ', '')})`
+      : `TỰ TÍNH theo công thức (Wise ${formatPremiumPct(s.blackMarketPremiumPct / 100)}, tròn 50 đ)`;
+    case 'blackMarketPremiumPct': return `${s.blackMarketPremiumPct >= 0 ? '+' : '−'}${Math.abs(s.blackMarketPremiumPct).toLocaleString('vi-VN', { maximumFractionDigits: 2 })}% so với Wise`;
     case 'profanityLevel': return `mức ${s.profanityLevel} / 3${s.personaOn ? '' : ' (đang ngoan nên không nói tục)'}`;
   }
 }
@@ -154,6 +166,17 @@ export function applySettingsChange(current: BotSettings, change: SettingsChange
   return { ...current, ...change.patch };
 }
 
+/** Cấu hình giá chợ đen từ cài đặt (đưa vào mọi nơi tính / hiển thị giá chợ đen). */
+export const blackMarketConfigOf = (s: BotSettings): BlackMarketConfig => ({ manual: s.blackMarketManual, premiumPct: s.blackMarketPremiumPct });
+
+/** Giá thủ công lưu hỏng → TẮT thủ công (về tự tính), không sập. */
+function parseManual(raw: unknown): BlackMarketManual {
+  const m = raw as Partial<BlackMarketManual> | null | undefined;
+  const vnd = typeof m?.vnd === 'number' && Number.isFinite(m.vnd) && m.vnd >= 15_000 && m.vnd <= 30_000 ? m.vnd : null;
+  const at = typeof m?.at === 'number' && Number.isFinite(m.at) ? m.at : null;
+  return { on: m?.on === true && vnd !== null, vnd, at };
+}
+
 /**
  * Đọc cài đặt đã lưu trong database: gộp với mặc định; ô nào sai kiểu / ngoài miền → dùng mặc định (dữ liệu hỏng không làm sập bot).
  * Cài đặt mới thêm sau này tự có giá trị mặc định cho bản ghi cũ.
@@ -181,5 +204,9 @@ export function mergeStoredSettings(bot: BotKey, stored: Record<string, unknown>
     alertFullMonth: bool(s.alertFullMonth, d.alertFullMonth),
     profanityLevel: isInt(s.profanityLevel, 0, 3) ? (s.profanityLevel as ProfanityLevel) : d.profanityLevel,
     timesheetReminderOn: bool(s.timesheetReminderOn, d.timesheetReminderOn),
+    blackMarketPremiumPct: typeof s.blackMarketPremiumPct === 'number' && Number.isFinite(s.blackMarketPremiumPct)
+      && s.blackMarketPremiumPct >= BLACK_MARKET_PREMIUM_MIN_PCT && s.blackMarketPremiumPct <= BLACK_MARKET_PREMIUM_MAX_PCT
+      ? s.blackMarketPremiumPct : d.blackMarketPremiumPct,
+    blackMarketManual: parseManual(s.blackMarketManual),
   };
 }

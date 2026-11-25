@@ -13,7 +13,7 @@ import {
 } from './prompt-context.service.ts';
 import { buildBankFacts, buildRateSnapshot } from './rate-feed.service.ts';
 import { findUnknownNumbers } from './number-guard.service.ts';
-import type { BotSettings } from './settings.service.ts';
+import { blackMarketConfigOf, type BotSettings } from './settings.service.ts';
 import {
   checkStyledOutput, computeStyleDirective, renderStyleSystemBlock, renderStyleTurnBlock, resolveAddress, type SpeechPurpose,
 } from './style.service.ts';
@@ -64,7 +64,7 @@ export async function speak(deps: SpeechDeps, settings: BotSettings, req: SpeakR
   // Dòng do nơi gọi đưa (giá vừa lấy, lịch lễ được hỏi) đứng ĐẦU: trần 8 dòng bối cảnh không được cắt mất chúng.
   const facts = [
     ...(req.extraFacts ?? []),
-    ...buildSituationFacts({ now, daysUntilPayday: getDaysUntilPayday(now), rate, recentBotPosts: [], news: [], ...situation })
+    ...buildSituationFacts({ now, daysUntilPayday: getDaysUntilPayday(now), rate, recentBotPosts: [], news: [], blackMarket: blackMarketConfigOf(settings), ...situation })
       .filter((f) => isRay || !/lương/i.test(f)),
     ...bankFacts,
   ];

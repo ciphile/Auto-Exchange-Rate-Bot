@@ -22,10 +22,10 @@ import { getDaysUntilPayday } from './payday.service.ts';
 import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
 import { fetchAndStoreRates, getLatestMid } from './rate-feed.service.ts';
-import { describeRateSource, estimateBlackMarketVnd } from './rate.service.ts';
+import { describeRateSource, resolveBlackMarket } from './rate.service.ts';
 import { getTimesheetDay } from './reminder.service.ts';
 import type { Runtime } from './runtime.types.ts';
-import { mergeStoredSettings, type BotSettings } from './settings.service.ts';
+import { blackMarketConfigOf, mergeStoredSettings, type BotSettings } from './settings.service.ts';
 import { rateSpellings, saveContextLine, speak } from './speech.service.ts';
 
 /** BR-30: câu đòi lấy giá NGAY (luật trước, AI sau). */
@@ -98,7 +98,7 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
       if (name === 'chodencontact' && rt.bot === 'ray') {
         const list = (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [];
         const mid = await getLatestMid(rt.store);
-        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null), { replyTo: update.messageId }));
+        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).todayLine : null), { replyTo: update.messageId }));
         return;
       }
       if (name === 'doitien' && rt.bot === 'ray') {
@@ -153,8 +153,8 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const mid = await getLatestMid(rt.store);
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
-  const fallback = exchange ? renderExchangeList(exchange, mid ? `${estimateBlackMarketVnd(mid.row.rate_vnd).toLocaleString('vi-VN')} đ / 1 SGD` : null) : holiday ? holiday.plain : isData
-    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), estimateBlackMarketVnd(mid.row.rate_vnd)) : BOT_TEXT.noRate)
+  const fallback = exchange ? renderExchangeList(exchange, mid ? resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).todayLine : null) : holiday ? holiday.plain : isData
+    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).phrase) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {
     purpose: isData ? 'answer_data' : 'answer_chat',
