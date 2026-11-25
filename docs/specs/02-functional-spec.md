@@ -135,6 +135,7 @@
 | `/nhactimesheet on|off` | Nhắc điền timesheet thứ Sáu (BR-43) | đổi |
 | `/ngayle` · `/ngayle them <YYYY-MM-DD> <tên>` · `/ngayle xoa <YYYY-MM-DD>` | Xem lễ Singapore sắp tới · thêm / xóa tay (BR-41) | xem / đổi |
 | `/gioithieu` | Bot **tự giới thiệu ngắn** trong nhóm (tên + chức năng chính, tối đa ~4 câu, AI diễn đạt; AI lỗi → câu soạn sẵn). Rây: tỉ giá, cảnh báo, lấy giá ngay, nhắc lễ + timesheet. Lũi: tin tức + trò chuyện (BR-45). Khang 25/11/2026 | gửi nhóm (thẻ xác nhận) |
+| `/caclenh` (Khang, chat riêng) · `/help` (mọi người, trong nhóm) | Hướng dẫn lệnh: `/caclenh` đầy đủ (làm gì · khi nào · kết quả); `/help` chỉ lệnh chung + cách gọi bot + **câu mẫu nói tự nhiên**, không lộ lệnh của Khang. Nguồn duy nhất `src/shared/command-guide.vi.ts`, tài liệu `docs/danh-sach-lenh.md`; thêm lệnh = cập nhật cả 2 (barie). Khang 25/11/2026 | xem |
 | `/thanhvien` | Xem / sửa danh sách thành viên dùng trong prompt (tên thật, vai trò, cách gọi) — lưu database, không repo (BR-21) | đổi |
 | `/noi`, `/thuhoi` | F-07 | đổi |
 | `/tomtat` | F-06 | xem (gọi AI) |

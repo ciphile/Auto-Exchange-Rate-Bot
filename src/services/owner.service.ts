@@ -12,6 +12,7 @@ import { parseHolidayCommand } from './holiday.service.ts';
 import { describeRateSource, type RateSource } from './rate.service.ts';
 import type { Runtime } from './runtime.types.ts';
 import { summarizeToday } from './summary.service.ts';
+import { renderOwnerGuide } from './help.service.ts';
 import { handleOwnerSettingsCommand, renderOwnerHelp, type BotSettings } from './settings.service.ts';
 
 const HOLIDAY_LIST_DAYS = 120;
@@ -26,6 +27,7 @@ export async function handleOwnerCommand(rt: Runtime, msg: IncomingMessage, sett
   const cmd = parseCommand(msg.text);
   switch (cmd?.name) {
     case 'start': case 'lenh': case 'help': return reply(rt, renderOwnerHelp());
+    case 'caclenh': return reply(rt, renderOwnerGuide(rt.bot));
     case 'tygia': return reply(rt, await renderRates(rt));
     case 'tomtat': return reply(rt, await summarizeToday(rt));
     case 'trangthai': return reply(rt, await renderStatus(rt, settings));

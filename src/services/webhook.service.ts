@@ -12,6 +12,7 @@ import { buildHolidayFacts, findNextHoliday, loadHolidayCalendar } from './calen
 import { handleConfirmPress, sendConfirmCard } from './confirm.service.ts';
 import { canFetchLiveNow, isSourceQuestionOpen, matchSourceKeywords, planLiveFetch, type LiveSource } from './live-rate.service.ts';
 import { handleOwnerCommand, renderHolidayList } from './owner.service.ts';
+import { renderGroupHelp } from './help.service.ts';
 import { resolveSpeaker, type Member } from './prompt-context.service.ts';
 import { fetchAndStoreRates, getLatestMid } from './rate-feed.service.ts';
 import { describeRateSource } from './rate.service.ts';
@@ -21,10 +22,10 @@ import { mergeStoredSettings, type BotSettings } from './settings.service.ts';
 import { rateSpellings, saveContextLine, speak } from './speech.service.ts';
 
 /** BR-30: câu đòi lấy giá NGAY (luật trước, AI sau). */
-const LIVE_RE = /(lấy|check|coi|xem|cập nhật|update)\s.{0,20}(giá|tỉ giá|tỷ giá)|(giá|tỉ giá|tỷ giá).{0,25}(ngay|bây giờ|giờ này|hiện tại|mới nhất|lúc này|live)/iu;
+export const LIVE_RE = /(lấy|check|coi|xem|cập nhật|update)\s.{0,20}(giá|tỉ giá|tỷ giá)|(giá|tỉ giá|tỷ giá).{0,25}(ngay|bây giờ|giờ này|hiện tại|mới nhất|lúc này|live)/iu;
 /** BR-42: câu hỏi về ngày lễ / ngày nghỉ (chỉ Rây — BR-45). */
-const HOLIDAY_Q_RE = /(ngày lễ|nghỉ lễ|lễ gì|lễ nào|có lễ|được nghỉ|nghỉ ngày nào|holiday)/iu;
-const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate\b|lương)/iu;
+export const HOLIDAY_Q_RE = /(ngày lễ|nghỉ lễ|lễ gì|lễ nào|có lễ|được nghỉ|nghỉ ngày nào|holiday)/iu;
+export const RATE_TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô sing|vnd|\brate\b|lương)/iu;
 const usernameCache = new Map<string, string>();
 
 async function getBotUsername(rt: Runtime): Promise<string> {
@@ -64,6 +65,7 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
     case 'bind_group': return sendConfirmCard(rt, { type: 'bind', chatId: update.chatId, title: update.chatTitle ?? 'không tên' }, BOT_TEXT.bindAsk(update.chatTitle ?? 'không tên'));
     case 'group_command': {
       const name = parseCommand(update.text)?.name;
+      if (name === 'help') { unwrap(await rt.tg.sendMessage(update.chatId, renderGroupHelp(rt.bot), { replyTo: update.messageId })); return; }
       if (name === 'tygia' || name === 'gia') return answer(rt, settings, update, members, update.chatId, true, true);
       if (name === 'ngayle') { unwrap(await rt.tg.sendMessage(update.chatId, await renderHolidayList(rt), { replyTo: update.messageId })); }
       return;
