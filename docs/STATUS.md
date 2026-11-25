@@ -24,4 +24,4 @@
 - Tải lịch lễ MOM tự động trong tick (hiện: bảng 2026 có sẵn + `/ngayle them`; lịch 2027 cần trước 15/12).
 - Lệnh xem tình trạng AI chi tiết / xóa cache / gọi thử (tài liệu Khang mục 13 — `/trangthai` đã hiện model gần nhất + model hết lượt) · `/thanhvien`.
 - KC-06: Vercel có chạy được `import './x.ts'` không (đã bật `rewriteRelativeImportExtensions`) — biết ở lần deploy đầu.
-- **DBS làm nguồn tỉ giá** (Khang 25/11/2026): mạng máy ảo đã thêm `www.dbs.com.sg`, nhưng lệnh tải trang bị bộ lọc quyền của phiên chặn → chờ Khang cho phép rõ để Kat xem dữ liệu thật rồi viết bộ đọc (không viết theo phỏng đoán).
+- **Bản Rây đã cài trên Supabase trước 25/11 trưa** (nếu có) → chạy lại `src/repositories/schema.sql` để bảng `rates` nhận nguồn `dbs` + có bảng `chat_log`.

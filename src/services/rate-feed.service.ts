@@ -1,7 +1,7 @@
 // F-01 + BR-04 / BR-29 / BR-30: lấy giá theo lịch / theo yêu cầu, lưu kho, dựng "bối cảnh giá" cho prompt.
 // AI KHÔNG BAO GIỜ đi tìm giá: mọi con số lấy từ kho này, kèm nguồn + giờ (BR-29).
 import { RATE_FETCH_HOURS_VN } from '../config/defaults.ts';
-import type { BankQuote } from '../adapters/rate-sources.adapter.ts';
+import type { BankQuote, DbsQuote } from '../adapters/rate-sources.adapter.ts';
 import type { RateRow, Store } from '../repositories/store.repository.ts';
 import { getInstantFromVn, getVnParts } from '../shared/vn-time.ts';
 import type { Result } from '../shared/result.ts';
@@ -11,7 +11,7 @@ import type { RateSnapshotFacts } from './prompt-context.service.ts';
 
 export type RateFetchers = {
   wise: () => Promise<Result<number>>; fallback: () => Promise<Result<number>>;
-  vcb: () => Promise<Result<BankQuote>>; vpbank: () => Promise<Result<BankQuote>>;
+  vcb: () => Promise<Result<BankQuote>>; vpbank: () => Promise<Result<BankQuote>>; dbs: () => Promise<Result<DbsQuote>>;
 };
 export type FetchReport = { saved: RateSource[]; failed: RateSource[] };
 
@@ -39,6 +39,11 @@ export async function fetchAndStoreRates(store: Store, fetchers: RateFetchers, s
       report.failed.push('wise');
       const f = await fetchers.fallback();
       if (f.ok) { await store.insertRate('wise_fallback', Math.round(f.data)); report.saved.push('wise_fallback'); } else report.failed.push('wise_fallback');
+      continue;
+    }
+    if (source === 'dbs') {
+      const d = await fetchers.dbs();
+      if (d.ok) { await store.insertRate('dbs', Math.round(d.data.rateVnd), { exactRate: d.data.rateVnd, effectiveAt: d.data.effectiveAt }); report.saved.push('dbs'); } else report.failed.push('dbs');
       continue;
     }
     const q = await fetchers[source]();
@@ -84,6 +89,13 @@ export async function buildBankFacts(store: Store, now: Date): Promise<string[]>
     const q = r.extra as BankQuote | null;
     const parts = [q?.transferBuyVnd ? `mua chuyển khoản ${q.transferBuyVnd.toLocaleString('vi-VN')}` : null, q?.sellVnd ? `bán ${q.sellVnd.toLocaleString('vi-VN')}` : null].filter(Boolean);
     out.push(`Giá ${source === 'vcb' ? 'Vietcombank' : 'VPBank'}: ${parts.join(', ') || r.rate_vnd.toLocaleString('vi-VN')} đ / 1 SGD (${describeRateSource(source, new Date(Date.parse(r.fetched_at)))}).`);
+  }
+  // DBS: nguồn tham khảo (Khang 25/11/2026) — mọi người hay xem để biết biến động; giá ngân hàng, đổi theo bậc lớn.
+  const dbs = await store.getLatestRate('dbs');
+  if (dbs && now.getTime() - Date.parse(dbs.fetched_at) <= DAY_MS) {
+    const eff = (dbs.extra as { effectiveAt?: number | null } | null)?.effectiveAt ?? null;
+    const when = describeRateSource('dbs', new Date(eff ?? Date.parse(dbs.fetched_at))).replace('lấy lúc', eff ? 'hiệu lực từ' : 'lấy lúc');
+    out.push(`Giá DBS (ngân hàng Singapore — chỉ để so biến động, đổi theo bậc ~2%, KHÔNG phải giá mọi người nhận): 1 SGD ≈ ${dbs.rate_vnd.toLocaleString('vi-VN')} VND (${when}).`);
   }
   return out;
 }

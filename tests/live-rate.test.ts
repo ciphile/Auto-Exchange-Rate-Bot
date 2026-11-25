@@ -13,7 +13,8 @@ test('BR-30 tham số AI: tên nguồn, mảng, tat_ca, tuy_bot; giá trị lạ
   assert.deepEqual(parseSourceParam(['vcb', 'wise', 'vcb']), { kind: 'named', sources: ['vcb', 'wise'] });
   assert.deepEqual(parseSourceParam('tat_ca'), { kind: 'all' });
   assert.deepEqual(parseSourceParam('tuy_bot'), { kind: 'any' });
-  for (const bad of [null, undefined, '', 'dbs', ['wise', 'dbs'], [], 5, { a: 1 }]) assert.equal(parseSourceParam(bad), null);
+  assert.deepEqual(parseSourceParam('dbs'), { kind: 'named', sources: ['dbs'] }); // Khang thêm DBS 25/11/2026
+  for (const bad of [null, undefined, '', 'acb', ['wise', 'acb'], [], 5, { a: 1 }]) assert.equal(parseSourceParam(bad), null);
 });
 
 test('BR-30 thiếu nguồn → hỏi lại', () => {

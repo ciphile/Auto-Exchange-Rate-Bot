@@ -104,6 +104,7 @@ export function createTestRuntime(opts: { now?: () => Date; aiReply?: (system: s
       wise: async () => ok(19950.4), fallback: async () => ok(19900),
       vcb: async () => ok({ bank: 'VCB', cashBuyVnd: 19500, transferBuyVnd: 19600, sellVnd: 20300 }),
       vpbank: async () => fail('E-SRC-002', 'giả lỗi'),
+      dbs: async () => ok({ rateVnd: 19607.8431, effectiveAt: Date.UTC(2026, 10, 25, 2, 15) }),
     },
   };
   return { rt, mem, fake, prompts, defaults: getDefaultSettings('ray') };

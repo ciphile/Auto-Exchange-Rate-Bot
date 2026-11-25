@@ -67,7 +67,7 @@
 | `/canhbaocathang on \| off` | Rây | cảnh báo cả tháng hay chỉ 14 ngày cuối | muốn theo dõi giá cả tháng | thẻ ✅ |
 | `/noituc 0..3` | Rây, Lũi | mức nói tục (chỉ khi bật tính cách) | muốn bot "đời" hơn hoặc sạch hơn | thẻ ✅ · 0 cấm … 3 thoáng; từ cấm tuyệt đối không bao giờ |
 | `/gionghi 20-6` | Rây, Lũi | giờ bot không tự nhắn (giờ VN) | đổi giờ yên lặng | thẻ ✅ · trong giờ nghỉ bot không tự báo, cảnh báo chờ tới sáng |
-| `/nguon wise,vcb,vpbank` | Rây | chọn nguồn tỉ giá được dùng | một nguồn hay lỗi, muốn tắt bớt | thẻ ✅ (Wise luôn được lấy để so mốc) |
+| `/nguon wise,vcb,vpbank,dbs` | Rây | chọn nguồn tỉ giá được dùng | một nguồn hay lỗi, muốn tắt bớt | thẻ ✅ (Wise luôn được lấy để so mốc) |
 | `/phongcach <mô tả> · /phongcach xoa` | Rây, Lũi | dặn thêm phong cách nói | muốn bot hay ví von, nói ngắn hơn… | thẻ ✅ · tối đa 200 ký tự |
 | `/nhactimesheet on \| off` | Rây | bật / tắt nhắc điền timesheet thứ Sáu | không muốn bot nhắc nữa (hoặc muốn nhắc lại) | thẻ ✅ |
 

@@ -22,12 +22,15 @@ create table if not exists bot_state (
 -- Tỉ giá đã lấy (BR-04). Giữ 60 ngày.
 create table if not exists rates (
   id bigint generated always as identity primary key,
-  source text not null check (source in ('wise', 'wise_fallback', 'vcb', 'vpbank')),
+  source text not null,
   rate_vnd integer not null check (rate_vnd between 1000 and 100000),
   extra jsonb,
   fetched_at timestamptz not null default now()
 );
 create index if not exists rates_source_time on rates (source, fetched_at desc);
+-- Thêm nguồn DBS (25/11/2026): cập nhật điều kiện cho bảng đã tạo từ bản cũ (chạy lại an toàn).
+alter table rates drop constraint if exists rates_source_check;
+alter table rates add constraint rates_source_check check (source in ('wise', 'wise_fallback', 'vcb', 'vpbank', 'dbs'));
 
 -- Kho ngữ cảnh ngắn 20 tin / nhóm (BR-36) — chữ đã MÃ HÓA AES-256-GCM. Xóa sạch lúc 01:00 mỗi ngày (D4).
 create table if not exists chat_context (

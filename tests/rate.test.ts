@@ -20,3 +20,30 @@ test('BR-29 câu về giá luôn kèm nguồn + thời điểm (giờ VN)', () =
   assert.equal(describeRateSource('vcb', vn(2026, 12, 1, 6, 5)), 'theo Vietcombank, lấy lúc 06:05 ngày 01/12/2026');
   assert.match(describeRateSource('wise_fallback', vn(2026, 12, 1, 1)), /nguồn dự phòng/);
 });
+
+test('DBS (Khang 25/11/2026): đọc đúng dòng VND/SGD theo dữ liệu thật — 100 VND = 0,0051 SGD → 1 SGD = 19.607,84; giờ hiệu lực là giờ Singapore', async () => {
+  const { parseDbsVnd } = await import('../src/adapters/rate-sources.adapter.ts');
+  const body = { results: { assets: [{ recData: [
+    { currency: 'VND', ttSell: '0.000052', ttBuy: '0.000000', quoteCurrency: 'BND', ttInverseSell: '0', ttInverseBuy: '19230.7692307692', baseCurrencyUnit: '1', quoteCurrencyUnit: '1' },
+    { currency: 'VND', ttSell: '0.0051', ttBuy: '0', quoteCurrency: 'SGD', ttInverseSell: '0', ttInverseBuy: '196.0784313725', baseCurrencyUnit: '100', quoteCurrencyUnit: '1' },
+  ] }] }, effectiveDateAndTime: '2026-11-25 10:15:03' };
+  const q = parseDbsVnd(body);
+  assert.ok(q && Math.abs(q.rateVnd - 19607.8431) < 0.001, JSON.stringify(q));
+  assert.equal(new Date(q?.effectiveAt ?? 0).toISOString(), '2026-11-25T02:15:03.000Z');
+  assert.equal(parseDbsVnd({ results: { assets: [{ recData: [{ currency: 'VND', quoteCurrency: 'SGD', ttSell: '0', ttInverseBuy: '0', baseCurrencyUnit: '100' }] }] } }), null, 'giá 0 → hỏng');
+  assert.equal(parseDbsVnd({}), null);
+  assert.equal(parseDbsVnd({ results: { assets: [{ recData: [{ currency: 'VND', quoteCurrency: 'SGD', ttInverseBuy: '5', baseCurrencyUnit: '1' }] }] } }), null, 'ngoài 10.000–40.000 → hỏng');
+});
+
+test('DBS: lấy giá lưu kho + bối cảnh ghi rõ "chỉ để so biến động, KHÔNG phải giá mọi người nhận"', async () => {
+  const { createTestRuntime } = await import('./fakes.ts');
+  const { fetchAndStoreRates, buildBankFacts } = await import('../src/services/rate-feed.service.ts');
+  const { matchSourceKeywords } = await import('../src/services/live-rate.service.ts');
+  const now = new Date('2026-11-25T03:00:00Z');
+  const { rt } = createTestRuntime({ now: () => now });
+  const r = await fetchAndStoreRates(rt.store, rt.fetchers, ['dbs']);
+  assert.deepEqual(r.saved, ['dbs']);
+  const facts = (await buildBankFacts(rt.store, now)).join('\n');
+  assert.match(facts, /Giá DBS .*KHÔNG phải giá mọi người nhận.*1 SGD ≈ 19\.608 VND \(theo DBS, hiệu lực từ 09:15 ngày 25\/11\/2026\)/);
+  assert.deepEqual(matchSourceKeywords('check giá DBS coi'), { kind: 'named', sources: ['dbs'] });
+});

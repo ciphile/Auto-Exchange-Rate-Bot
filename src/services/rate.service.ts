@@ -18,9 +18,9 @@ export function convertVndToSgdCents(amountVnd: number, rateVnd: number): number
   return Math.round((amountVnd / rateVnd) * 100);
 }
 
-export type RateSource = 'wise' | 'wise_fallback' | 'vcb' | 'vpbank';
+export type RateSource = 'wise' | 'wise_fallback' | 'vcb' | 'vpbank' | 'dbs';
 const SOURCE_LABELS: Record<RateSource, string> = {
-  wise: 'Wise', wise_fallback: 'nguồn dự phòng (cập nhật 1 lần / ngày)', vcb: 'Vietcombank', vpbank: 'VPBank',
+  wise: 'Wise', wise_fallback: 'nguồn dự phòng (cập nhật 1 lần / ngày)', vcb: 'Vietcombank', vpbank: 'VPBank', dbs: 'DBS',
 };
 
 /** BR-29: mọi câu về giá phải kèm nguồn + thời điểm lấy (giờ VN). Code tạo chuỗi này, AI chỉ chép lại. */

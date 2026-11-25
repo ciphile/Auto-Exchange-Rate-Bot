@@ -218,3 +218,8 @@
 - **Cách làm:** test sinh tự động chạy ĐÚNG đường thật (tin Telegram → prompt → AI giả lỗi / đúng / bịa số → kiểm lời → gửi), mỗi tình huống kiểm 9 luật bất biến + kỳ vọng riêng (tỉ giá × 6 ngày × 3 kiểu AI, kho giá trống / dự phòng / cũ, ngày lễ × 5 ngày, 41 câu cắc cớ / lừa bot, quy đổi, Lũi, chat riêng).
 - **Bắt được 5 lỗi thật:** AI bịa số lọt ra nhóm (câu hỏi thường + câu tán gẫu) · hỏi quy đổi để AI tự nhân · câu không dấu không hiểu · 1 điểm giá mà nói "đi ngang 0%, thấp nhất 7 ngày" · (trước đó) giờ lặp + ",0".
 - **Bài học:** test "chạy đường thật + luật bất biến + sinh hàng trăm tình huống" bắt được lỗi mà test từng hàm không bắt; số liệu được phép phải lấy từ dữ liệu CODE, không từ chữ người dùng (chống lừa).
+
+## 25/11/2026 — Thêm nguồn DBS (Khang cho phép đọc trang DBS)
+- Mạng máy ảo chặn `www.dbs.com.sg` → Kat xin thêm vào môi trường (Khang duyệt); lệnh tải trang bị bộ lọc quyền của phiên chặn → **dừng, hỏi Khang**, không lách. Khang nhắn "cho Kat đọc trang DBS" → thử lại 1 lần.
+- Dò: dữ liệu nhúng sẵn trong trang là bản **2020** (bẫy!) → đọc `fx-board-rate.js` tìm đường dẫn thật `sg-rates-api/.../getCurrencyConversionRates` → dòng VND/SGD khớp từng số lẻ với ảnh Khang (19.607,8431).
+- Bài học: dữ liệu "có sẵn trong HTML" có thể là bản cũ — luôn xem ngày hiệu lực; viết bộ đọc theo dữ liệu thật, không theo phỏng đoán. Node `fetch` trên máy ảo cần `NODE_USE_ENV_PROXY=1` mới đi qua proxy (chỉ máy ảo, Vercel không cần).

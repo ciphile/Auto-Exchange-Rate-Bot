@@ -29,7 +29,7 @@ export const OWNER_COMMAND_HELP: readonly (readonly [string, string])[] = [
   ['/canhbaocathang on | off', 'cảnh báo cả tháng / chỉ 14 ngày cuối'],
   ['/noituc 0..3', 'nói tục: 0 cấm · 1 tục nhẹ · 2 nhẹ + vừa · 3 thoáng hơn (từ cấm tuyệt đối thì không bao giờ)'],
   ['/gionghi 20-6', 'giờ nghỉ, bot không tự nhắn (giờ VN)'],
-  ['/nguon wise,vcb,vpbank', 'nguồn tỉ giá được dùng'],
+  ['/nguon wise,vcb,vpbank,dbs', 'nguồn tỉ giá được dùng'],
   ['/phongcach <mô tả>', 'ghi thêm phong cách (gõ /phongcach xoa để xóa)'],
   ['/nhactimesheet on | off', 'thỉnh thoảng nhắc điền timesheet ngày thứ Sáu'],
 ];
@@ -50,7 +50,7 @@ export const COMMAND_ERRORS = {
   frequency: 'Mức tần suất là số từ 1 tới 5. Ví dụ: /tansuat 3',
   profanity: 'Mức nói tục là số từ 0 tới 3. Ví dụ: /noituc 1',
   quiet: 'Gõ giờ bắt đầu - giờ kết thúc (giờ chẵn, 0–23). Ví dụ: /gionghi 20-6',
-  sources: 'Gõ các nguồn wise, vcb, vpbank cách nhau dấu phẩy. Ví dụ: /nguon wise,vcb',
+  sources: 'Gõ các nguồn wise, vcb, vpbank, dbs cách nhau dấu phẩy. Ví dụ: /nguon wise,vcb,dbs',
   style: 'Phong cách tối đa 200 ký tự. Ví dụ: /phongcach hay ví von kiểu miền Tây',
   same: 'Cài đặt này đang đúng như vậy rồi, không cần đổi.',
 } as const;

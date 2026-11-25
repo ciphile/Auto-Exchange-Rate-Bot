@@ -46,7 +46,7 @@ export const COMMAND_GUIDE: readonly CommandGuide[] = [
   { cmd: 'canhbaocathang', syntax: '/canhbaocathang on | off', scope: 'owner', bots: RAY, what: 'cảnh báo cả tháng hay chỉ 14 ngày cuối', when: 'muốn theo dõi giá cả tháng', result: 'thẻ ✅' },
   { cmd: 'noituc', syntax: '/noituc 0..3', scope: 'owner', bots: BOTH, what: 'mức nói tục (chỉ khi bật tính cách)', when: 'muốn bot "đời" hơn hoặc sạch hơn', result: 'thẻ ✅ · 0 cấm … 3 thoáng; từ cấm tuyệt đối không bao giờ' },
   { cmd: 'gionghi', syntax: '/gionghi 20-6', scope: 'owner', bots: BOTH, what: 'giờ bot không tự nhắn (giờ VN)', when: 'đổi giờ yên lặng', result: 'thẻ ✅ · trong giờ nghỉ bot không tự báo, cảnh báo chờ tới sáng' },
-  { cmd: 'nguon', syntax: '/nguon wise,vcb,vpbank', scope: 'owner', bots: RAY, what: 'chọn nguồn tỉ giá được dùng', when: 'một nguồn hay lỗi, muốn tắt bớt', result: 'thẻ ✅ (Wise luôn được lấy để so mốc)' },
+  { cmd: 'nguon', syntax: '/nguon wise,vcb,vpbank,dbs', scope: 'owner', bots: RAY, what: 'chọn nguồn tỉ giá được dùng', when: 'một nguồn hay lỗi, muốn tắt bớt', result: 'thẻ ✅ (Wise luôn được lấy để so mốc)' },
   { cmd: 'phongcach', syntax: '/phongcach <mô tả> · /phongcach xoa', scope: 'owner', bots: BOTH, what: 'dặn thêm phong cách nói', when: 'muốn bot hay ví von, nói ngắn hơn…', result: 'thẻ ✅ · tối đa 200 ký tự' },
   { cmd: 'nhactimesheet', syntax: '/nhactimesheet on | off', scope: 'owner', bots: RAY, what: 'bật / tắt nhắc điền timesheet thứ Sáu', when: 'không muốn bot nhắc nữa (hoặc muốn nhắc lại)', result: 'thẻ ✅' },
 ];

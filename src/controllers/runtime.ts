@@ -2,7 +2,7 @@
 // Chỉ ghép, không quy tắc nghiệp vụ. Mọi đối tượng dùng `fetch` chuẩn của Node.
 import type { AppEnv } from '../config/env.ts';
 import { callGeminiModel, listGeminiModels } from '../adapters/gemini.adapter.ts';
-import { fetchFallbackMid, fetchVcb, fetchVpbank, fetchWiseLive } from '../adapters/rate-sources.adapter.ts';
+import { fetchDbs, fetchFallbackMid, fetchVcb, fetchVpbank, fetchWiseLive } from '../adapters/rate-sources.adapter.ts';
 import { createDb } from '../adapters/supabase.adapter.ts';
 import { createTelegramClient } from '../adapters/telegram.adapter.ts';
 import type { BotKey } from '../domain/telegram.ts';
@@ -37,6 +37,6 @@ export function createRuntime(bot: BotKey, env: AppEnv, requestId: string, modul
   return {
     bot, env, store, key, now, random: Math.random, ai, log, requestId, ownerId: Number(env.OWNER_TELEGRAM_ID),
     tg: createTelegramClient(token),
-    fetchers: { wise: fetchWiseLive, fallback: fetchFallbackMid, vcb: fetchVcb, vpbank: fetchVpbank },
+    fetchers: { wise: fetchWiseLive, fallback: fetchFallbackMid, vcb: fetchVcb, vpbank: fetchVpbank, dbs: fetchDbs },
   };
 }

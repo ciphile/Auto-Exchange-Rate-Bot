@@ -2,8 +2,9 @@
 // AI chỉ chọn action `lay_ty_gia_ngay` + tham số `nguon`; code kiểm tham số và quyết định đọc nguồn nào.
 import { LIVE_FETCH_COOLDOWN_MS, LIVE_SOURCE_FOR_ANY, SOURCE_QUESTION_TTL_MS } from '../config/defaults.ts';
 
-export type LiveSource = 'wise' | 'vcb' | 'vpbank';
-export const LIVE_SOURCES: readonly LiveSource[] = ['wise', 'vcb', 'vpbank'];
+export type LiveSource = 'wise' | 'vcb' | 'vpbank' | 'dbs';
+// DBS thêm 25/11/2026 (Khang): nguồn THAM KHẢO để so biến động (giá ngân hàng, đổi theo bậc ~2%).
+export const LIVE_SOURCES: readonly LiveSource[] = ['wise', 'vcb', 'vpbank', 'dbs'];
 
 /** Người dùng muốn nguồn nào: nêu tên cụ thể · "tất cả" · "tùy mày / nguồn nào cũng được". */
 export type SourceChoice =
@@ -37,6 +38,7 @@ const SOURCE_PATTERNS: Record<LiveSource, RegExp> = {
   wise: word('wise|wai'),
   vcb: word('vcb|vietcombank|vietcom|việt\\s?com(?:\\s?bank)?|viet\\s?com(?:\\s?bank)?'),
   vpbank: word('vp\\s?bank|vpb|vp'),
+  dbs: word('dbs|đê bê ét|de be et'),
 };
 const ALL_PATTERN = word('tất cả|tat ca|cả 3|cả ba|ca 3|ca ba|3 nguồn|ba nguồn|3 nguon|ba nguon|mọi nguồn|moi nguon|lấy hết|lay het|hết luôn|het luon|hết đi|het di|all');
 // "tuy" không dấu dễ là "tuy nhiên" → chỉ nhận "tuy may / tuy m" (Bẫy 16).
