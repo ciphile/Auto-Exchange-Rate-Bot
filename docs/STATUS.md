@@ -16,6 +16,28 @@
 | 6 | KC-01 (Supabase Cron MỖI PHÚT trên gói Free — nhịp lịch 1 phút cho việc chờ 2 phút) · KC-06 (Vercel chạy `import './x.ts'`) · KC-08 (Vercel vào được MOM) | ⏳ sau việc 2 |
 | 7 | Nhỏ: tách hàm `answer` trong `webhook.service.ts` (~70 dòng > 50) · lệnh xem tình trạng AI chi tiết / xóa cache (tài liệu Khang mục 13) · `/thanhvien` gắn mã Telegram | ⏳ Kat |
 
+## PENDING — ghi 25/11/2026 khi Khang hết usage tuần (khoan làm, tuần sau tiếp tục)
+Thứ tự ưu tiên từ trên xuống. Chưa việc nào làm dở trên máy (cây làm việc sạch).
+
+**Trước khi Khang cài lịch gọi bot (phần 7):**
+- ⭐⭐ Lịch dọn nhật ký `cron.job_run_details` mỗi đêm (xóa dòng cũ hơn 1 ngày) — thêm vào hướng dẫn phần 7. Chưa làm.
+- Khang mợt PR #7 rồi. Nhánh còn 2 commit chưa vào `main` (ghi pending + merge lại `main`) → cần **PR #8 nhỏ** nếu Khang muốn dòng pending nằm trên `main`. Chờ Khang bảo.
+
+**Việc của Kat (làm được khi Khang bảo):**
+- Ép tên nguồn trong câu AI của Rây (AI quên chữ "theo Wise" thì code tự thêm). Chờ Khang quyết.
+- Tải lịch lễ MOM tự động trong nhịp lịch; lịch 2027 phải có trước 15/12 (tạm: `/ngayle them`). KC-08 chưa kiểm.
+- Lệnh `/thanhvien` gắn mã Telegram từng người (BR-40); hiện hồ sơ nạp bằng SQL.
+- Lệnh xem tình trạng AI chi tiết / xóa cache / gọi thử (tài liệu Khang mục 13).
+- Tách hàm `answer` trong `webhook.service.ts` (~70 dòng, quá 50 theo chuẩn).
+- `/chotden`: chưa tự nhắc Khang qua tin riêng khi giá thủ công cũ > 24 giờ (hiện chỉ nhắc khi gõ `/chotden` hoặc `/trangthai`). Chờ Khang chọn.
+
+**Chờ Khang / bên ngoài:**
+- Deploy thật lên Vercel + kiểm sau deploy (robots.txt, `/docs` 404, `/api/ray` 405, `/api/tick` 401, `/trangthai`). Chưa biết KC-06 (Vercel chạy `import './x.ts'`).
+- KC-01: pg_cron gọi mỗi phút trên gói Free — chưa thử thật.
+- Cài Rây theo hướng dẫn phần 1–8 + chạy `thanh-vien.sql` + `/chodencontact them …`.
+- Lũi: tính cách, tâm trạng riêng, giọng văn, lĩnh vực tin, token. Chưa bắt đầu.
+- Khang chốt cách nói giờ "rưỡi / lẻ" (Kat chọn tạm: "mười giờ rưỡi sáng", "hai giờ chiều lẻ năm phút").
+
 ## Câu hỏi chờ Khang
 - Không có.
 
