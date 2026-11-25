@@ -55,3 +55,27 @@ test('/help trong nhóm: ai gõ cũng được, có câu mẫu, KHÔNG lộ lệ
   assert.equal(fake.sent.at(-1)?.text, renderOwnerGuide('ray'));
   assert.match(renderOwnerGuide('ray'), /\/noi <nội dung>[\s\S]*Kết quả/);
 });
+
+test('Menu lệnh Telegram: chat riêng Khang có lệnh của Khang; nhóm chỉ lệnh chung; tên lệnh hợp lệ; chỉ cài lại khi danh sách đổi', async () => {
+  const { buildCommandMenus } = await import('../src/services/help.service.ts');
+  const { runTick } = await import('../src/services/tick.service.ts');
+  for (const bot of ['ray', 'lui'] as const) {
+    const m = buildCommandMenus(bot);
+    for (const c of [...m.owner, ...m.group]) {
+      assert.match(c.command, /^[a-z0-9_]{1,32}$/);
+      assert.ok(c.description.length >= 3 && c.description.length <= 256);
+    }
+    assert.ok(!m.group.some((c) => ['noi', 'caidat', 'thuhoi', 'tinhcach'].includes(c.command)), 'nhóm không thấy lệnh của Khang');
+  }
+  const ray = buildCommandMenus('ray');
+  assert.equal(ray.owner[0]?.command, 'caclenh');
+  assert.ok(ray.owner.some((c) => c.command === 'noi') && ray.owner.some((c) => c.command === 'help'));
+  assert.ok(!buildCommandMenus('lui').group.some((c) => c.command === 'tygia'), 'BR-45');
+  let t = new Date('2026-11-25T03:00:00Z');
+  const { rt, fake } = createTestRuntime({ now: () => t });
+  await runTick(rt, null);
+  assert.deepEqual(fake.menus.map((x) => x.scope), ['chat', 'all_group_chats']);
+  t = new Date('2026-11-25T03:20:00Z');
+  await runTick(rt, null);
+  assert.equal(fake.menus.length, 2, 'không đổi thì không gọi Telegram lại');
+});

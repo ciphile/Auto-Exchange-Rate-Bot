@@ -22,6 +22,7 @@ import { CHEER_TEXT } from '../shared/cheer.vi.ts';
 import { buildWorkCheer, formatHolidayLineVi } from './cheer.service.ts';
 import { estimateBlackMarketVnd } from './rate.service.ts';
 import { getChimeFactor } from './style.service.ts';
+import { buildCommandMenus } from './help.service.ts';
 
 const TOPIC_RE = /(giá|tỉ giá|tỷ giá|sgd|đô|vàng|coin|bitcoin|lương|thuế|kinh tế|lãi suất)/iu;
 const SENT_KEYS_MAX = 60;
@@ -40,6 +41,7 @@ export async function runTick(rt: Runtime, webhookUrl: string | null): Promise<{
     minuteOfDay: p.hour * 60 + p.minute, cal: await loadHolidayCalendar(rt.store, today) };
   const steps: Step[] = [
     { name: 'webhook', run: () => ensureWebhook(rt, webhookUrl, today) },
+    { name: 'menu', run: () => ensureCommandMenu(rt) },
     { name: 'rates', run: () => fetchScheduledRates(ctx) },
     { name: 'alert', run: () => runAlert(ctx) },
     { name: 'report', run: () => runScheduledReport(ctx) },
@@ -64,6 +66,16 @@ async function ensureWebhook(rt: Runtime, url: string | null, today: string): Pr
   const info = unwrap(await rt.tg.getWebhookInfo());
   if (info.url !== url) unwrap(await rt.tg.setWebhook(url, rt.bot === 'ray' ? rt.env.RAY_WEBHOOK_SECRET : rt.env.LUI_WEBHOOK_SECRET ?? ''));
   await rt.store.setState(rt.bot, 'webhook_checked', today);
+}
+
+/** Menu lệnh Telegram: chỉ gọi Telegram khi danh sách lệnh đổi (so chữ ký đã lưu) — deploy lệnh mới thì tự cập nhật. */
+async function ensureCommandMenu(rt: Runtime): Promise<void> {
+  const menus = buildCommandMenus(rt.bot);
+  const signature = JSON.stringify({ menus, owner: rt.ownerId });
+  if ((await rt.store.getState<string>(rt.bot, 'menu_signature')) === signature) return;
+  unwrap(await rt.tg.setMyCommands(menus.owner, { type: 'chat', chat_id: rt.ownerId }));
+  unwrap(await rt.tg.setMyCommands(menus.group, { type: 'all_group_chats' }));
+  await rt.store.setState(rt.bot, 'menu_signature', signature);
 }
 
 /** BR-04: tới mốc giờ lấy giá mà chưa có giá của mốc đó → lấy mọi nguồn đang bật. */

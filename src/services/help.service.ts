@@ -38,3 +38,23 @@ export function renderOwnerGuide(bot: BotKey): string {
     'Chat riêng chữ thường (không có "/") → bot trả lời như nói chuyện bình thường.',
   ].join('\n');
 }
+
+export type MenuCommand = { command: string; description: string };
+export const MENU_DESCRIPTION_MAX = 256; // giới hạn của Telegram
+
+const toMenu = (list: readonly CommandGuide[]): MenuCommand[] => {
+  const seen = new Set<string>();
+  return list.filter((g) => !seen.has(g.cmd) && seen.add(g.cmd))
+    .map((g) => ({ command: g.cmd, description: g.what.slice(0, MENU_DESCRIPTION_MAX) }));
+};
+
+/**
+ * Menu lệnh Telegram (Khang 25/11/2026): chat riêng của Khang → lệnh của Khang (+ /help); mọi nhóm → chỉ lệnh chung.
+ * Lấy từ COMMAND_GUIDE nên luôn khớp /caclenh, /help và docs/danh-sach-lenh.md.
+ */
+export function buildCommandMenus(bot: BotKey): { owner: MenuCommand[]; group: MenuCommand[] } {
+  const priority = ['caclenh', 'trangthai', 'tygia', 'noi', 'thuhoi', 'tomtat', 'caidat'];
+  const owner = forBot(bot, 'owner').filter((g) => g.cmd !== 'gannhom') // /gannhom gõ trong nhóm, không để menu chat riêng
+    .sort((a, b) => (priority.indexOf(a.cmd) + 1 || 99) - (priority.indexOf(b.cmd) + 1 || 99));
+  return { owner: toMenu([...owner, ...forBot(bot, 'group').filter((g) => g.cmd === 'help')]), group: toMenu(forBot(bot, 'group')) };
+}

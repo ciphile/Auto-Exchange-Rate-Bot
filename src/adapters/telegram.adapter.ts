@@ -156,6 +156,9 @@ export function createTelegramClient(token: string, fetchImpl: typeof fetch = fe
     /** ATR-1: đăng ký webhook kèm secret_token; chỉ nhận đúng 3 loại update bot cần. */
     setWebhook: (url: string, secretToken: string) =>
       call<boolean>('setWebhook', { url, secret_token: secretToken, allowed_updates: ['message', 'callback_query', 'my_chat_member'], max_connections: 10 }),
+    /** Menu lệnh (nút "Menu" / gõ "/"): scope = chat riêng 1 người hoặc mọi nhóm. */
+    setMyCommands: (commands: { command: string; description: string }[], scope: { type: 'chat'; chat_id: number } | { type: 'all_group_chats' }) =>
+      call<boolean>('setMyCommands', { commands, scope }),
     getMe: () => call<{ id: number; username?: string }>('getMe', {}),
     getWebhookInfo: () => call<{ url?: string; last_error_message?: string; pending_update_count?: number }>('getWebhookInfo', {}),
   };

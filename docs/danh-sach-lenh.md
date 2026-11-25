@@ -9,6 +9,12 @@
 | `/caclenh` | chỉ Khang | chat riêng với bot | hướng dẫn **đầy đủ** mọi lệnh (lệnh của Khang + lệnh của nhóm) |
 | `/help` | mọi người | trong nhóm | chỉ lệnh **ai cũng dùng được** + cách gọi bot + **câu mẫu nói tự nhiên** (không lộ lệnh của Khang) |
 
+## 1b. Menu lệnh Telegram (nút "Menu" / gõ "/")
+- **Chat riêng của Khang:** menu có mọi lệnh của Khang + `/help` (trừ `/gannhom` — lệnh này gõ trong nhóm).
+- **Trong nhóm:** menu chỉ có lệnh chung (`/help`, `/tygia`, `/ngayle`).
+- Người khác chat riêng với bot: không có menu (bot im lặng với người lạ).
+- Bot **tự cài menu** ở nhịp lịch 10 phút; danh sách lệnh đổi (deploy bản mới) thì tự cập nhật. Menu lấy từ `src/shared/command-guide.vi.ts`.
+
 ## 2. Lệnh cho mọi người trong nhóm (gõ trong nhóm)
 | Lệnh (cách gõ) | Bot | Làm gì | Tình huống dùng | Kết quả mong đợi |
 |---|---|---|---|---|

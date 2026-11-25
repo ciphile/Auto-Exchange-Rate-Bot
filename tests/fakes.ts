@@ -65,6 +65,7 @@ export function createFakeTelegram() {
   const sent: SentMessage[] = [];
   const edited: string[] = [];
   let webhookUrl = '';
+  const menus: { scope: string; commands: string[] }[] = [];
   let msgId = 100;
   const tg = {
     sendMessage: async (chatId: number, text: string, opts: { replyTo?: number; buttons?: { text: string; data: string }[][] } = {}) => {
@@ -75,9 +76,10 @@ export function createFakeTelegram() {
     answerCallback: async () => ok(true),
     setWebhook: async (url: string) => { webhookUrl = url; return ok(true); },
     getWebhookInfo: async () => ok({ url: webhookUrl }),
+    setMyCommands: async (commands: { command: string }[], scope: { type: string }) => { menus.push({ scope: scope.type, commands: commands.map((c) => c.command) }); return ok(true); },
     getMe: async () => ok({ id: 111, username: 'ray_test_bot' }),
   };
-  return { tg, sent, edited, getWebhookUrl: () => webhookUrl };
+  return { tg, sent, edited, menus, getWebhookUrl: () => webhookUrl };
 }
 
 export const OWNER_ID = 999;
