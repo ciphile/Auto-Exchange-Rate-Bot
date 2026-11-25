@@ -1,6 +1,7 @@
 // Tính toán tỉ giá thuần (BR-12, action quy_doi). Tỉ giá là "VND / 1 SGD" (số thực, không phải tiền);
 // SỐ TIỀN luôn là số nguyên đơn vị nhỏ nhất (CODING_STANDARDS 6.3).
 import { BLACK_MARKET_PREMIUM, BLACK_MARKET_ROUND_VND, DEFAULT_BLACK_MARKET_PREMIUM_PCT } from '../config/defaults.ts';
+import { speakClock, speakDay } from '../shared/spoken-time.ts';
 import { getVnParts } from '../shared/vn-time.ts';
 
 /**
@@ -27,18 +28,17 @@ export type BlackMarketQuote = {
   todayLine: string;
 };
 
-const pad2 = (n: number) => String(n).padStart(2, '0');
 const vndText = (n: number) => n.toLocaleString('vi-VN');
 
 /**
  * BR-53: giá chợ đen dùng khắp bot. THỦ CÔNG bật + có giá → đúng số Khang nhập (không làm tròn lại);
  * ngược lại TỰ TÍNH = Wise × (1 + mức chênh), tròn 50 đ (BR-12).
  */
-export function resolveBlackMarket(wiseMidVnd: number, cfg: BlackMarketConfig = DEFAULT_BLACK_MARKET_CONFIG): BlackMarketQuote {
+export function resolveBlackMarket(wiseMidVnd: number, cfg: BlackMarketConfig = DEFAULT_BLACK_MARKET_CONFIG, now?: Date): BlackMarketQuote {
   const m = cfg.manual;
   if (m.on && m.vnd !== null) {
     const p = m.at !== null ? getVnParts(new Date(m.at)) : null;
-    const when = p ? ` lúc ${pad2(p.hour)}:${pad2(p.minute)} ngày ${pad2(p.day)}/${pad2(p.month)}/${p.year}` : '';
+    const when = p && m.at !== null ? ` lúc ${speakClock(p.hour, p.minute)} ${speakDay(new Date(m.at), now)}` : '';
     return { vnd: m.vnd, manual: true, label: `giá thật Khang nhập tay${when}`, phrase: `chợ đen khoảng ${vndText(m.vnd)} đ`, todayLine: `Giá chợ đen bữa nay: ${vndText(m.vnd)} đ / 1 SGD` };
   }
   const vnd = estimateBlackMarketVnd(wiseMidVnd, cfg.premiumPct / 100);
@@ -67,8 +67,8 @@ const SOURCE_LABELS: Record<RateSource, string> = {
 };
 
 /** BR-29: mọi câu về giá phải kèm nguồn + thời điểm lấy (giờ VN). Code tạo chuỗi này, AI chỉ chép lại. */
-export function describeRateSource(source: RateSource, fetchedAt: Date): string {
+export function describeRateSource(source: RateSource, fetchedAt: Date, now: Date): string {
   const p = getVnParts(fetchedAt);
-  const hhmm = `${String(p.hour).padStart(2, '0')}:${String(p.minute).padStart(2, '0')}`;
-  return `theo ${SOURCE_LABELS[source]}, lấy lúc ${hhmm} ngày ${String(p.day).padStart(2, '0')}/${String(p.month).padStart(2, '0')}/${p.year}`;
+  // Khang 25/11/2026: nói giờ + ngày kiểu người ("lấy lúc mười giờ sáng hôm nay"), không "10:00 ngày 25/11/2026".
+  return `theo ${SOURCE_LABELS[source]}, lấy lúc ${speakClock(p.hour, p.minute)} ${speakDay(fetchedAt, now)}`;
 }

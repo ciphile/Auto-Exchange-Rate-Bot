@@ -44,7 +44,8 @@ test('BR-53 công thức TỰ TÍNH không đổi: Wise × 1,0048 tròn 50 đ; T
   assert.equal(m.vnd, 20100);
   assert.equal(m.manual, true);
   assert.equal(m.phrase, 'chợ đen khoảng 20.100 đ');
-  assert.match(m.label, /giá thật Khang nhập tay lúc 09:00 ngày 25\/11\/2026/);
+  assert.match(m.label, /giá thật Khang nhập tay lúc chín giờ sáng ngày 25 tháng 11/);
+  assert.match(resolveBlackMarket(20007.4, blackMarketConfigOf(MANUAL), new Date(NOW)).label, /lúc chín giờ sáng hôm nay/);
   const odd = resolveBlackMarket(20007.4, { manual: { on: true, vnd: 20123, at: NOW }, premiumPct: 0.48 });
   assert.equal(odd.vnd, 20123, 'không làm tròn số Khang nhập');
   assert.equal(resolveBlackMarket(20000, { manual: { on: false, vnd: 20500, at: NOW }, premiumPct: 0.48 }).vnd, 20100, 'tắt thủ công → tự tính dù còn giá cũ');
@@ -53,7 +54,7 @@ test('BR-53 công thức TỰ TÍNH không đổi: Wise × 1,0048 tròn 50 đ; T
 test('BR-53 nhập giá thật: bật THỦ CÔNG + ghi giờ; thẻ cũ → mới; Wise lệch quá xa → từ chối (gõ nhầm)', () => {
   const p = asProposal(plan('/chotden 20100'));
   assert.deepEqual(p.change.patch.blackMarketManual, { on: true, vnd: 20100, at: NOW });
-  assert.match(p.confirmText, /Giá chợ đen \(công tắc tự tính \/ thủ công\):\nTỰ TÍNH theo công thức \(Wise \+0,48%, tròn 50 đ\)\n→ THỦ CÔNG: 20\.100 đ \(Khang nhập lúc 10:00 ngày 25\/11\/2026\)/);
+  assert.match(p.confirmText, /Giá chợ đen \(công tắc tự tính \/ thủ công\):\nTỰ TÍNH theo công thức \(Wise \+0,48%, tròn 50 đ\)\n→ THỦ CÔNG: 20\.100 đ \(Khang nhập lúc mười giờ sáng ngày 25 tháng 11\)/);
   assert.match(p.confirmText, /ĐÚNG 20\.100 đ/);
   assert.match(asReply(plan('/chotden 29000')), /lệch \+44,95% so với Wise/);
   assert.equal(asProposal(plan('/chotden 29000', DEF, null)).change.patch.blackMarketManual?.vnd, 29000, 'chưa có Wise → không kiểm lệch, vẫn nhận');
@@ -79,7 +80,7 @@ test('BR-53 mức chênh của công thức + macdinh + xem; giá thủ công c�
   assert.equal(d.change.patch.blackMarketPremiumPct, 0.48);
   assert.equal(d.change.patch.blackMarketManual?.on, false);
   assert.match(asReply(plan('/chotden')), /Đang TỰ TÍNH: \(Wise \+0,48%, tròn 50 đ\)\. Công thức tự tính với Wise 20\.007 cho ra ≈ 20\.100/);
-  assert.match(asReply(plan('/chotden', MANUAL)), /Đang THỦ CÔNG: 20\.100 đ \(Khang nhập lúc 09:00 ngày 25\/11\/2026\)/);
+  assert.match(asReply(plan('/chotden', MANUAL)), /Đang THỦ CÔNG: 20\.100 đ \(Khang nhập lúc chín giờ sáng ngày 25 tháng 11\)/);
   assert.equal(manualStaleWarning(MANUAL, NOW), null);
   const stale = { ...MANUAL, blackMarketManual: { on: true, vnd: 20100, at: NOW - 30 * 3600_000 } };
   assert.match(manualStaleWarning(stale, NOW) ?? '', /nhập từ 24\/11 \(30 giờ trước\)/);
@@ -119,7 +120,7 @@ test('BR-53 từ lệnh tới kết quả: Khang gõ /chotden 20100 → ✅ → 
   assert.deepEqual(s.blackMarketManual, { on: true, vnd: 20100, at: NOW });
 
   const facts = buildSituationFacts({ now, daysUntilPayday: 5, rate: { wiseVnd: 19950, fetchedAt: NOW, sourceLabel: 'theo Wise', change24hPct: null, change7dPct: null, low7dVnd: null, high7dVnd: null }, recentBotPosts: [], news: [], blackMarket: blackMarketConfigOf(s) }).join('\n');
-  assert.match(facts, /; chợ đen 20\.100 VND \(giá thật Khang nhập tay lúc 10:00 ngày 25\/11\/2026\)\./);
+  assert.match(facts, /; chợ đen 20\.100 VND \(giá thật Khang nhập tay lúc mười giờ sáng hôm nay\)\./);
   const table = await loadRateTable(rt.store, now, blackMarketConfigOf(s));
   assert.equal(table.cho_den?.rate, 20100);
   assert.match(renderConversion({ kind: 'sgd', sgdCents: 100_000 }, ['cho_den'], table, true), /20\.100\.000 đ/);

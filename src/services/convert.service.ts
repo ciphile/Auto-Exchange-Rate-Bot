@@ -67,20 +67,20 @@ export async function loadRateTable(store: Store, now: Date, blackMarket: BlackM
   const fresh = (iso: string) => now.getTime() - Date.parse(iso) <= DAY_MS;
   const mid = await getLatestMid(store);
   if (mid && fresh(mid.row.fetched_at)) {
-    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
+    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at), now);
     table.wise = { rate: mid.row.rate_vnd, label: src };
-    const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarket);
+    const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarket, now);
     table.cho_den = { rate: bm.vnd, label: bm.manual ? bm.label : `chợ đen ước tính ${src}` }; // có giờ lấy giá (BR-54)
   } else if (blackMarket.manual.on && blackMarket.manual.vnd !== null) {
     // Thủ công: giá chợ đen do Khang nhập không cần Wise.
-    table.cho_den = { rate: blackMarket.manual.vnd, label: resolveBlackMarket(0, blackMarket).label };
+    table.cho_den = { rate: blackMarket.manual.vnd, label: resolveBlackMarket(0, blackMarket, now).label };
   }
   for (const s of ['dbs', 'vcb', 'vpbank'] as const) {
     const r = await store.getLatestRate(s);
     if (!r || !fresh(r.fetched_at)) continue;
     const q = r.extra as (BankQuote & { exactRate?: number }) | null;
     const rate = s === 'dbs' ? r.rate_vnd : q?.transferBuyVnd ?? null;
-    if (rate) table[s] = { rate: Math.round(rate), label: describeRateSource(s as RateSource, new Date(r.fetched_at)) };
+    if (rate) table[s] = { rate: Math.round(rate), label: describeRateSource(s as RateSource, new Date(r.fetched_at), now) };
   }
   return table;
 }

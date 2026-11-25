@@ -120,9 +120,10 @@ for (const q of RATE_Q) {
         assert.match(o.prompt, new RegExp(`chợ đen ước tính ${fmt(BLACK).replace('.', '\\.')}`), 'BR-47 chợ đen');
         assert.equal(/GIỌNG ĐỘNG VIÊN/.test(o.prompt), cheer, 'BR-46 động viên đúng ngày');
         // BR-54: AI quên giờ + ngày → code tự thêm (giá lấy cách đây 4 giờ).
-        const st = makeRateStamp(now.getTime() - 4 * 3600_000);
-        if (ai === 'correct') assert.equal(text, `Dạ giá Wise 19.950 đ nha (lúc ${st.time} ngày ${st.date})`);
-        else assert.match(text, /19\.950 đ \(theo Wise, lấy lúc \d\d:\d\d ngày \d\d\/\d\d\/2026\)/, 'câu soạn sẵn đúng giá + nguồn + giờ');
+        const st = makeRateStamp(now.getTime() - 4 * 3600_000, now);
+        if (ai === 'correct') assert.equal(text, `Dạ giá Wise 19.950 đ nha (lúc ${st.time} ${st.day})`);
+        else assert.equal(text.includes(`19.950 đ (theo Wise, lấy lúc ${st.time} ${st.day})`), true, `câu soạn sẵn đúng giá + nguồn + giờ + ngày kiểu người: ${text}`);
+        assert.ok(!/\d{1,2}:\d{2}/.test(text) && !/\d{1,2}\/\d{1,2}\/\d{4}/.test(text), 'không ghi giờ / ngày kiểu máy');
       });
     }
   }
@@ -145,8 +146,8 @@ for (const q of STATE_Q) {
           assert.match(o.prompt, /nguồn dự phòng/);
           assert.match(text, /19\.950 đ \(theo nguồn dự phòng/);
         } else {
-          assert.match(o.prompt, /lấy lúc \d\d:\d\d ngày 22\/11\/2026/, 'giá cũ ghi rõ ngày');
-          assert.match(text, /ngày 22\/11\/2026/);
+          assert.match(o.prompt, /lấy lúc [\p{L} ]+ ngày 22\)/u, 'giá cũ ghi rõ ngày');
+          assert.match(text, /lấy lúc [\p{L} ]+ ngày 22\)/u);
         }
       });
     }

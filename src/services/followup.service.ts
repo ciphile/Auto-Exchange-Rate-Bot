@@ -38,11 +38,11 @@ async function answerSourceQuestionByDefault(rt: Runtime, settings: BotSettings,
     const mid = await getLatestMid(rt.store);
     if (mid) {
       const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings));
-      line = BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), bm.phrase);
+      line = BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at), rt.now()), bm.phrase);
     }
   } else {
     const row = await rt.store.getLatestRate(source);
-    if (row) line = BOT_TEXT.rateLine(row.rate_vnd, describeRateSource(source, new Date(row.fetched_at)));
+    if (row) line = BOT_TEXT.rateLine(row.rate_vnd, describeRateSource(source, new Date(row.fetched_at), rt.now()));
   }
   const lead = noSourceLead(settings, `tự lấy ${SOURCE_NAMES[source]}`);
   const text = line ? `${lead} ${line}` : `${lead} Mà em chưa lấy được giá nào, lát hỏi lại em nha.`;

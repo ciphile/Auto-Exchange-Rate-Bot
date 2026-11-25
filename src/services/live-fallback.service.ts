@@ -9,9 +9,9 @@ import { blackMarketConfigOf, type BotSettings } from './settings.service.ts';
 type Mid = { row: { rate_vnd: number; fetched_at: string }; source: RateSource };
 
 /** Dòng "Giá chợ đen … bữa nay" kèm nguồn + giờ + ngày (tự tính: giờ lấy giá Wise · thủ công: giờ Khang nhập). */
-export function exchangeBlackLine(mid: Mid, settings: BotSettings): string {
-  const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings));
-  return `${bm.todayLine} (${bm.manual ? bm.label : describeRateSource(mid.source, new Date(mid.row.fetched_at))})`;
+export function exchangeBlackLine(mid: Mid, settings: BotSettings, now: Date): string {
+  const bm = resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings), now);
+  return `${bm.todayLine} (${bm.manual ? bm.label : describeRateSource(mid.source, new Date(mid.row.fetched_at), now)})`;
 }
 
 /**
@@ -22,7 +22,7 @@ export async function buildLiveFallback(store: Store, settings: BotSettings, now
   const lines: string[] = [];
   if (sources.includes('wise')) {
     const mid = await getLatestMid(store);
-    if (mid) lines.push(BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).phrase));
+    if (mid) lines.push(BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at), now), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings), now).phrase));
   }
   lines.push(...(await buildBankFacts(store, now, sources.filter((s) => s !== 'wise'))));
   return lines.length > 0 ? lines.join('\n') : null;

@@ -74,7 +74,7 @@ export async function buildRateSnapshot(store: Store, now: Date): Promise<RateSn
   const oldest = week.at(-1);
   const hasWeek = week.length >= 2 && oldest !== undefined && at - Date.parse(oldest.fetched_at) >= DAY_MS;
   return {
-    wiseVnd: latest.row.rate_vnd, fetchedAt: at, sourceLabel: describeRateSource(latest.source, new Date(at)),
+    wiseVnd: latest.row.rate_vnd, fetchedAt: at, sourceLabel: describeRateSource(latest.source, new Date(at), now),
     change24hPct: pct(latest.row.rate_vnd, near(at - DAY_MS)), change7dPct: hasWeek ? pct(latest.row.rate_vnd, oldest?.rate_vnd ?? null) : null,
     low7dVnd: hasWeek ? Math.min(...values) : null, high7dVnd: hasWeek ? Math.max(...values) : null,
   };
@@ -89,13 +89,13 @@ export async function buildBankFacts(store: Store, now: Date, only?: readonly Li
     if (!r || now.getTime() - Date.parse(r.fetched_at) > DAY_MS) continue;
     const q = r.extra as BankQuote | null;
     const parts = [q?.transferBuyVnd ? `mua chuyển khoản ${q.transferBuyVnd.toLocaleString('vi-VN')}` : null, q?.sellVnd ? `bán ${q.sellVnd.toLocaleString('vi-VN')}` : null].filter(Boolean);
-    out.push(`Giá ${source === 'vcb' ? 'Vietcombank' : 'VPBank'}: ${parts.join(', ') || r.rate_vnd.toLocaleString('vi-VN')} đ / 1 SGD (${describeRateSource(source, new Date(Date.parse(r.fetched_at)))}).`);
+    out.push(`Giá ${source === 'vcb' ? 'Vietcombank' : 'VPBank'}: ${parts.join(', ') || r.rate_vnd.toLocaleString('vi-VN')} đ / 1 SGD (${describeRateSource(source, new Date(Date.parse(r.fetched_at)), now)}).`);
   }
   // DBS: nguồn tham khảo (Khang 25/11/2026) — mọi người hay xem để biết biến động; giá ngân hàng, đổi theo bậc lớn.
   const dbs = !only || only.includes('dbs') ? await store.getLatestRate('dbs') : null;
   if (dbs && now.getTime() - Date.parse(dbs.fetched_at) <= DAY_MS) {
     const eff = (dbs.extra as { effectiveAt?: number | null } | null)?.effectiveAt ?? null;
-    const when = describeRateSource('dbs', new Date(eff ?? Date.parse(dbs.fetched_at))).replace('lấy lúc', eff ? 'hiệu lực từ' : 'lấy lúc');
+    const when = describeRateSource('dbs', new Date(eff ?? Date.parse(dbs.fetched_at)), now).replace('lấy lúc', eff ? 'hiệu lực từ' : 'lấy lúc');
     out.push(`Giá DBS (ngân hàng Singapore — chỉ để so biến động, đổi theo bậc ~2%, KHÔNG phải giá mọi người nhận): 1 SGD ≈ ${dbs.rate_vnd.toLocaleString('vi-VN')} VND (${when}).`);
   }
   return out;

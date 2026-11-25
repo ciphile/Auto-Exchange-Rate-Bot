@@ -150,7 +150,7 @@ export function renderStyleTurnBlock(d: StyleDirective): string {
     moodLine,
     `- Lập trường: ${STANCE_TEXT[d.stance][d.mode]}`,
     `- Độ dài: ${d.words[0]}–${d.words[1]} chữ, tối đa ${d.maxSentences} câu.`,
-    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn + GIỜ + NGÀY lấy giá nếu nói giá (nói cụt cũng KHÔNG được bỏ giờ + ngày). Vd "Wise <giá> lúc <giờ> <ngày> :))".' : null,
+    d.terse ? '- Lần này nói CỤT kiểu nhắn tin: 1 câu ngắn, có thể chỉ vài chữ, vẫn đủ con số (ĐỦ chữ số, bỏ dấu chấm được) + tên nguồn + GIỜ + NGÀY lấy giá nếu nói giá (nói cụt cũng KHÔNG được bỏ giờ + ngày), giờ + ngày nói bằng CHỮ kiểu người (mười giờ sáng, hôm nay). Vd "Wise <giá> lúc <giờ> <ngày> :))".' : null,
     d.mode === 'on' ? `- Biểu cảm bằng ký tự (${TEXT_EMOTICONS.map((e) => `"${e}"`).join(', ')}) dùng thoải mái, không tính vào emoji; từ lóng ${SLANG_WORDS.map((w) => `"${w}"`).join(', ')} được dùng vừa phải.` : '- KHÔNG dùng từ lóng (vãi, éo, móa).',
     d.mode === 'on' && d.profanityMax > 0 ? '- Ví dụ khi được nói tục nhẹ: "vãi <giá> =)), éo gì cũng giảm".' : null,
     `- Emoji: tối đa ${d.emojiMax}.`,

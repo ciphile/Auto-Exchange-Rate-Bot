@@ -208,7 +208,7 @@ test('BR-51 đổi tiền: hỏi số tiền không nói nguồn → bot hỏi l
   await handleUpdate(rt, groupMsg('chợ đen', 9)); // người khác
   assert.equal(fake.sent.length, before);
   await handleUpdate(rt, groupMsg('chợ đen', 5));
-  assert.equal(fake.sent.at(-1)?.text, 'Dạ 5.000 SGD đổi ra nè:\n- Chợ đen: ≈ 100.500.000 đ (1 SGD = 20.100 đ, chợ đen ước tính theo Wise, lấy lúc 10:00 ngày 25/11/2026)');
+  assert.equal(fake.sent.at(-1)?.text, 'Dạ 5.000 SGD đổi ra nè:\n- Chợ đen: ≈ 100.500.000 đ (1 SGD = 20.100 đ, chợ đen ước tính theo Wise, lấy lúc mười giờ sáng hôm nay)');
   assert.equal(prompts.length, 0, 'đổi tiền không gọi AI');
 });
 

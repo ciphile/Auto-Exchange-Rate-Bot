@@ -117,7 +117,7 @@ async function runAlert(ctx: Ctx): Promise<void> {
   const r = evaluateAlert(state, mid.row.rate_vnd, now, settings.alertLevelsVnd, isAlertWindowOpen(now, settings.alertFullMonth),
     FREQUENCY_PROFILES[settings.frequencyLevel].alerts, settings.quietHours);
   if (r.action === 'send' && r.event) {
-    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
+    const src = describeRateSource(mid.source, new Date(mid.row.fetched_at), now);
     const up = r.event.direction === 'up';
     const cheer = buildWorkCheer(now, getDaysUntilPayday(now));
     const sent = await postToGroup(ctx, {
@@ -148,7 +148,7 @@ async function runScheduledReport(ctx: Ctx): Promise<void> {
   if (minute === undefined || minuteOfDay < minute || (await rt.store.getState<boolean>(rt.bot, doneKey))) return;
   const mid = await getLatestMid(rt.store);
   if (!mid) return;
-  const src = describeRateSource(mid.source, new Date(mid.row.fetched_at));
+  const src = describeRateSource(mid.source, new Date(mid.row.fetched_at), now);
   const days = getDaysUntilPayday(now);
   // BR-46: thứ Tư → thứ Sáu / gần lương → giọng động viên; BR-47: Wise trước, kèm chợ đen ước tính.
   const cheer = buildWorkCheer(now, days);

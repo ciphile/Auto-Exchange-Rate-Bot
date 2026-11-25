@@ -110,7 +110,7 @@ export async function handleUpdate(rt: Runtime, update: IncomingUpdate): Promise
       if (name === 'chodencontact' && rt.bot === 'ray') {
         const list = (await rt.store.getState<ExchangeContact[]>(rt.bot, EXCHANGE_STATE_KEY)) ?? [];
         const mid = await getLatestMid(rt.store);
-        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? exchangeBlackLine(mid, settings) : null), { replyTo: update.messageId }));
+        unwrap(await rt.tg.sendMessage(update.chatId, renderExchangeList(list, mid ? exchangeBlackLine(mid, settings, rt.now()) : null), { replyTo: update.messageId }));
         return;
       }
       if (name === 'doitien' && rt.bot === 'ray') {
@@ -172,8 +172,8 @@ async function answer(rt: Runtime, settings: BotSettings, msg: IncomingMessage, 
   const cheer = rt.bot === 'ray' && isData && !holiday ? buildWorkCheer(now, getDaysUntilPayday(now)) : null;
   const asker = members.find((m) => m.telegramUserId === msg.fromId) ?? members.find((m) => m.name === resolveSpeaker(msg.fromId, msg.fromName, members)) ?? null;
   const liveFallback = liveSources.length > 0 ? await buildLiveFallback(rt.store, settings, now, liveSources) : null;
-  const fallback = exchange ? renderExchangeList(exchange, mid ? exchangeBlackLine(mid, settings) : null) : holiday ? holiday.plain : liveFallback ? liveFallback : isData
-    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at)), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings)).phrase) : BOT_TEXT.noRate)
+  const fallback = exchange ? renderExchangeList(exchange, mid ? exchangeBlackLine(mid, settings, now) : null) : holiday ? holiday.plain : liveFallback ? liveFallback : isData
+    ? (mid ? BOT_TEXT.rateLine(mid.row.rate_vnd, describeRateSource(mid.source, new Date(mid.row.fetched_at), now), resolveBlackMarket(mid.row.rate_vnd, blackMarketConfigOf(settings), now).phrase) : BOT_TEXT.noRate)
     : BOT_TEXT.aiFallbackChat;
   const r = await speak(rt, settings, {
     purpose: isData ? 'answer_data' : 'answer_chat',
