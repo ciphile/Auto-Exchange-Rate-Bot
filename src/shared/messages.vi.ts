@@ -10,6 +10,14 @@ export const ERROR_MESSAGES: Record<ErrorCode, { message: string; fix: string }>
     message: 'Không lấy được giá từ mọi nguồn (Wise, dự phòng, VCB, VPBank); bot không nhắn gì vào group.',
     fix: 'Kiểm trạng thái Vercel và mạng; lỗi tự hết khi nguồn có lại, bot dùng bản giá gần nhất kèm ngày giờ.',
   },
+  'E-SRC-003': {
+    message: 'Không tải hoặc không đọc được lịch ngày lễ Singapore từ trang MOM; bot đang dùng lịch đã lưu / lịch có sẵn và sẽ thử lại ngày mai.',
+    fix: 'Không cần làm gì nếu lịch năm nay đã có (/ngayle để xem). Nếu thiếu, tự thêm bằng /ngayle them 2027-01-01 Tên lễ.',
+  },
+  'E-SRC-004': {
+    message: 'Đã qua 15/12 mà bot vẫn chưa có lịch ngày lễ Singapore năm sau (trang MOM chưa đăng hoặc không vào được).',
+    fix: 'Bot vẫn thử lại mỗi ngày. Muốn chắc, gõ /ngayle them <ngày YYYY-MM-DD> <tên lễ> cho từng ngày lễ năm sau.',
+  },
   'E-AI-001': {
     message: 'Gemini đã hết lượt miễn phí của hôm nay; bot đang nói bằng câu soạn sẵn.',
     fix: 'Không cần làm gì; lượt miễn phí reset khoảng 15:00 giờ VN.',

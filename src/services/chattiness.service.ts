@@ -13,6 +13,8 @@ export type ChimeInInput = {
   chimeInsToday: number;
   lastChimeInAt: number | null;
   hasTopicKeyword: boolean; // đợt có từ khóa đúng chuyên môn bot
+  /** BR-32: hệ số tính cách × tâm trạng (style.service getChimeFactor); không truyền = 1. Trần / ngày KHÔNG đổi. */
+  personaFactor?: number;
   now: Date;
 };
 export type ChimeInDecision = { speak: boolean; reason: string };
@@ -32,6 +34,6 @@ export function decideChimeIn(input: ChimeInInput, random: () => number, quiet =
   if (input.lastChimeInAt !== null && input.now.getTime() - input.lastChimeInAt < CHIME_IN_COOLDOWN_MS) {
     return { speak: false, reason: 'đang nghỉ sau lần chen trước' };
   }
-  const p = Math.min(CHATTINESS_MAX_PROBABILITY, row.probability * (input.hasTopicKeyword ? CHATTINESS_TOPIC_BOOST : 1));
+  const p = Math.min(CHATTINESS_MAX_PROBABILITY, row.probability * (input.hasTopicKeyword ? CHATTINESS_TOPIC_BOOST : 1) * (input.personaFactor ?? 1));
   return random() < p ? { speak: true, reason: `trúng xác suất ${p}` } : { speak: false, reason: `trượt xác suất ${p}` };
 }

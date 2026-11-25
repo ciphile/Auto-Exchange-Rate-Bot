@@ -1,0 +1,8 @@
+#!/bin/sh
+# Barie (CODING_STANDARDS 6.18, BUG-0001 lần 3): test / typecheck / audit đỏ → KHÔNG cho commit.
+# Bật 1 lần mỗi máy: git config core.hooksPath .githooks  (npm install tự bật qua script "prepare").
+npm run check --silent >/tmp/pre-commit-check.log 2>&1 || {
+  echo "⛔ npm run check ĐỎ — không commit. Xem /tmp/pre-commit-check.log"
+  grep -E "^not ok|error TS" /tmp/pre-commit-check.log | head -20
+  exit 1
+}

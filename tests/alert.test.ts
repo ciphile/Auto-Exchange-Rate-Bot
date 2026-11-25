@@ -1,10 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULT_ALERT_LEVELS_VND as L } from '../src/config/defaults.ts';
+import { FREQUENCY_PROFILES } from '../src/config/frequency.ts';
 import { EMPTY_ALERT_STATE, evaluateAlert, pickCrossedLevel, updateBand, type AlertState } from '../src/services/alert.service.ts';
 import { vn } from './helpers.ts';
 
-const run = (s: AlertState, rate: number, at: Date, open = true) => evaluateAlert(s, rate, at, L, open);
+// Các test BR-06…BR-09 chạy ở mức tần suất 5 (= giới hạn BR-08 gốc: 4 lần / 24 giờ, cách ≥ 3 giờ).
+const run = (s: AlertState, rate: number, at: Date, open = true) => evaluateAlert(s, rate, at, L, open, FREQUENCY_PROFILES[5].alerts);
 
 test('BR-06 lần đo đầu chỉ đặt vị trí, không báo', () => {
   const r = run(EMPTY_ALERT_STATE, 20050, vn(2026, 12, 20, 11));
